@@ -1,25 +1,33 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, Fraunces } from 'next/font/google';
 import './globals.css';
 import { LayoutWrapper } from '@/components/layout';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { GlobalChatbot } from '@/components/ai';
 
 const inter = Inter({
-  variable: '--font-geist-sans',
+  variable: '--font-inter',
   subsets: ['latin'],
+});
+
+const fraunces = Fraunces({
+  variable: '--font-fraunces',
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
 });
 
 export const metadata: Metadata = {
   title: 'Infoverse Digital-Ed | Educational Platform',
   description:
-    'Access quality educational content from Oak National Academy for Key Stages 1-4. Explore subjects, units, and lessons aligned with the UK curriculum.',
+    'Access quality educational content for Key Stages 1-4. Explore subjects, units, and lessons aligned with the UK curriculum, crafted by educators with 50+ years of experience.',
   keywords: [
     'education',
-    'Oak National Academy',
+    'Infoverse',
     'Key Stages',
     'UK curriculum',
     'learning',
     'lessons',
+    'online learning',
   ],
 };
 
@@ -31,11 +39,12 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${inter.variable} antialiased flex flex-col min-h-screen`}
+        className={`${inter.variable} ${fraunces.variable} antialiased flex flex-col min-h-screen bg-blue-50`}
         suppressHydrationWarning
       >
         <AuthProvider>
           <LayoutWrapper>{children}</LayoutWrapper>
+          <GlobalChatbot />
         </AuthProvider>
       </body>
     </html>

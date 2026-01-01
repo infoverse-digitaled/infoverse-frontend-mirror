@@ -42,8 +42,9 @@ export default function LessonPage() {
     if (lesson.description) {
       context += `Description: ${typeof lesson.description === 'string' ? lesson.description : ''}\n\n`;
     }
-    if (transcriptData) {
-      context += `Transcript: ${transcriptData.substring(0, 5000)}\n`;
+    if (transcriptData?.sentences) {
+      const transcriptText = transcriptData.sentences.map(s => s.text).join(' ');
+      context += `Transcript: ${transcriptText.substring(0, 5000)}\n`;
     }
     return context;
   };

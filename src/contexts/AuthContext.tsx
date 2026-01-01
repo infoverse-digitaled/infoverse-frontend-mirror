@@ -34,7 +34,8 @@ interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string, licenseKey?: string) => Promise<RegisterResult>;
-  logout: () => void;
+  logout: () => Promise<void>;
+  setTokenAndFetchUser: (token: string) => Promise<void>;
   loading: boolean;
   isTrialExpired: boolean;
   daysRemaining: number | null;
@@ -130,13 +131,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { skipPayment: !!skipPayment };
   };
 
-  const logout = () => {
+  const logout = async () => {
     localStorage.removeItem('token');
     setUser(null);
   };
 
+  const setTokenAndFetchUser = async (token: string) => {
+    localStorage.setItem('token', token);
+    await fetchUser();
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, loading, isTrialExpired, daysRemaining }}>
+    <AuthContext.Provider value={{ user, login, register, logout, setTokenAndFetchUser, loading, isTrialExpired, daysRemaining }}>
       {children}
     </AuthContext.Provider>
   );

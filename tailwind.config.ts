@@ -34,6 +34,7 @@ const config: Config = {
       },
       fontFamily: {
         sans: ['var(--font-inter)', 'sans-serif'],
+        serif: ['var(--font-fraunces)', 'serif'],
       },
       boxShadow: {
         'soft': '0 4px 20px -2px rgba(51, 161, 205, 0.1)', // Subtle primary-tinted shadow

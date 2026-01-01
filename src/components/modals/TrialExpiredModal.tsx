@@ -1,20 +1,36 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui';
 
 export function TrialExpiredModal() {
-  const { user, isTrialExpired, daysRemaining } = useAuth();
+  const { user, isTrialExpired, logout } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
     // Show modal if user is logged in and trial is expired
-    if (user && isTrialExpired) {
+    // But NOT on the pricing page (so they can complete payment)
+    if (user && isTrialExpired && pathname !== '/pricing') {
       setIsOpen(true);
+    } else {
+      setIsOpen(false);
     }
-  }, [user, isTrialExpired]);
+  }, [user, isTrialExpired, pathname]);
+
+  const handleViewPlans = () => {
+    setIsOpen(false);
+    router.push('/pricing');
+  };
+
+  const handleLogout = async () => {
+    setIsOpen(false);
+    await logout();
+    router.push('/');
+  };
 
   if (!isOpen) return null;
 
@@ -37,19 +53,17 @@ export function TrialExpiredModal() {
         </h2>
 
         <p className="text-gray-600 text-center mb-6">
-          Your 14-day free trial has expired. To continue accessing all features and lessons, please add your payment details to subscribe.
+          Your 14-day free trial has expired. To continue accessing all features and lessons, please subscribe to a plan.
         </p>
 
         <div className="space-y-3">
-          <Link href="/pricing" className="block">
-            <Button fullWidth size="lg" className="shadow-lg">
-              View Subscription Plans
-            </Button>
-          </Link>
+          <Button onClick={handleViewPlans} fullWidth size="lg" className="shadow-lg">
+            View Subscription Plans
+          </Button>
 
-          <p className="text-xs text-gray-400 text-center">
-            You won&apos;t be charged until you choose a plan
-          </p>
+          <Button onClick={handleLogout} variant="outline" fullWidth size="lg">
+            Logout
+          </Button>
         </div>
 
         {/* Features reminder */}
@@ -61,12 +75,6 @@ export function TrialExpiredModal() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
               Access to all subjects and lessons
-            </li>
-            <li className="flex items-center gap-2">
-              <svg className="w-4 h-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-              No advertisements
             </li>
             <li className="flex items-center gap-2">
               <svg className="w-4 h-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">

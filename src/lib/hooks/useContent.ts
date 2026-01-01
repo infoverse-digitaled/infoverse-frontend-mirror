@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import apiClient from '@/lib/api/client';
+import { apiClient } from '@/lib/api/client';
 
 interface BlogPost {
   _id: string;

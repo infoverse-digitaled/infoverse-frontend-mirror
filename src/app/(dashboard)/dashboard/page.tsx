@@ -5,6 +5,7 @@ import {
   ProfileCard,
   CourseProgressCard,
   SuggestedCourseCard,
+  ProgressTracker,
 } from '@/components/dashboard';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMyProgress } from '@/lib/hooks/useOakData';
@@ -46,7 +47,7 @@ export default function DashboardPage() {
   return (
     <div className="p-8">
       {/* Header with Profile Card */}
-      <div className="flex justify-between items-start mb-12">
+      <div className="flex justify-between items-start mb-8">
         <div>
           <h1 className="text-4xl font-bold text-black mb-2 bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent">
             Welcome back, {user?.name?.split(' ')[0] || 'Student'}!
@@ -55,6 +56,9 @@ export default function DashboardPage() {
         </div>
         <ProfileCard />
       </div>
+
+      {/* Progress Tracker */}
+      <ProgressTracker />
 
       {/* My Courses Section */}
       <section className="mb-16">
