@@ -54,17 +54,6 @@ export default function AuthLayout({
         <div className="w-full max-w-[754px]">{children}</div>
       </div>
 
-      {/* Help Button - Bottom Right */}
-      <div className="fixed bottom-8 right-8 z-10">
-        <Link href="/help">
-          <button className="flex items-center gap-2 px-4 py-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl text-text-dark hover:text-primary transition-all hover:scale-105">
-            <span className="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold">
-              ?
-            </span>
-            <span className="font-medium">Help</span>
-          </button>
-        </Link>
-      </div>
     </div>
   );
 }
