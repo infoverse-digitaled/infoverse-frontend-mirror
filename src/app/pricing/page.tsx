@@ -144,11 +144,6 @@ export default function PricingPage() {
                   Explore
                 </Button>
               </Link>
-              <Link href="#faq">
-                <Button variant="outline" size="lg" className="rounded-xl">
-                  Compare
-                </Button>
-              </Link>
             </div>
           </div>
         </Container>
