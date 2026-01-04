@@ -3,11 +3,11 @@
 import { useState } from 'react';
 import authApiClient from '@/lib/api/auth-client';
 
-interface TrialExpiredModalProps {
-  daysOverdue?: number;
+interface SubscribeModalProps {
+  onClose: () => void;
 }
 
-export function TrialExpiredModal({ daysOverdue = 0 }: TrialExpiredModalProps) {
+export function SubscribeModal({ onClose }: SubscribeModalProps) {
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -51,25 +51,32 @@ export function TrialExpiredModal({ daysOverdue = 0 }: TrialExpiredModalProps) {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 sm:p-8">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 sm:p-8 relative">
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 transition-colors"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="w-20 h-20 mx-auto mb-5 bg-orange-100 rounded-full flex items-center justify-center">
-            <svg className="w-10 h-10 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <div className="w-20 h-20 mx-auto mb-5 bg-primary/10 rounded-full flex items-center justify-center">
+            <svg className="w-10 h-10 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
           </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-3">
-            Your Free Trial Has Ended
+            Upgrade to Premium
           </h2>
           <p className="text-gray-600">
-            {daysOverdue > 0
-              ? `Your trial expired ${daysOverdue} day${daysOverdue > 1 ? 's' : ''} ago.`
-              : 'Your 14-day free trial has ended.'
-            }
+            Get unlimited access to all lessons, AI-powered learning support, and more.
           </p>
-          <p className="text-gray-900 font-medium mt-2">
-            Subscribe now to continue learning!
+          <p className="text-gray-500 text-sm mt-2">
+            No credit card required to start
           </p>
         </div>
 

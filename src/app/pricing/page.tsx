@@ -22,7 +22,7 @@ const plans: Plan[] = [
     name: 'Monthly',
     price: '₦7,500',
     description: 'Per month, billed monthly',
-    planCode: 'PLN_ycwo3qwzubzlv3v',
+    planCode: 'PLN_vnfkw3ejctr7fe4',
     features: [
       '5,000+ curriculum lessons',
       'AI-powered learning support',
@@ -34,7 +34,7 @@ const plans: Plan[] = [
     name: 'Annual',
     price: '₦65,000',
     description: 'Per year, save 28%',
-    planCode: 'PLN_o1rf7r0jl507aoq',
+    planCode: 'PLN_t56h44wx8f2vcw7',
     features: [
       '5,000+ curriculum lessons',
       'AI-powered learning support',
@@ -73,8 +73,6 @@ export default function PricingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const { user } = useAuth();
   const router = useRouter();
-
-  const [loadingPayNow, setLoadingPayNow] = useState<string | null>(null);
 
   const handleSelectPlan = async (planCode: string) => {
     if (!user) {
@@ -122,35 +120,6 @@ export default function PricingPage() {
       setError(errorMessage);
     } finally {
       setLoadingPlan(null);
-    }
-  };
-
-  const handlePayNow = async (planCode: string) => {
-    if (!user) {
-      sessionStorage.setItem('selectedPlan', planCode);
-      sessionStorage.setItem('payNow', 'true');
-      router.push('/register');
-      return;
-    }
-
-    try {
-      setLoadingPayNow(planCode);
-      setError(null);
-
-      const response = await authApiClient.post<{ authorization_url: string }>(
-        '/payment/initialize',
-        { planCode }
-      );
-
-      if (response.data.authorization_url) {
-        window.location.href = response.data.authorization_url;
-      }
-    } catch (err: unknown) {
-      console.error('Failed to initialize payment:', err);
-      const errorMessage = (err as { response?: { data?: { error?: string } } })?.response?.data?.error || 'Failed to initialize payment. Please try again.';
-      setError(errorMessage);
-    } finally {
-      setLoadingPayNow(null);
     }
   };
 
@@ -271,32 +240,6 @@ export default function PricingPage() {
                       </li>
                     ))}
                   </ul>
-
-                  {/* Pay with card button */}
-                  <div className="mt-8 pt-6 border-t border-gray-100">
-                    <button
-                      onClick={() => handlePayNow(plan.planCode)}
-                      disabled={!!loadingPayNow || !!loadingPlan}
-                      className="w-full text-center text-sm text-gray-500 hover:text-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                    >
-                      {loadingPayNow === plan.planCode ? (
-                        <>
-                          <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                          </svg>
-                          Processing...
-                        </>
-                      ) : (
-                        <>
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                          </svg>
-                          Pay with card instead
-                        </>
-                      )}
-                    </button>
-                  </div>
                 </div>
               ))}
             </div>

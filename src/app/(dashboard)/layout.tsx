@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import clsx from 'clsx';
 import { Button } from '@/components/ui';
-import { TrialExpiredModal } from '@/components/subscription';
+import { TrialExpiredModal, SubscribeModal } from '@/components/subscription';
 
 interface NavItemProps {
   href: string;
@@ -43,6 +43,7 @@ export default function DashboardLayout({
   const router = useRouter();
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showSubscribeModal, setShowSubscribeModal] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -214,12 +215,15 @@ export default function DashboardLayout({
                 : `${daysRemaining} days left in your free trial.`
               }
             </span>
-            <a href="/pricing" className={clsx(
-              "ml-2 underline font-semibold",
-              daysRemaining <= 3 ? "text-white" : "text-primary hover:text-primary-dark"
-            )}>
+            <button
+              onClick={() => setShowSubscribeModal(true)}
+              className={clsx(
+                "ml-2 underline font-semibold cursor-pointer",
+                daysRemaining <= 3 ? "text-white" : "text-primary hover:text-primary-dark"
+              )}
+            >
               Subscribe now
-            </a>
+            </button>
           </div>
         )}
 
@@ -238,6 +242,11 @@ export default function DashboardLayout({
 
       {/* Trial Expired Modal - blocks all content until payment */}
       {isTrialExpired && <TrialExpiredModal daysOverdue={getDaysOverdue()} />}
+
+      {/* Subscribe Modal - for users who want to subscribe early */}
+      {showSubscribeModal && (
+        <SubscribeModal onClose={() => setShowSubscribeModal(false)} />
+      )}
     </div>
   );
 }
