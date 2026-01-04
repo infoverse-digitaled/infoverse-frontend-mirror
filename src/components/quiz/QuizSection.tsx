@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Card,
   CardHeader,
@@ -17,6 +17,16 @@ interface QuizSectionProps {
   variant?: 'starter' | 'exit';
 }
 
+// Helper to shuffle an array (for randomizing match options)
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
 export function QuizSection({
   title,
   questions,
@@ -26,6 +36,24 @@ export function QuizSection({
     {}
   );
   const [showResults, setShowResults] = useState(false);
+
+  // Track match question state: { questionIndex: { leftIndex: rightIndex } }
+  const [matchSelections, setMatchSelections] = useState<Record<number, Record<number, number>>>({});
+  // Track which left item is currently selected for matching
+  const [activeMatchItem, setActiveMatchItem] = useState<{ qIndex: number; leftIndex: number } | null>(null);
+
+  // Memoize shuffled right-side options for match questions
+  const shuffledMatchOptions = useMemo(() => {
+    const shuffled: Record<number, number[]> = {};
+    questions.forEach((q, qIndex) => {
+      if (q.questionType === 'match') {
+        // Create array of indices and shuffle them
+        const indices = q.answers.map((_, i) => i);
+        shuffled[qIndex] = shuffleArray(indices);
+      }
+    });
+    return shuffled;
+  }, [questions]);
 
   const borderColor =
     variant === 'starter' ? 'border-primary' : 'border-secondary';
@@ -47,22 +75,92 @@ export function QuizSection({
 
   const handleReset = () => {
     setSelectedAnswers({});
+    setMatchSelections({});
+    setActiveMatchItem(null);
     setShowResults(false);
+  };
+
+  // Handle clicking a left-side match item
+  const handleMatchLeftClick = (qIndex: number, leftIndex: number) => {
+    if (showResults) return;
+    setActiveMatchItem({ qIndex, leftIndex });
+  };
+
+  // Handle clicking a right-side match item
+  const handleMatchRightClick = (qIndex: number, rightIndex: number) => {
+    if (showResults) return;
+    if (!activeMatchItem || activeMatchItem.qIndex !== qIndex) return;
+
+    // Set the match
+    setMatchSelections((prev) => ({
+      ...prev,
+      [qIndex]: {
+        ...(prev[qIndex] || {}),
+        [activeMatchItem.leftIndex]: rightIndex,
+      },
+    }));
+    setActiveMatchItem(null);
+  };
+
+  // Clear a specific match
+  const handleClearMatch = (qIndex: number, leftIndex: number) => {
+    if (showResults) return;
+    setMatchSelections((prev) => {
+      const updated = { ...prev };
+      if (updated[qIndex]) {
+        const { [leftIndex]: _, ...rest } = updated[qIndex];
+        updated[qIndex] = rest;
+      }
+      return updated;
+    });
+  };
+
+  // Check if a right option is already matched to something
+  const isRightOptionMatched = (qIndex: number, rightIndex: number): boolean => {
+    const matches = matchSelections[qIndex] || {};
+    return Object.values(matches).includes(rightIndex);
+  };
+
+  // Get match score for a question
+  const getMatchScore = (qIndex: number): { correct: number; total: number } => {
+    const question = questions[qIndex];
+    const matches = matchSelections[qIndex] || {};
+    let correct = 0;
+    const total = question.answers.length;
+
+    question.answers.forEach((_, leftIndex) => {
+      // Correct if left item is matched to the same index on the right
+      // (since the correct answer for index 0 is answer.correctChoice at index 0)
+      if (matches[leftIndex] === leftIndex) {
+        correct++;
+      }
+    });
+
+    return { correct, total };
   };
 
   const getScore = () => {
     let correct = 0;
+    let total = 0;
+
     questions.forEach((q, index) => {
-      const selectedIdx = selectedAnswers[index];
-      if (
-        selectedIdx !== undefined &&
-        q.answers[selectedIdx] &&
-        !q.answers[selectedIdx].distractor
-      ) {
-        correct++;
+      if (q.questionType === 'multiple-choice') {
+        total++;
+        const selectedIdx = selectedAnswers[index];
+        if (
+          selectedIdx !== undefined &&
+          q.answers[selectedIdx] &&
+          !q.answers[selectedIdx].distractor
+        ) {
+          correct++;
+        }
+      } else if (q.questionType === 'match') {
+        const matchScore = getMatchScore(index);
+        correct += matchScore.correct;
+        total += matchScore.total;
       }
     });
-    return correct;
+    return { correct, total };
   };
 
   if (!questions || questions.length === 0) return null;
@@ -87,7 +185,7 @@ export function QuizSection({
         </CardTitle>
         {showResults && (
           <div className={`text-lg font-semibold ${accentColor}`}>
-            Score: {getScore()}/{answerableQuestions.length}
+            Score: {getScore().correct}/{getScore().total}
           </div>
         )}
       </CardHeader>
@@ -181,28 +279,118 @@ export function QuizSection({
                 )}
 
                 {question.questionType === 'match' && (
-                  <div className="space-y-2">
+                  <div className="space-y-4">
                     <p className="text-sm text-gray-500 mb-2">
-                      Match the items:
+                      Click an item on the left, then click the matching item on the right:
                     </p>
-                    {question.answers.map((answer, aIndex) => (
-                      <div
-                        key={aIndex}
-                        className="p-3 rounded-lg border bg-gray-50 border-gray-200 flex items-center gap-4"
-                      >
-                        <span className="font-medium">
-                          <ContentRenderer
-                            content={answer.matchOption?.content || ''}
-                          />
-                        </span>
-                        <span className="text-gray-400">→</span>
-                        <span>
-                          <ContentRenderer
-                            content={answer.correctChoice?.content || ''}
-                          />
-                        </span>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Left side - items to match */}
+                      <div className="space-y-2">
+                        <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Items</p>
+                        {question.answers.map((answer, leftIndex) => {
+                          const isActive = activeMatchItem?.qIndex === qIndex && activeMatchItem?.leftIndex === leftIndex;
+                          const hasMatch = matchSelections[qIndex]?.[leftIndex] !== undefined;
+                          const matchedRightIndex = matchSelections[qIndex]?.[leftIndex];
+                          const isCorrect = showResults && matchedRightIndex === leftIndex;
+                          const isWrong = showResults && hasMatch && matchedRightIndex !== leftIndex;
+
+                          let leftClasses = 'p-3 rounded-lg border cursor-pointer transition-all';
+
+                          if (showResults) {
+                            if (isCorrect) {
+                              leftClasses += ' bg-green-50 border-green-500 text-green-800';
+                            } else if (isWrong) {
+                              leftClasses += ' bg-red-50 border-red-500 text-red-800';
+                            } else if (!hasMatch) {
+                              leftClasses += ' bg-yellow-50 border-yellow-500 text-yellow-800';
+                            } else {
+                              leftClasses += ' bg-gray-50 border-gray-200';
+                            }
+                          } else {
+                            if (isActive) {
+                              leftClasses += ' bg-primary/20 border-primary ring-2 ring-primary/50';
+                            } else if (hasMatch) {
+                              leftClasses += ' bg-blue-50 border-blue-300';
+                            } else {
+                              leftClasses += ' bg-white border-gray-200 hover:border-gray-400 hover:bg-gray-50';
+                            }
+                          }
+
+                          return (
+                            <div
+                              key={leftIndex}
+                              className={leftClasses}
+                              onClick={() => hasMatch && !showResults
+                                ? handleClearMatch(qIndex, leftIndex)
+                                : handleMatchLeftClick(qIndex, leftIndex)
+                              }
+                            >
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="font-medium">
+                                  <ContentRenderer content={answer.matchOption?.content || ''} />
+                                </span>
+                                {hasMatch && !showResults && (
+                                  <span className="text-xs text-blue-600 flex items-center gap-1">
+                                    → {question.answers[matchedRightIndex]?.correctChoice?.content}
+                                    <button
+                                      onClick={(e) => { e.stopPropagation(); handleClearMatch(qIndex, leftIndex); }}
+                                      className="ml-1 text-gray-400 hover:text-red-500"
+                                    >
+                                      ✕
+                                    </button>
+                                  </span>
+                                )}
+                                {showResults && isCorrect && <span className="text-green-600">✓</span>}
+                                {showResults && isWrong && <span className="text-red-600">✗</span>}
+                                {showResults && !hasMatch && <span className="text-yellow-600">?</span>}
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
-                    ))}
+
+                      {/* Right side - choices to match to */}
+                      <div className="space-y-2">
+                        <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Matches</p>
+                        {(shuffledMatchOptions[qIndex] || []).map((originalIndex) => {
+                          const answer = question.answers[originalIndex];
+                          const isMatched = isRightOptionMatched(qIndex, originalIndex);
+                          const isSelectable = activeMatchItem?.qIndex === qIndex && !isMatched;
+
+                          let rightClasses = 'p-3 rounded-lg border transition-all';
+
+                          if (showResults) {
+                            rightClasses += ' bg-gray-50 border-gray-200';
+                          } else if (isMatched) {
+                            rightClasses += ' bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed';
+                          } else if (isSelectable) {
+                            rightClasses += ' bg-white border-primary cursor-pointer hover:bg-primary/10 ring-1 ring-primary/30';
+                          } else {
+                            rightClasses += ' bg-white border-gray-200';
+                          }
+
+                          return (
+                            <div
+                              key={originalIndex}
+                              className={rightClasses}
+                              onClick={() => isSelectable && handleMatchRightClick(qIndex, originalIndex)}
+                            >
+                              <ContentRenderer content={answer.correctChoice?.content || ''} />
+                              {isMatched && !showResults && (
+                                <span className="text-xs text-gray-400 ml-2">(matched)</span>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {showResults && (
+                      <div className="mt-2 p-2 rounded bg-gray-50 text-sm">
+                        Match score: {getMatchScore(qIndex).correct}/{getMatchScore(qIndex).total} correct
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -227,18 +415,28 @@ export function QuizSection({
         </div>
 
         {answerableQuestions.some(
-          (q) => q.questionType === 'multiple-choice'
+          (q) => q.questionType === 'multiple-choice' || q.questionType === 'match'
         ) && (
           <div className="mt-6 flex gap-4">
             {!showResults ? (
               <Button
                 onClick={handleCheckAnswers}
-                disabled={
-                  Object.keys(selectedAnswers).length <
-                  answerableQuestions.filter(
-                    (q) => q.questionType === 'multiple-choice'
-                  ).length
-                }
+                disabled={(() => {
+                  // Check if all multiple-choice questions are answered
+                  const mcQuestions = answerableQuestions.filter(q => q.questionType === 'multiple-choice');
+                  const mcAnswered = Object.keys(selectedAnswers).length >= mcQuestions.length;
+
+                  // Check if all match questions are fully matched
+                  const matchQuestions = answerableQuestions
+                    .map((q, idx) => ({ q, idx }))
+                    .filter(({ q }) => q.questionType === 'match');
+                  const matchesComplete = matchQuestions.every(({ q, idx }) => {
+                    const matches = matchSelections[idx] || {};
+                    return Object.keys(matches).length === q.answers.length;
+                  });
+
+                  return !mcAnswered || !matchesComplete;
+                })()}
                 className="w-full sm:w-auto"
               >
                 Check Answers

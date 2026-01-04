@@ -1,16 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { usePathname } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
+import { useState } from 'react';
 import authApiClient from '@/lib/api/auth-client';
 
-export function TrialExpiredModal() {
-  const { user, isTrialExpired } = useAuth();
-  const [isOpen, setIsOpen] = useState(false);
+interface TrialExpiredModalProps {
+  daysOverdue?: number;
+}
+
+export function TrialExpiredModal({ daysOverdue = 0 }: TrialExpiredModalProps) {
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const pathname = usePathname();
 
   const plans = [
     {
@@ -29,17 +28,6 @@ export function TrialExpiredModal() {
       planCode: 'PLN_ycwo3qwzubzlv3v',
     },
   ];
-
-  useEffect(() => {
-    // Show modal if user is logged in and trial is expired
-    // But NOT on the pricing or payment pages
-    const isPaymentPage = pathname?.startsWith('/pricing') || pathname?.startsWith('/payment');
-    if (user && isTrialExpired && !isPaymentPage) {
-      setIsOpen(true);
-    } else {
-      setIsOpen(false);
-    }
-  }, [user, isTrialExpired, pathname]);
 
   const handleProceedToPayment = async (planCode: string) => {
     try {
@@ -61,32 +49,29 @@ export function TrialExpiredModal() {
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center">
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
-
-      {/* Modal */}
-      <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 p-6 sm:p-8">
-        {/* Warning Icon */}
-        <div className="w-20 h-20 mx-auto mb-5 bg-orange-100 rounded-full flex items-center justify-center">
-          <svg className="w-10 h-10 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 sm:p-8">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="w-20 h-20 mx-auto mb-5 bg-orange-100 rounded-full flex items-center justify-center">
+            <svg className="w-10 h-10 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-3">
+            Your Free Trial Has Ended
+          </h2>
+          <p className="text-gray-600">
+            {daysOverdue > 0
+              ? `Your trial expired ${daysOverdue} day${daysOverdue > 1 ? 's' : ''} ago.`
+              : 'Your 14-day free trial has ended.'
+            }
+          </p>
+          <p className="text-gray-900 font-medium mt-2">
+            Subscribe now to continue learning!
+          </p>
         </div>
-
-        <h2 className="text-2xl font-bold text-gray-900 text-center mb-3">
-          Your Free Trial Has Ended
-        </h2>
-
-        <p className="text-gray-600 text-center mb-2">
-          Your 14-day free trial has expired.
-        </p>
-        <p className="text-gray-900 font-medium text-center mb-6">
-          Subscribe now to continue learning!
-        </p>
 
         {/* Error message */}
         {error && (

@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import clsx from 'clsx';
 import { Button } from '@/components/ui';
+import { TrialExpiredModal } from '@/components/subscription';
 
 interface NavItemProps {
   href: string;
@@ -38,7 +39,7 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, logout, loading } = useAuth();
+  const { user, logout, loading, isTrialExpired, daysRemaining } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -48,6 +49,19 @@ export default function DashboardLayout({
       router.push('/login');
     }
   }, [user, loading, router]);
+
+  // Calculate days overdue for the modal
+  const getDaysOverdue = (): number => {
+    if (!user?.subscription?.trialEndsAt) return 0;
+    const trialEnd = new Date(user.subscription.trialEndsAt);
+    const now = new Date();
+    const diffTime = now.getTime() - trialEnd.getTime();
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    return Math.max(0, diffDays);
+  };
+
+  // Debug logging
+  console.log('[Dashboard] isTrialExpired:', isTrialExpired, 'daysRemaining:', daysRemaining, 'user subscription:', user?.subscription);
 
   if (loading) {
     return (
@@ -186,6 +200,29 @@ export default function DashboardLayout({
 
       {/* Main Content */}
       <main className="flex-1 lg:ml-0 pt-16 lg:pt-0 min-h-screen">
+        {/* Trial Status Banner */}
+        {user?.subscription?.status === 'trialing' && daysRemaining !== null && daysRemaining > 0 && (
+          <div className={clsx(
+            "px-4 py-2.5 text-center text-sm font-medium",
+            daysRemaining <= 3
+              ? "bg-orange-500 text-white"
+              : "bg-primary/10 text-primary"
+          )}>
+            <span>
+              {daysRemaining === 1
+                ? "Your free trial ends tomorrow!"
+                : `${daysRemaining} days left in your free trial.`
+              }
+            </span>
+            <a href="/pricing" className={clsx(
+              "ml-2 underline font-semibold",
+              daysRemaining <= 3 ? "text-white" : "text-primary hover:text-primary-dark"
+            )}>
+              Subscribe now
+            </a>
+          </div>
+        )}
+
         <div className="p-6 md:p-8 max-w-7xl mx-auto">
            {children}
         </div>
@@ -193,11 +230,14 @@ export default function DashboardLayout({
       
       {/* Overlay for mobile menu */}
       {isMobileMenuOpen && (
-        <div 
+        <div
             className="fixed inset-0 bg-black/20 z-30 lg:hidden backdrop-blur-sm"
             onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
+
+      {/* Trial Expired Modal - blocks all content until payment */}
+      {isTrialExpired && <TrialExpiredModal daysOverdue={getDaysOverdue()} />}
     </div>
   );
 }

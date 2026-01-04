@@ -45,15 +45,26 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Helper function to check if trial is expired
 const checkTrialExpired = (user: User | null): boolean => {
-  if (!user?.subscription) return false;
+  if (!user?.subscription) {
+    console.log('[Auth] No subscription found');
+    return false;
+  }
   const { status, trialEndsAt } = user.subscription;
 
-  if (status === 'active') return false; // Paid user
+  console.log('[Auth] Checking trial status:', { status, trialEndsAt, now: new Date().toISOString() });
+
+  if (status === 'active') {
+    console.log('[Auth] User has active subscription');
+    return false; // Paid user
+  }
   if (status === 'trialing' && trialEndsAt) {
-    return new Date(trialEndsAt) <= new Date();
+    const isExpired = new Date(trialEndsAt) <= new Date();
+    console.log('[Auth] Trial status - isExpired:', isExpired);
+    return isExpired;
   }
   // Free, cancelled, past_due, inactive - all considered expired
   if (['free', 'cancelled', 'past_due', 'inactive'].includes(status)) {
+    console.log('[Auth] Subscription status requires payment:', status);
     return true;
   }
   return false;

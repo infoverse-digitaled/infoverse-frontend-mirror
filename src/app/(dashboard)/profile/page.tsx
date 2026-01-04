@@ -88,24 +88,24 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="p-8 max-w-3xl mx-auto">
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Profile Settings</h1>
+    <div className="p-4 sm:p-6 lg:p-8 max-w-3xl mx-auto">
+      <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-8">Profile Settings</h1>
 
       {/* Profile Information Card */}
-      <Card className="mb-8 shadow-lg">
-        <CardHeader className="border-b border-gray-100">
-          <CardTitle>Profile Information</CardTitle>
+      <Card className="mb-6 sm:mb-8 shadow-lg">
+        <CardHeader className="border-b border-gray-100 px-4 sm:px-6">
+          <CardTitle className="text-lg sm:text-xl">Profile Information</CardTitle>
         </CardHeader>
-        <CardContent className="p-6">
-          <div className="space-y-6">
+        <CardContent className="p-4 sm:p-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* Avatar and basic info */}
-            <div className="flex items-center gap-4">
-              <div className="w-20 h-20 rounded-full bg-primary text-white flex items-center justify-center font-bold text-3xl">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-primary text-white flex items-center justify-center font-bold text-2xl sm:text-3xl flex-shrink-0">
                 {user?.name?.charAt(0).toUpperCase() || 'U'}
               </div>
-              <div>
-                <p className="text-lg font-semibold text-gray-900">{user?.name}</p>
-                <p className="text-gray-500">{user?.email}</p>
+              <div className="min-w-0">
+                <p className="text-base sm:text-lg font-semibold text-gray-900 truncate">{user?.name}</p>
+                <p className="text-sm sm:text-base text-gray-500 truncate">{user?.email}</p>
               </div>
             </div>
 
@@ -130,11 +130,12 @@ export default function ProfilePage() {
                   {nameSuccess && (
                     <p className="text-green-500 text-sm">{nameSuccess}</p>
                   )}
-                  <div className="flex gap-3">
+                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                     <Button
                       onClick={handleUpdateName}
                       isLoading={nameLoading}
                       disabled={nameLoading}
+                      className="w-full sm:w-auto"
                     >
                       Save
                     </Button>
@@ -146,6 +147,7 @@ export default function ProfilePage() {
                         setNameError('');
                       }}
                       disabled={nameLoading}
+                      className="w-full sm:w-auto"
                     >
                       Cancel
                     </Button>
@@ -181,10 +183,10 @@ export default function ProfilePage() {
 
       {/* Change Password Card */}
       <Card className="shadow-lg">
-        <CardHeader className="border-b border-gray-100">
-          <CardTitle>Change Password</CardTitle>
+        <CardHeader className="border-b border-gray-100 px-4 sm:px-6">
+          <CardTitle className="text-lg sm:text-xl">Change Password</CardTitle>
         </CardHeader>
-        <CardContent className="p-6">
+        <CardContent className="p-4 sm:p-6">
           <form onSubmit={handleChangePassword} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -244,6 +246,7 @@ export default function ProfilePage() {
               type="submit"
               isLoading={passwordLoading}
               disabled={passwordLoading}
+              className="w-full sm:w-auto"
             >
               Change Password
             </Button>

@@ -10,7 +10,7 @@ console.log('[Auth Client] Base URL:', baseURL);
 
 const authApiClient = axios.create({
   baseURL,
-  timeout: 10000,
+  timeout: 30000, // Increased to 30s for AI responses
   headers: {
     'Content-Type': 'application/json',
   },
