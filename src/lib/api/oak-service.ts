@@ -150,6 +150,7 @@ export const oakService = {
 
   /**
    * Fetch a single lesson by slug
+   * NOTE: This is a premium endpoint that requires authentication
    */
   async getLesson(slug: string): Promise<Lesson> {
     if (useMockData()) {
@@ -162,9 +163,9 @@ export const oakService = {
       return Promise.reject(new Error('Lesson not found'));
     }
 
-    // Real API call using the lesson endpoint
+    // Real API call using the lesson endpoint (requires auth token)
     const endpoint = API_ENDPOINTS.lesson(slug);
-    const response = await apiClient.get<BackendResponse<Lesson>>(endpoint);
+    const response = await authApiClient.get<BackendResponse<Lesson>>(endpoint);
     return response.data.data; // Unwrap: response.data.data to get the object
   },
 
@@ -226,6 +227,7 @@ export const oakService = {
 
   /**
    * Fetch quiz questions for a lesson
+   * NOTE: This is a premium endpoint that requires authentication
    */
   async getLessonQuiz(lessonSlug: string): Promise<LessonQuiz> {
     if (useMockData()) {
@@ -233,14 +235,15 @@ export const oakService = {
       return Promise.resolve({ starterQuiz: [], exitQuiz: [] });
     }
 
-    // Real API call
+    // Real API call (requires auth token)
     const endpoint = API_ENDPOINTS.lessonQuiz(lessonSlug);
-    const response = await apiClient.get<BackendResponse<LessonQuiz>>(endpoint);
+    const response = await authApiClient.get<BackendResponse<LessonQuiz>>(endpoint);
     return response.data.data;
   },
 
   /**
    * Fetch lesson assets (video, worksheets, slides)
+   * NOTE: This is a premium endpoint that requires authentication
    */
   async getLessonAssets(lessonSlug: string): Promise<LessonAssets> {
     if (useMockData()) {
@@ -248,14 +251,15 @@ export const oakService = {
       return Promise.resolve({ assets: [] });
     }
 
-    // Real API call
+    // Real API call (requires auth token)
     const endpoint = API_ENDPOINTS.lessonAssets(lessonSlug);
-    const response = await apiClient.get<BackendResponse<LessonAssets>>(endpoint);
+    const response = await authApiClient.get<BackendResponse<LessonAssets>>(endpoint);
     return response.data.data;
   },
 
   /**
    * Fetch lesson transcript
+   * NOTE: This is a premium endpoint that requires authentication
    */
   async getLessonTranscript(lessonSlug: string): Promise<LessonTranscript> {
     if (useMockData()) {
@@ -263,9 +267,9 @@ export const oakService = {
       return Promise.resolve({ sentences: [] });
     }
 
-    // Real API call
+    // Real API call (requires auth token)
     const endpoint = API_ENDPOINTS.lessonTranscript(lessonSlug);
-    const response = await apiClient.get<BackendResponse<LessonTranscript>>(endpoint);
+    const response = await authApiClient.get<BackendResponse<LessonTranscript>>(endpoint);
     return response.data.data;
   },
 

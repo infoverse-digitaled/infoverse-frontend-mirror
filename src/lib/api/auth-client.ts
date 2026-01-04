@@ -42,10 +42,19 @@ authApiClient.interceptors.response.use(
     if (error.response) {
       // Server responded with error status
       if (error.response.status === 401) {
-        // Unauthorized - clear token and redirect to login
+        // Unauthorized - only redirect if not already on auth pages
         if (typeof window !== 'undefined') {
-          localStorage.removeItem('token');
-          window.location.href = '/login';
+          const currentPath = window.location.pathname;
+          const isAuthPage = currentPath.startsWith('/login') ||
+                            currentPath.startsWith('/register') ||
+                            currentPath.startsWith('/auth');
+
+          // Only clear token and redirect if not on auth pages (prevent loops)
+          if (!isAuthPage) {
+            localStorage.removeItem('token');
+            // Use replace to prevent back button loops
+            window.location.replace('/login');
+          }
         }
       }
       console.error('API Error:', error.response.status, error.response.data);
