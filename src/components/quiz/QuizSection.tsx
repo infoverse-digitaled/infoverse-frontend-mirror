@@ -41,6 +41,8 @@ export function QuizSection({
   const [matchSelections, setMatchSelections] = useState<Record<number, Record<number, number>>>({});
   // Track which left item is currently selected for matching
   const [activeMatchItem, setActiveMatchItem] = useState<{ qIndex: number; leftIndex: number } | null>(null);
+  // Track short-answer inputs: { questionIndex: userAnswer }
+  const [shortAnswers, setShortAnswers] = useState<Record<number, string>>({});
 
   // Memoize shuffled right-side options for match questions
   const shuffledMatchOptions = useMemo(() => {
@@ -77,7 +79,29 @@ export function QuizSection({
     setSelectedAnswers({});
     setMatchSelections({});
     setActiveMatchItem(null);
+    setShortAnswers({});
     setShowResults(false);
+  };
+
+  // Handle short answer input change
+  const handleShortAnswerChange = (qIndex: number, value: string) => {
+    if (showResults) return;
+    setShortAnswers((prev) => ({
+      ...prev,
+      [qIndex]: value,
+    }));
+  };
+
+  // Check if a short answer is correct (case-insensitive)
+  const isShortAnswerCorrect = (qIndex: number): boolean => {
+    const question = questions[qIndex];
+    const userAnswer = (shortAnswers[qIndex] || '').trim().toLowerCase();
+    if (!userAnswer) return false;
+
+    // Check against all accepted answers
+    return question.answers.some(
+      (a) => a.content?.toLowerCase().trim() === userAnswer
+    );
   };
 
   // Handle clicking a left-side match item
@@ -158,6 +182,11 @@ export function QuizSection({
         const matchScore = getMatchScore(index);
         correct += matchScore.correct;
         total += matchScore.total;
+      } else if (q.questionType === 'short-answer') {
+        total++;
+        if (isShortAnswerCorrect(index)) {
+          correct++;
+        }
       }
     });
     return { correct, total };
@@ -395,18 +424,50 @@ export function QuizSection({
                 )}
 
                 {question.questionType === 'short-answer' && (
-                  <div className="space-y-2">
-                    <p className="text-sm text-gray-500">Expected answer:</p>
-                    {question.answers
-                      .filter((a) => !a.distractor)
-                      .map((answer, aIndex) => (
-                        <div
-                          key={aIndex}
-                          className="p-3 rounded-lg border bg-green-50 border-green-200 text-green-800"
-                        >
-                          <ContentRenderer content={answer.content || ''} />
+                  <div className="space-y-3">
+                    {/* Input field for user's answer */}
+                    <div className="flex flex-col gap-2">
+                      <input
+                        type="text"
+                        placeholder="Type your answer here..."
+                        value={shortAnswers[qIndex] || ''}
+                        onChange={(e) => handleShortAnswerChange(qIndex, e.target.value)}
+                        disabled={showResults}
+                        className={`w-full p-3 rounded-lg border transition-all ${
+                          showResults
+                            ? isShortAnswerCorrect(qIndex)
+                              ? 'bg-green-50 border-green-500 text-green-800'
+                              : 'bg-red-50 border-red-500 text-red-800'
+                            : 'bg-white border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20'
+                        }`}
+                      />
+                      {showResults && (
+                        <div className="flex items-center gap-2">
+                          {isShortAnswerCorrect(qIndex) ? (
+                            <span className="text-green-600 font-medium">✓ Correct!</span>
+                          ) : (
+                            <span className="text-red-600 font-medium">✗ Incorrect</span>
+                          )}
                         </div>
-                      ))}
+                      )}
+                    </div>
+
+                    {/* Show expected answers only AFTER submission */}
+                    {showResults && (
+                      <div className="mt-2">
+                        <p className="text-sm text-gray-500 mb-1">Accepted answer(s):</p>
+                        <div className="flex flex-wrap gap-2">
+                          {question.answers.map((answer, aIndex) => (
+                            <span
+                              key={aIndex}
+                              className="px-3 py-1 rounded-full bg-green-100 border border-green-300 text-green-800 text-sm"
+                            >
+                              <ContentRenderer content={answer.content || ''} />
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -415,7 +476,7 @@ export function QuizSection({
         </div>
 
         {answerableQuestions.some(
-          (q) => q.questionType === 'multiple-choice' || q.questionType === 'match'
+          (q) => q.questionType === 'multiple-choice' || q.questionType === 'match' || q.questionType === 'short-answer'
         ) && (
           <div className="mt-6 flex gap-4">
             {!showResults ? (
@@ -435,7 +496,15 @@ export function QuizSection({
                     return Object.keys(matches).length === q.answers.length;
                   });
 
-                  return !mcAnswered || !matchesComplete;
+                  // Check if all short-answer questions have input
+                  const shortAnswerQuestions = answerableQuestions
+                    .map((q, idx) => ({ q, idx }))
+                    .filter(({ q }) => q.questionType === 'short-answer');
+                  const shortAnswersComplete = shortAnswerQuestions.every(({ idx }) => {
+                    return (shortAnswers[idx] || '').trim().length > 0;
+                  });
+
+                  return !mcAnswered || !matchesComplete || !shortAnswersComplete;
                 })()}
                 className="w-full sm:w-auto"
               >
