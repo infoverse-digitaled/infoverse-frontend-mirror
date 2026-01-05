@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, Loading } from '@/components/ui';
 import type { LessonAssets, TranscriptSentence } from '@/types/oak-api.types';
 
@@ -12,7 +12,16 @@ interface VideoPlayerProps {
 
 export function VideoPlayer({ assets, transcript, isLoading }: VideoPlayerProps) {
   const [showTranscript, setShowTranscript] = useState(false);
+  const [authToken, setAuthToken] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Get auth token from localStorage on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('auth_token');
+      setAuthToken(token);
+    }
+  }, []);
 
   if (isLoading) {
     return (
@@ -36,6 +45,11 @@ export function VideoPlayer({ assets, transcript, isLoading }: VideoPlayerProps)
     return null;
   }
 
+  // Append auth token to video URL for authentication (video elements can't send headers)
+  const authenticatedVideoUrl = authToken
+    ? `${videoUrl}${videoUrl.includes('?') ? '&' : '?'}token=${authToken}`
+    : videoUrl;
+
   const handleTranscriptClick = (startTime: number) => {
     if (videoRef.current) {
       videoRef.current.currentTime = startTime;
@@ -58,7 +72,7 @@ export function VideoPlayer({ assets, transcript, isLoading }: VideoPlayerProps)
         <div className="aspect-video bg-black rounded-lg overflow-hidden mb-4">
           <video
             ref={videoRef}
-            src={videoUrl}
+            src={authenticatedVideoUrl}
             controls
             className="w-full h-full"
             playsInline

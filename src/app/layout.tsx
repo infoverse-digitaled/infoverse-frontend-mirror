@@ -1,9 +1,12 @@
 import type { Metadata } from 'next';
 import { Inter, Fraunces } from 'next/font/google';
 import './globals.css';
+// KaTeX CSS for rendering LaTeX math in quizzes
+import 'katex/dist/katex.min.css';
 import { LayoutWrapper } from '@/components/layout';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { GlobalChatbot } from '@/components/ai';
+import { TrialBanner } from '@/components/TrialBanner';
 
 const inter = Inter({
   variable: '--font-inter',
@@ -43,6 +46,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <AuthProvider>
+          <TrialBanner />
           <LayoutWrapper>{children}</LayoutWrapper>
           <GlobalChatbot />
         </AuthProvider>
