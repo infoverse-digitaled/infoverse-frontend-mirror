@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import clsx from 'clsx';
 import { Button } from '@/components/ui';
-import { TrialExpiredModal, SubscribeModal } from '@/components/subscription';
+import { TrialExpiredModal } from '@/components/subscription';
 
 interface NavItemProps {
   href: string;
@@ -43,7 +43,6 @@ export default function DashboardLayout({
   const router = useRouter();
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [showSubscribeModal, setShowSubscribeModal] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -201,32 +200,6 @@ export default function DashboardLayout({
 
       {/* Main Content */}
       <main className="flex-1 lg:ml-0 pt-16 lg:pt-0 min-h-screen">
-        {/* Trial Status Banner */}
-        {user?.subscription?.status === 'trialing' && daysRemaining !== null && daysRemaining > 0 && (
-          <div className={clsx(
-            "px-4 py-2.5 text-center text-sm font-medium",
-            daysRemaining <= 3
-              ? "bg-orange-500 text-white"
-              : "bg-primary/10 text-primary"
-          )}>
-            <span>
-              {daysRemaining === 1
-                ? "Your free trial ends tomorrow!"
-                : `${daysRemaining} days left in your free trial.`
-              }
-            </span>
-            <button
-              onClick={() => setShowSubscribeModal(true)}
-              className={clsx(
-                "ml-2 underline font-semibold cursor-pointer",
-                daysRemaining <= 3 ? "text-white" : "text-primary hover:text-primary-dark"
-              )}
-            >
-              Subscribe now
-            </button>
-          </div>
-        )}
-
         <div className="p-6 md:p-8 max-w-7xl mx-auto">
            {children}
         </div>
@@ -242,11 +215,6 @@ export default function DashboardLayout({
 
       {/* Trial Expired Modal - blocks all content until payment */}
       {isTrialExpired && <TrialExpiredModal daysOverdue={getDaysOverdue()} />}
-
-      {/* Subscribe Modal - for users who want to subscribe early */}
-      {showSubscribeModal && (
-        <SubscribeModal onClose={() => setShowSubscribeModal(false)} />
-      )}
     </div>
   );
 }
