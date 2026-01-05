@@ -98,9 +98,9 @@ export function QuizSection({
     const userAnswer = (shortAnswers[qIndex] || '').trim().toLowerCase();
     if (!userAnswer) return false;
 
-    // Check against all accepted answers
+    // Check against all accepted answers (only text answers)
     return question.answers.some(
-      (a) => a.content?.toLowerCase().trim() === userAnswer
+      (a) => typeof a.content === 'string' && a.content.toLowerCase().trim() === userAnswer
     );
   };
 
@@ -368,7 +368,7 @@ export function QuizSection({
                                 </span>
                                 {hasMatch && !showResults && (
                                   <span className="text-xs text-blue-600 flex items-center gap-1">
-                                    → {question.answers[matchedRightIndex]?.correctChoice?.content}
+                                    → <ContentRenderer content={question.answers[matchedRightIndex]?.correctChoice?.content || ''} />
                                     <button
                                       onClick={(e) => { e.stopPropagation(); handleClearMatch(qIndex, leftIndex); }}
                                       className="ml-1 text-gray-400 hover:text-red-500"
