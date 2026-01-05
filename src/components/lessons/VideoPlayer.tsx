@@ -13,6 +13,7 @@ interface VideoPlayerProps {
 export function VideoPlayer({ assets, transcript, isLoading }: VideoPlayerProps) {
   const [showTranscript, setShowTranscript] = useState(false);
   const [authToken, setAuthToken] = useState<string | null>(null);
+  const [tokenChecked, setTokenChecked] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   // Get auth token from localStorage on mount
@@ -20,10 +21,13 @@ export function VideoPlayer({ assets, transcript, isLoading }: VideoPlayerProps)
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('auth_token');
       setAuthToken(token);
+      setTokenChecked(true);
     }
   }, []);
 
-  if (isLoading) {
+  // Wait for token check to complete before rendering video
+  // This prevents the video from loading without the token on first render
+  if (isLoading || !tokenChecked) {
     return (
       <Card className="mb-8">
         <CardHeader>
