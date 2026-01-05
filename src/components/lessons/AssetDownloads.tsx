@@ -14,7 +14,7 @@ export function AssetDownloads({ assets }: AssetDownloadsProps) {
   // Get auth token from localStorage on mount
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('auth_token');
+      const token = localStorage.getItem('token');
       setAuthToken(token);
     }
   }, []);
