@@ -107,7 +107,7 @@ export interface LessonFilters {
  * Lesson Asset Types
  */
 export interface LessonAsset {
-  type: 'video' | 'slideDeck' | 'worksheet' | 'worksheetAnswers' | 'starterQuiz' | 'starterQuizAnswers' | 'exitQuiz' | 'exitQuizAnswers';
+  type: 'video' | 'slideDeck' | 'worksheet' | 'worksheetAnswers' | 'supplementaryResource' | 'starterQuiz' | 'starterQuizAnswers' | 'exitQuiz' | 'exitQuizAnswers';
   label: string;
   url: string;
 }
