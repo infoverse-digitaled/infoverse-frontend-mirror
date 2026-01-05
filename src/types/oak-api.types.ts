@@ -48,18 +48,34 @@ export interface Lesson {
   presentationUrl?: string;
 }
 
+/**
+ * Image object for quiz questions and answers
+ */
+export interface QuizImage {
+  url: string;
+  width: number;
+  height: number;
+  alt: string;
+}
+
+/**
+ * Content can be a string (text) or an image object
+ */
+export type QuizContent = string | QuizImage;
+
 export interface QuizAnswer {
-  type: string;
-  content: string;
-  distractor: boolean;
+  type: 'text' | 'image';
+  content: QuizContent;
+  distractor?: boolean;
   order?: number;
-  matchOption?: { type: string; content: string };
-  correctChoice?: { type: string; content: string };
+  matchOption?: { type: 'text' | 'image'; content: QuizContent };
+  correctChoice?: { type: 'text' | 'image'; content: QuizContent };
 }
 
 export interface QuizQuestion {
   question: string;
   questionType: 'multiple-choice' | 'order' | 'match' | 'short-answer' | 'explanatory-text';
+  questionImage?: QuizImage;
   answers: QuizAnswer[];
 }
 

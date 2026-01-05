@@ -230,6 +230,13 @@ export function QuizSection({
                   <ContentRenderer content={question.question || 'Question'} />
                 </div>
 
+                {/* Render question image if present */}
+                {question.questionImage && (
+                  <div className="mb-4">
+                    <ContentRenderer content={question.questionImage} />
+                  </div>
+                )}
+
                 {question.questionType === 'multiple-choice' && (
                   <div className="space-y-2">
                     {question.answers.map((answer, aIndex) => {
