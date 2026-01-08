@@ -19,8 +19,15 @@ import type {
  * Custom hooks for fetching Oak National Academy data with SWR
  */
 
+// Default SWR options for Oak data - prevent stale cache issues
+const OAK_SWR_OPTIONS = {
+  dedupingInterval: 30000, // 30 seconds - prevent duplicate requests
+  revalidateOnFocus: false, // Don't refetch on window focus
+  revalidateOnReconnect: true, // Refetch when network reconnects
+};
+
 export function useKeyStages() {
-  return useSWR<KeyStage[]>('key-stages', () => oakService.getKeyStages());
+  return useSWR<KeyStage[]>('key-stages', () => oakService.getKeyStages(), OAK_SWR_OPTIONS);
 }
 
 export function useSubjects(filters?: SubjectFilters) {
@@ -28,13 +35,14 @@ export function useSubjects(filters?: SubjectFilters) {
     ? ['subjects', filters.keyStageSlug]
     : 'subjects';
 
-  return useSWR<Subject[]>(key, () => oakService.getSubjects(filters));
+  return useSWR<Subject[]>(key, () => oakService.getSubjects(filters), OAK_SWR_OPTIONS);
 }
 
 export function useSubject(slug: string | null) {
   return useSWR<Subject>(
     slug ? ['subject', slug] : null,
-    () => slug ? oakService.getSubject(slug) : Promise.reject('No slug')
+    () => slug ? oakService.getSubject(slug) : Promise.reject('No slug'),
+    OAK_SWR_OPTIONS
   );
 }
 
@@ -45,14 +53,16 @@ export function useUnits(filters?: UnitFilters) {
 
   return useSWR<Unit[]>(
     filters ? key : 'units',
-    () => oakService.getUnits(filters)
+    () => oakService.getUnits(filters),
+    OAK_SWR_OPTIONS
   );
 }
 
 export function useUnit(slug: string | null) {
   return useSWR<Unit>(
     slug ? ['unit', slug] : null,
-    () => slug ? oakService.getUnit(slug) : Promise.reject('No slug')
+    () => slug ? oakService.getUnit(slug) : Promise.reject('No slug'),
+    OAK_SWR_OPTIONS
   );
 }
 
@@ -66,39 +76,44 @@ export function useLessons(filters?: LessonFilters) {
 
   return useSWR<Lesson[]>(
     filters ? key : 'lessons',
-    () => oakService.getLessons(filters)
+    () => oakService.getLessons(filters),
+    OAK_SWR_OPTIONS
   );
 }
 
 export function useLesson(slug: string | null) {
   return useSWR<Lesson>(
     slug ? ['lesson', slug] : null,
-    () => slug ? oakService.getLesson(slug) : Promise.reject('No slug')
+    () => slug ? oakService.getLesson(slug) : Promise.reject('No slug'),
+    OAK_SWR_OPTIONS
   );
 }
 
 export function useYears() {
-  return useSWR<Year[]>('years', () => oakService.getYears());
+  return useSWR<Year[]>('years', () => oakService.getYears(), OAK_SWR_OPTIONS);
 }
 
 export function useLessonQuiz(lessonSlug: string | null) {
   return useSWR<LessonQuiz>(
     lessonSlug ? ['lesson-quiz', lessonSlug] : null,
-    () => lessonSlug ? oakService.getLessonQuiz(lessonSlug) : Promise.reject('No slug')
+    () => lessonSlug ? oakService.getLessonQuiz(lessonSlug) : Promise.reject('No slug'),
+    OAK_SWR_OPTIONS
   );
 }
 
 export function useLessonAssets(lessonSlug: string | null) {
   return useSWR<LessonAssets>(
     lessonSlug ? ['lesson-assets', lessonSlug] : null,
-    () => lessonSlug ? oakService.getLessonAssets(lessonSlug) : Promise.reject('No slug')
+    () => lessonSlug ? oakService.getLessonAssets(lessonSlug) : Promise.reject('No slug'),
+    OAK_SWR_OPTIONS
   );
 }
 
 export function useLessonTranscript(lessonSlug: string | null) {
   return useSWR<LessonTranscript>(
     lessonSlug ? ['lesson-transcript', lessonSlug] : null,
-    () => lessonSlug ? oakService.getLessonTranscript(lessonSlug) : Promise.reject('No slug')
+    () => lessonSlug ? oakService.getLessonTranscript(lessonSlug) : Promise.reject('No slug'),
+    OAK_SWR_OPTIONS
   );
 }
 
@@ -143,4 +158,21 @@ export function useEnroll() {
   }, []);
 
   return { enroll, isEnrolling, error };
+}
+
+/**
+ * Utility function to clear all Oak data from SWR cache
+ * Call this to force fresh data fetch after backend cache is cleared
+ */
+export async function clearOakCache() {
+  // Clear all Oak-related keys from SWR cache
+  await mutate((key) => {
+    if (typeof key === 'string') {
+      return ['key-stages', 'subjects', 'units', 'lessons', 'years'].some(k => key.includes(k));
+    }
+    if (Array.isArray(key)) {
+      return ['subjects', 'subject', 'units', 'unit', 'lessons', 'lesson', 'lesson-quiz', 'lesson-assets', 'lesson-transcript'].includes(key[0]);
+    }
+    return false;
+  }, undefined, { revalidate: true });
 }
