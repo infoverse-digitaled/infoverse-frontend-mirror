@@ -174,7 +174,7 @@ export default function ProfilePage() {
               </label>
               <div className="flex items-center justify-between">
                 <span className="text-gray-900">{user?.email}</span>
-                <span className="text-xs text-gray-400">Cannot be changed</span>
+                <span className="text-xs text-gray-500">Cannot be changed</span>
               </div>
             </div>
           </div>

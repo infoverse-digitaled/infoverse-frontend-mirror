@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui';
@@ -9,8 +9,10 @@ import { useAuth } from '@/contexts/AuthContext';
 
 export const Header: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMoreDropdownOpen, setIsMoreDropdownOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { user, logout } = useAuth();
+  const moreDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -19,6 +21,35 @@ export const Header: React.FC = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (moreDropdownRef.current && !moreDropdownRef.current.contains(event.target as Node)) {
+        setIsMoreDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const moreDropdownLinks = [
+    { href: '/blog', label: 'Blog', icon: (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+      </svg>
+    )},
+    { href: '/nurtured', label: 'For Schools', icon: (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+      </svg>
+    )},
+    { href: '/contact', label: 'Contact', icon: (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+      </svg>
+    )},
+  ];
 
   const publicNavLinks = [
     { href: '/', label: 'Home', icon: (
@@ -31,14 +62,14 @@ export const Header: React.FC = () => {
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
       </svg>
     )},
+    { href: '/pricing', label: 'Pricing', icon: (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    )},
     { href: '/about', label: 'About', icon: (
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-    )},
-    { href: '/contact', label: 'Contact', icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
       </svg>
     )},
   ];
@@ -116,10 +147,59 @@ export const Header: React.FC = () => {
                   scrolled ? 'px-3 py-1.5 text-sm' : 'px-4 py-2 text-sm'
                 )}
               >
-                <span className="text-gray-400 group-hover:text-primary transition-colors">{link.icon}</span>
+                <span className="text-gray-500 group-hover:text-primary transition-colors">{link.icon}</span>
                 <span>{link.label}</span>
               </Link>
             ))}
+
+            {/* More Dropdown */}
+            <div className="relative" ref={moreDropdownRef}>
+              <button
+                onClick={() => setIsMoreDropdownOpen(!isMoreDropdownOpen)}
+                className={cn(
+                  'relative flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-primary transition-all duration-300 font-medium rounded-full hover:bg-primary/10 group',
+                  scrolled ? 'px-3 py-1.5 text-sm' : 'px-4 py-2 text-sm',
+                  isMoreDropdownOpen && 'text-primary bg-primary/10'
+                )}
+              >
+                <span className={cn('text-gray-500 group-hover:text-primary transition-colors', isMoreDropdownOpen && 'text-primary')}>
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
+                  </svg>
+                </span>
+                <span>More</span>
+                <svg
+                  className={cn('w-4 h-4 transition-transform duration-200', isMoreDropdownOpen && 'rotate-180')}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {/* Dropdown Menu - Opens Upward */}
+              <div
+                className={cn(
+                  'absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 bg-white/95 backdrop-blur-xl rounded-xl shadow-2xl border border-gray-200/50 overflow-hidden transition-all duration-200',
+                  isMoreDropdownOpen
+                    ? 'opacity-100 translate-y-0 pointer-events-auto'
+                    : 'opacity-0 translate-y-2 pointer-events-none'
+                )}
+              >
+                {moreDropdownLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setIsMoreDropdownOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:text-primary hover:bg-primary/10 transition-all duration-200"
+                  >
+                    <span className="text-gray-500">{link.icon}</span>
+                    <span className="font-medium">{link.label}</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
           </div>
 
           {/* Divider */}
@@ -227,10 +307,28 @@ export const Header: React.FC = () => {
                   className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:text-primary rounded-xl hover:bg-primary/10 transition-all duration-300 font-medium"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  <span className="text-gray-400">{link.icon}</span>
+                  <span className="text-gray-500">{link.icon}</span>
                   <span>{link.label}</span>
                 </Link>
               ))}
+            </div>
+
+            {/* More Section */}
+            <div className="border-t border-gray-200 mt-2 pt-2">
+              <p className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">More</p>
+              <div className="flex flex-col gap-1">
+                {moreDropdownLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:text-primary rounded-xl hover:bg-primary/10 transition-all duration-300 font-medium"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <span className="text-gray-500">{link.icon}</span>
+                    <span>{link.label}</span>
+                  </Link>
+                ))}
+              </div>
             </div>
 
             {/* Divider */}

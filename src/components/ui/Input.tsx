@@ -1,6 +1,6 @@
 'use client';
 
-import { InputHTMLAttributes, forwardRef, useState } from 'react';
+import { InputHTMLAttributes, forwardRef, useState, useId } from 'react';
 import { cn } from '@/lib/utils/cn';
 
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
@@ -9,26 +9,37 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, type, className, ...props }, ref) => {
+  ({ label, error, type, className, id: providedId, ...props }, ref) => {
     const [showPassword, setShowPassword] = useState(false);
     const isPassword = type === 'password';
     const inputType = isPassword && showPassword ? 'text' : type;
 
+    // Generate unique IDs for accessibility
+    const generatedId = useId();
+    const inputId = providedId || `input-${generatedId}`;
+    const errorId = `${inputId}-error`;
+
     return (
       <div className="w-full">
         {label && (
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label
+            htmlFor={inputId}
+            className="block text-sm font-medium text-gray-700 mb-2"
+          >
             {label}
           </label>
         )}
         <div className="relative">
           <input
             ref={ref}
+            id={inputId}
             type={inputType}
+            aria-invalid={error ? 'true' : 'false'}
+            aria-describedby={error ? errorId : undefined}
             className={cn(
               'w-full h-12 px-4 rounded-xl',
               'bg-gray-50 border border-transparent',
-              'text-gray-900 text-base placeholder:text-gray-400',
+              'text-gray-900 text-base placeholder:text-gray-500',
               'focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none',
               'transition-all duration-200',
               'disabled:opacity-50 disabled:cursor-not-allowed',
@@ -43,8 +54,9 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-              tabIndex={-1}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+              aria-pressed={showPassword}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
             >
               {showPassword ? (
                 <svg
@@ -52,6 +64,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
+                  aria-hidden="true"
                 >
                   <path
                     strokeLinecap="round"
@@ -66,6 +79,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
+                  aria-hidden="true"
                 >
                   <path
                     strokeLinecap="round"
@@ -84,7 +98,11 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             </button>
           )}
         </div>
-        {error && <p className="mt-1.5 text-sm text-red-500">{error}</p>}
+        {error && (
+          <p id={errorId} className="mt-1.5 text-sm text-red-500" role="alert">
+            {error}
+          </p>
+        )}
       </div>
     );
   }

@@ -406,7 +406,7 @@ export default function ContactPage() {
                     required
                     rows={6}
                     placeholder="Share your question or feedback"
-                    className="w-full px-0 py-3 border-b border-gray-200 bg-transparent focus:outline-none focus:border-gray-900 transition-colors resize-none placeholder:text-gray-400"
+                    className="w-full px-0 py-3 border-b border-gray-200 bg-transparent focus:outline-none focus:border-gray-900 transition-colors resize-none placeholder:text-gray-500"
                   />
                 </div>
 

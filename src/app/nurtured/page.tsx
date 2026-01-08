@@ -109,8 +109,6 @@ const projectsData = [
 ];
 
 const stats = [
-  { value: '500+', label: 'Educators Trained' },
-  { value: '50+', label: 'Schools Partnered' },
   { value: '95%', label: 'Satisfaction Rate' },
   { value: '10+', label: 'Years Experience' },
 ];
@@ -244,12 +242,6 @@ export default function NurturedPage() {
                     </svg>
                   </Button>
                 </Link>
-                <Link href="#focus-areas" className="inline-flex items-center gap-2 px-6 py-3 font-medium text-gray-900 hover:text-primary transition-colors group">
-                  View focus areas
-                  <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </Link>
               </div>
             </div>
 
@@ -274,21 +266,7 @@ export default function NurturedPage() {
                   </div>
                 </div>
 
-                {/* Floating badges */}
-                <div className="absolute -top-4 -right-4 bg-white rounded-2xl shadow-xl p-4 animate-float">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center text-green-600">
-                      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                    </div>
-                    <div>
-                      <p className="font-semibold text-gray-900 text-sm">CPD Certified</p>
-                      <p className="text-xs text-gray-500">Accredited training</p>
-                    </div>
-                  </div>
-                </div>
-
+                {/* Floating badge */}
                 <div className="absolute -bottom-4 -left-4 bg-white rounded-2xl shadow-xl p-4 animate-float-delay-1">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
@@ -354,13 +332,12 @@ export default function NurturedPage() {
         </Container>
       </section>
 
-      {/* Focus Areas Section */}
+      {/* Focus Areas Section - COMMENTED OUT FOR NOW
       <section id="focus-areas" className="px-5 md:px-16 py-20 md:py-32 bg-white relative overflow-hidden">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-primary/5 via-secondary/5 to-purple-500/5 rounded-full blur-3xl" />
 
         <Container size="xl" className="px-0 relative">
           <div className="flex flex-col gap-16 md:gap-20">
-            {/* Header */}
             <div className="max-w-3xl mx-auto text-center">
               <p className="font-semibold text-base text-primary mb-4">
                 Our Expertise
@@ -374,22 +351,18 @@ export default function NurturedPage() {
               </p>
             </div>
 
-            {/* Focus Areas Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
               {focusAreasData.map((area, index) => (
                 <div
                   key={index}
                   className="group relative bg-white rounded-3xl p-8 hover-lift border border-gray-100 overflow-hidden"
                 >
-                  {/* Gradient background on hover */}
                   <div className={`absolute inset-0 bg-gradient-to-br ${area.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500`} />
 
-                  {/* Icon */}
                   <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${area.gradient} flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform duration-300`}>
                     {area.icon}
                   </div>
 
-                  {/* Content */}
                   <h3 className="font-serif font-bold text-xl md:text-2xl leading-tight text-gray-900 mb-4">
                     {area.title}
                   </h3>
@@ -411,6 +384,7 @@ export default function NurturedPage() {
           </div>
         </Container>
       </section>
+      */}
 
       {/* Development Projects Section */}
       <section className="px-5 md:px-16 py-20 md:py-32 bg-gray-50">

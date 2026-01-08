@@ -105,7 +105,7 @@ export default function DashboardPage() {
         )}
       </section>
 
-      {/* Suggested Courses Section */}
+      {/* Suggested Courses Section - COMMENTED OUT FOR NOW
       <section>
         <div className="mb-4 sm:mb-6">
           <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-black mb-1 sm:mb-2">
@@ -125,6 +125,7 @@ export default function DashboardPage() {
           ))}
         </div>
       </section>
+      */}
     </div>
   );
 }

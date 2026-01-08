@@ -15,15 +15,15 @@ export function SubscribeModal({ onClose }: SubscribeModalProps) {
     {
       id: 'annual',
       name: 'Annual Plan',
-      price: '₦65,000',
-      description: 'Best value - save 28%',
+      price: '₦40,000',
+      description: 'Best value - save 33%',
       planCode: 'PLN_t56h44wx8f2vcw7',
       recommended: true,
     },
     {
       id: 'monthly',
       name: 'Monthly Plan',
-      price: '₦7,500',
+      price: '₦5,000',
       description: 'Billed monthly',
       planCode: 'PLN_vnfkw3ejctr7fe4',
     },
@@ -50,12 +50,18 @@ export function SubscribeModal({ onClose }: SubscribeModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="subscribe-modal-title"
+    >
       <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 sm:p-8 relative">
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 transition-colors"
+          className="absolute top-4 right-4 p-2 text-gray-500 hover:text-gray-700 transition-colors"
+          aria-label="Close dialog"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -69,7 +75,7 @@ export function SubscribeModal({ onClose }: SubscribeModalProps) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-3">
+          <h2 id="subscribe-modal-title" className="text-2xl font-bold text-gray-900 mb-3">
             Upgrade to Premium
           </h2>
           <p className="text-gray-600">
@@ -144,7 +150,7 @@ export function SubscribeModal({ onClose }: SubscribeModalProps) {
         <div className="mt-6 pt-6 border-t border-gray-200">
           <p className="text-xs text-gray-500 text-center mb-3">What you&apos;ll unlock:</p>
           <div className="flex flex-wrap justify-center gap-2">
-            {['5,000+ lessons', 'AI tutor', 'Progress tracking'].map((feature, i) => (
+            {['100+ lessons', 'AI tutor', 'Progress tracking'].map((feature, i) => (
               <span key={i} className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 rounded-full text-xs text-gray-600">
                 <svg className="w-3 h-3 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />

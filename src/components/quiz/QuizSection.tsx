@@ -323,7 +323,7 @@ export function QuizSection({
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {/* Left side - items to match */}
                       <div className="space-y-2">
-                        <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Items</p>
+                        <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Items</p>
                         {question.answers.map((answer, leftIndex) => {
                           const isActive = activeMatchItem?.qIndex === qIndex && activeMatchItem?.leftIndex === leftIndex;
                           const hasMatch = matchSelections[qIndex]?.[leftIndex] !== undefined;
@@ -371,7 +371,7 @@ export function QuizSection({
                                     → <ContentRenderer content={question.answers[matchedRightIndex]?.correctChoice?.content || ''} />
                                     <button
                                       onClick={(e) => { e.stopPropagation(); handleClearMatch(qIndex, leftIndex); }}
-                                      className="ml-1 text-gray-400 hover:text-red-500"
+                                      className="ml-1 text-gray-500 hover:text-red-500"
                                     >
                                       ✕
                                     </button>
@@ -388,7 +388,7 @@ export function QuizSection({
 
                       {/* Right side - choices to match to */}
                       <div className="space-y-2">
-                        <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Matches</p>
+                        <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Matches</p>
                         {(shuffledMatchOptions[qIndex] || []).map((originalIndex) => {
                           const answer = question.answers[originalIndex];
                           const isMatched = isRightOptionMatched(qIndex, originalIndex);
@@ -399,7 +399,7 @@ export function QuizSection({
                           if (showResults) {
                             rightClasses += ' bg-gray-50 border-gray-200';
                           } else if (isMatched) {
-                            rightClasses += ' bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed';
+                            rightClasses += ' bg-gray-100 border-gray-200 text-gray-500 cursor-not-allowed';
                           } else if (isSelectable) {
                             rightClasses += ' bg-white border-primary cursor-pointer hover:bg-primary/10 ring-1 ring-primary/30';
                           } else {
@@ -414,7 +414,7 @@ export function QuizSection({
                             >
                               <ContentRenderer content={answer.correctChoice?.content || ''} />
                               {isMatched && !showResults && (
-                                <span className="text-xs text-gray-400 ml-2">(matched)</span>
+                                <span className="text-xs text-gray-500 ml-2">(matched)</span>
                               )}
                             </div>
                           );

@@ -20,11 +20,11 @@ const plans: Plan[] = [
   {
     id: 'monthly',
     name: 'Monthly',
-    price: '₦7,500',
+    price: '₦5,000',
     description: 'Per month, billed monthly',
     planCode: 'PLN_vnfkw3ejctr7fe4',
     features: [
-      '5,000+ curriculum lessons',
+      '100+ curriculum lessons',
       'AI-powered learning support',
       'Progress tracking dashboard',
     ],
@@ -32,11 +32,11 @@ const plans: Plan[] = [
   {
     id: 'annual',
     name: 'Annual',
-    price: '₦65,000',
-    description: 'Per year, save 28%',
+    price: '₦40,000',
+    description: 'Per year, save 33%',
     planCode: 'PLN_t56h44wx8f2vcw7',
     features: [
-      '5,000+ curriculum lessons',
+      '100+ curriculum lessons',
       'AI-powered learning support',
       'Progress tracking dashboard',
       'Priority email support',
@@ -51,7 +51,7 @@ const faqs = [
   },
   {
     question: 'What happens after the trial?',
-    answer: "Your 14-day trial gives you full access to all features. When it ends, you choose to subscribe or walk away. We'll never charge you without your decision.",
+    answer: "Your 7-day trial gives you full access to all features. When it ends, you choose to subscribe or walk away. We'll never charge you without your decision.",
   },
   {
     question: 'Can I change my plan?',
@@ -63,7 +63,7 @@ const faqs = [
   },
   {
     question: 'Is the trial truly free?',
-    answer: 'Completely free. No credit card required to start. You get 14 days of unrestricted access to everything. Cancel anytime before the trial ends.',
+    answer: 'Completely free. No credit card required to start. You get 7 days of unrestricted access to everything. Cancel anytime before the trial ends.',
   },
 ];
 
@@ -136,7 +136,7 @@ export default function PricingPage() {
               Flexible pricing for every learner
             </h1>
             <p className="text-base md:text-xl text-gray-600 leading-relaxed mb-8">
-              Choose a plan that fits your needs. All plans include full access to 5,000+ UK-curriculum lessons, quizzes, and exams.
+              Choose a plan that fits your needs. All plans include full access to 100+ UK-curriculum lessons, quizzes, and exams.
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <Link href="#pricing">
@@ -162,7 +162,7 @@ export default function PricingPage() {
                 Simple pricing
               </h2>
               <p className="text-base md:text-xl text-gray-600 leading-relaxed">
-                All plans unlock access to 5,000+ curriculum-aligned lessons and expert-designed content.
+                All plans unlock access to 100+ curriculum-aligned lessons and expert-designed content.
               </p>
             </div>
 
@@ -210,7 +210,7 @@ export default function PricingPage() {
                   >
                     {user?.subscription?.status === 'trialing' && user?.subscription?.trialEndsAt && new Date(user.subscription.trialEndsAt) < new Date()
                       ? 'Subscribe Now'
-                      : 'Start 14-day free trial'}
+                      : 'Start 7-day free trial'}
                   </Button>
                   <p className="text-center text-sm text-gray-500 mb-8">
                     No credit card required
@@ -328,7 +328,7 @@ export default function PricingPage() {
               Ready to start<br />Begin learning
             </h2>
             <p className="text-base md:text-xl text-gray-600 leading-relaxed mb-10">
-              Start your 14-day free trial today and unlock UK-standard education for your child or school.
+              Start your 7-day free trial today and unlock UK-standard education for your child or school.
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <Link href="/register">

@@ -1,7 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import authApiClient from '@/lib/api/auth-client';
+
+interface Plan {
+  id: string;
+  name: string;
+  price: string;
+  description: string;
+  planCode: string;
+  recommended?: boolean;
+}
 
 interface TrialExpiredModalProps {
   daysOverdue?: number;
@@ -10,24 +19,40 @@ interface TrialExpiredModalProps {
 export function TrialExpiredModal({ daysOverdue = 0 }: TrialExpiredModalProps) {
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [plans, setPlans] = useState<Plan[]>([]);
 
-  const plans = [
-    {
-      id: 'annual',
-      name: 'Annual Plan',
-      price: '₦65,000',
-      description: 'Best value - save 28%',
-      planCode: 'PLN_t56h44wx8f2vcw7',
-      recommended: true,
-    },
-    {
-      id: 'monthly',
-      name: 'Monthly Plan',
-      price: '₦7,500',
-      description: 'Billed monthly',
-      planCode: 'PLN_vnfkw3ejctr7fe4',
-    },
-  ];
+  // Fetch plans from API on mount
+  useEffect(() => {
+    const fetchPlans = async () => {
+      try {
+        const response = await authApiClient.get('/payment/plans');
+        if (response.data?.plans) {
+          setPlans(response.data.plans);
+        }
+      } catch (err) {
+        console.error('Failed to fetch plans:', err);
+        // Fallback plans if API fails
+        setPlans([
+          {
+            id: 'annual',
+            name: 'Annual Plan',
+            price: '₦40,000',
+            description: 'Best value - save 33%',
+            planCode: '',
+            recommended: true,
+          },
+          {
+            id: 'monthly',
+            name: 'Monthly Plan',
+            price: '₦5,000',
+            description: 'Billed monthly',
+            planCode: '',
+          },
+        ]);
+      }
+    };
+    fetchPlans();
+  }, []);
 
   const handleProceedToPayment = async (planCode: string) => {
     try {
@@ -65,7 +90,7 @@ export function TrialExpiredModal({ daysOverdue = 0 }: TrialExpiredModalProps) {
           <p className="text-gray-600">
             {daysOverdue > 0
               ? `Your trial expired ${daysOverdue} day${daysOverdue > 1 ? 's' : ''} ago.`
-              : 'Your 14-day free trial has ended.'
+              : 'Your 7-day free trial has ended.'
             }
           </p>
           <p className="text-gray-900 font-medium mt-2">
@@ -137,7 +162,7 @@ export function TrialExpiredModal({ daysOverdue = 0 }: TrialExpiredModalProps) {
         <div className="mt-6 pt-6 border-t border-gray-200">
           <p className="text-xs text-gray-500 text-center mb-3">What you&apos;ll unlock:</p>
           <div className="flex flex-wrap justify-center gap-2">
-            {['5,000+ lessons', 'AI tutor', 'Progress tracking'].map((feature, i) => (
+            {['100+ lessons', 'AI tutor', 'Progress tracking'].map((feature, i) => (
               <span key={i} className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 rounded-full text-xs text-gray-600">
                 <svg className="w-3 h-3 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />

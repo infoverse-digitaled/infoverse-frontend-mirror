@@ -63,7 +63,7 @@ export default function BrowsePage() {
           <p className="text-base sm:text-lg text-red-500 font-medium">
             Error loading subjects
           </p>
-          <p className="text-gray-400 text-sm mt-1">Please try again later.</p>
+          <p className="text-gray-500 text-sm mt-1">Please try again later.</p>
         </div>
       ) : subjects && subjects.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">

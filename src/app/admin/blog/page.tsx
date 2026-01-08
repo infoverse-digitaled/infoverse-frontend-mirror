@@ -348,7 +348,7 @@ export default function AdminBlogPage() {
                     <p className="text-sm text-gray-500">
                       {post.excerpt || 'No excerpt'}
                     </p>
-                    <p className="text-xs text-gray-400 mt-1">
+                    <p className="text-xs text-gray-500 mt-1">
                       Created: {new Date(post.createdAt).toLocaleDateString()}
                     </p>
                   </div>

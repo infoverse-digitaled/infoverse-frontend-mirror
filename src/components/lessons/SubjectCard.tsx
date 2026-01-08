@@ -73,12 +73,12 @@ export function SubjectCard({ subject, keyStage }: SubjectCardProps) {
                   {subject.description}
                </p>
            ) : (
-                <p className="text-sm text-gray-400 italic mb-4">
+                <p className="text-sm text-gray-500 italic mb-4">
                     Explore this subject to learn more.
                 </p>
            )}
            
-           <div className="pt-4 border-t border-gray-50 flex items-center justify-between text-xs text-gray-400 font-medium">
+           <div className="pt-4 border-t border-gray-50 flex items-center justify-between text-xs text-gray-500 font-medium">
                <span>{subject.lessonCount ? `${subject.lessonCount} Lessons` : 'Content Available'}</span>
                <span className={clsx("flex items-center gap-1 transition-all", isLocked ? "text-secondary" : "text-primary group-hover:gap-2")}>
                    {isLocked ? "Upgrade" : "Explore"}

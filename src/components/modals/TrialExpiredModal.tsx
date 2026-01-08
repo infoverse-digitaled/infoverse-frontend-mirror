@@ -5,30 +5,55 @@ import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import authApiClient from '@/lib/api/auth-client';
 
+interface Plan {
+  id: string;
+  name: string;
+  price: string;
+  description: string;
+  planCode: string;
+  recommended?: boolean;
+}
+
 export function TrialExpiredModal() {
   const { user, isTrialExpired } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [plans, setPlans] = useState<Plan[]>([]);
   const pathname = usePathname();
 
-  const plans = [
-    {
-      id: 'annual',
-      name: 'Annual Plan',
-      price: '₦65,000',
-      description: 'Best value - save 28%',
-      planCode: 'PLN_o1rf7r0jl507aoq',
-      recommended: true,
-    },
-    {
-      id: 'monthly',
-      name: 'Monthly Plan',
-      price: '₦7,500',
-      description: 'Billed monthly',
-      planCode: 'PLN_ycwo3qwzubzlv3v',
-    },
-  ];
+  // Fetch plans from API on mount
+  useEffect(() => {
+    const fetchPlans = async () => {
+      try {
+        const response = await authApiClient.get('/payment/plans');
+        if (response.data?.plans) {
+          setPlans(response.data.plans);
+        }
+      } catch (err) {
+        console.error('Failed to fetch plans:', err);
+        // Fallback plans if API fails
+        setPlans([
+          {
+            id: 'annual',
+            name: 'Annual Plan',
+            price: '₦40,000',
+            description: 'Best value - save 33%',
+            planCode: '',
+            recommended: true,
+          },
+          {
+            id: 'monthly',
+            name: 'Monthly Plan',
+            price: '₦5,000',
+            description: 'Billed monthly',
+            planCode: '',
+          },
+        ]);
+      }
+    };
+    fetchPlans();
+  }, []);
 
   useEffect(() => {
     // Show modal if user is logged in and trial is expired
@@ -82,7 +107,7 @@ export function TrialExpiredModal() {
         </h2>
 
         <p className="text-gray-600 text-center mb-2">
-          Your 14-day free trial has expired.
+          Your 7-day free trial has expired.
         </p>
         <p className="text-gray-900 font-medium text-center mb-6">
           Subscribe now to continue learning!
@@ -152,7 +177,7 @@ export function TrialExpiredModal() {
         <div className="mt-6 pt-6 border-t border-gray-200">
           <p className="text-xs text-gray-500 text-center mb-3">What you&apos;ll unlock:</p>
           <div className="flex flex-wrap justify-center gap-2">
-            {['5,000+ lessons', 'AI tutor', 'Progress tracking'].map((feature, i) => (
+            {['100+ lessons', 'AI tutor', 'Progress tracking'].map((feature, i) => (
               <span key={i} className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 rounded-full text-xs text-gray-600">
                 <svg className="w-3 h-3 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />

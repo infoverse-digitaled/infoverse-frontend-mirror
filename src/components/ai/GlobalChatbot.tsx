@@ -108,17 +108,19 @@ export function GlobalChatbot() {
 
           {/* Close button when open */}
           {isOpen && (
-            <div
+            <button
+              type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 setIsOpen(false);
               }}
+              aria-label="Close chat"
               className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center cursor-pointer transition-colors"
             >
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
-            </div>
+            </button>
           )}
 
           {/* Chevron when collapsed */}
@@ -190,18 +192,22 @@ export function GlobalChatbot() {
             {/* Input */}
             <form onSubmit={handleSubmit} className="p-3 border-t bg-gray-50">
               <div className="flex gap-2">
+                <label htmlFor="chat-input" className="sr-only">Ask a question</label>
                 <input
+                  id="chat-input"
                   ref={inputRef}
                   type="text"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   placeholder="Ask a question..."
+                  aria-label="Type your question here"
                   className="flex-1 px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
                   disabled={isLoading}
                 />
                 <button
                   type="submit"
                   disabled={isLoading || !inputValue.trim()}
+                  aria-label={isLoading ? 'Sending message' : 'Send message'}
                   className="px-4 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg"
                 >
                   {isLoading ? (

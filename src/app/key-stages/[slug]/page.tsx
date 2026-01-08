@@ -164,13 +164,13 @@ export default function KeyStagePage() {
             <Link href="/" className="hover:text-primary transition-colors duration-300 hover:-translate-y-0.5 inline-block">
               Home
             </Link>
-            <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
             <Link href="/key-stages" className="hover:text-primary transition-colors duration-300 hover:-translate-y-0.5 inline-block">
               Key Stages
             </Link>
-            <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
             <span className="text-gray-900 font-medium">{keyStageTitle}</span>
@@ -316,7 +316,7 @@ export default function KeyStagePage() {
             ) : (
               <div className="text-center py-16 bg-white rounded-2xl border border-gray-100">
                 <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gray-100 flex items-center justify-center">
-                  <svg className="w-10 h-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-10 h-10 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                   </svg>
                 </div>
@@ -381,13 +381,12 @@ export default function KeyStagePage() {
                     Track your progress and start your learning journey today.
                   </p>
                   <div className="flex flex-wrap gap-4 justify-center animate-slide-up delay-300">
-                    <Link href="/register">
+                    <Link href="/pricing">
                       <Button
-                        variant="secondary"
                         size="lg"
-                        className="rounded-xl shadow-lg shadow-black/20 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 bg-white text-primary hover:bg-white/90"
+                        className="rounded-xl shadow-lg shadow-black/20 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 !bg-white !text-primary hover:!bg-gray-100"
                       >
-                        Sign up free
+                        Start free trial
                         <svg className="w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                         </svg>
@@ -395,9 +394,8 @@ export default function KeyStagePage() {
                     </Link>
                     <Link href="/login">
                       <Button
-                        variant="outline"
                         size="lg"
-                        className="rounded-xl border-2 border-white/30 text-white hover:bg-white hover:text-primary backdrop-blur-sm transition-all duration-300 hover:-translate-y-1"
+                        className="rounded-xl border-2 !border-white/30 !bg-transparent !text-white hover:!bg-white hover:!text-primary backdrop-blur-sm transition-all duration-300 hover:-translate-y-1"
                       >
                         Log in
                       </Button>

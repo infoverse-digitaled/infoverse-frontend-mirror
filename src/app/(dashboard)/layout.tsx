@@ -28,7 +28,7 @@ function NavItem({ href, icon, label, isActive }: NavItemProps) {
         }
       )}
     >
-      <span className={clsx("w-5 h-5", isActive ? "text-primary" : "text-gray-400")}>{icon}</span>
+      <span className={clsx("w-5 h-5", isActive ? "text-primary" : "text-gray-500")}>{icon}</span>
       {label}
     </Link>
   );

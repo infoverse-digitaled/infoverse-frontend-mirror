@@ -97,13 +97,13 @@ export default function BlogPostPage() {
               <Link href="/" className="hover:text-primary transition-colors duration-300 hover:-translate-y-0.5 inline-block">
                 Home
               </Link>
-              <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
               <Link href="/blog" className="hover:text-primary transition-colors duration-300 hover:-translate-y-0.5 inline-block">
                 Blog
               </Link>
-              <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
               <span className="text-gray-900 font-medium line-clamp-1">{post.title}</span>
@@ -269,16 +269,16 @@ export default function BlogPostPage() {
                   Ready to start learning?
                 </h2>
                 <p className="text-lg md:text-xl text-white/90 mb-10 leading-relaxed animate-slide-up delay-200">
-                  Access over 5,000+ curriculum-aligned lessons designed by expert educators. Transform your learning journey today.
+                  Access over 100+ curriculum-aligned lessons designed by expert educators. Transform your learning journey today.
                 </p>
                 <div className="flex flex-wrap gap-4 justify-center animate-slide-up delay-300">
-                  <Link href="/register">
+                  <Link href="/pricing">
                     <Button
                       variant="secondary"
                       size="lg"
                       className="rounded-xl shadow-lg shadow-black/20 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 bg-white text-primary hover:bg-white/90"
                     >
-                      Get started free
+                      Start free trial
                       <svg className="w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                       </svg>

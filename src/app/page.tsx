@@ -61,9 +61,9 @@ export default function Home() {
   ];
 
   const stats = [
-    { value: '5,000+', label: 'Lessons Available' },
+    { value: '100+', label: 'Lessons Available' },
     { value: '4', label: 'Key Stages' },
-    { value: '50+', label: 'Subjects' },
+    { value: '8+', label: 'Subjects' },
     { value: '100%', label: 'Curriculum Aligned' },
   ];
 
@@ -183,13 +183,13 @@ export default function Home() {
 
             {/* Subheadline */}
             <p className="text-xl md:text-2xl text-white/80 leading-relaxed mb-12 max-w-3xl mx-auto animate-slide-up delay-200">
-              Over 5,000+ curriculum-aligned lessons, expertly designed to boost academic performance.
+              Over 100+ curriculum-aligned lessons, expertly designed to boost academic performance.
               Access the same quality content trusted by UK schools.
             </p>
 
             {/* CTA Buttons */}
             <div className="flex flex-wrap gap-4 justify-center animate-slide-up delay-300">
-              <Link href="/register">
+              <Link href="/pricing">
                 <Button
                   size="lg"
                   className="rounded-2xl px-10 py-4 text-lg shadow-2xl shadow-primary/40 hover:shadow-3xl hover:shadow-primary/50 hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group"
@@ -314,8 +314,8 @@ export default function Home() {
                         ))}
                       </div>
                       <div>
-                        <p className="font-semibold text-gray-900">Join 10,000+ learners</p>
-                        <p className="text-sm text-gray-500">Already improving their grades</p>
+                        <p className="font-semibold text-gray-900">5 Key Stages</p>
+                        <p className="text-sm text-gray-500">100+ active lessons</p>
                       </div>
                     </div>
                   </div>
@@ -344,7 +344,7 @@ export default function Home() {
                       </svg>
                     </div>
                     <div>
-                      <p className="font-semibold text-gray-900 text-sm">5,000+</p>
+                      <p className="font-semibold text-gray-900 text-sm">100+</p>
                       <p className="text-xs text-gray-500">Active lessons</p>
                     </div>
                   </div>

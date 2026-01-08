@@ -129,7 +129,7 @@ export default function KeyStagesPage() {
 
             {/* Subheadline */}
             <p className="text-xl md:text-2xl text-white/80 leading-relaxed mb-12 max-w-3xl mx-auto animate-slide-up delay-200">
-              Over 5,000+ curriculum-aligned lessons designed by expert educators.
+              Over 100+ curriculum-aligned lessons designed by expert educators.
               Select a key stage to begin your learning journey.
             </p>
 
