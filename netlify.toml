@@ -5,6 +5,7 @@
 [build.environment]
   NODE_VERSION = "22"
   NEXT_PUBLIC_API_URL = "https://infoverse-backend-84498540486.europe-west1.run.app/api/v1"
+  NEXT_DISABLE_TURBOPACK = "1"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
