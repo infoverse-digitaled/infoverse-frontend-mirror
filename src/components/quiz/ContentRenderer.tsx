@@ -80,6 +80,7 @@ export function ContentRenderer({ content }: ContentRendererProps) {
           height={content.height}
           alt={content.alt || 'Quiz image'}
           className="max-w-full rounded-lg"
+          unoptimized
         />
       </div>
     );

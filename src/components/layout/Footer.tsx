@@ -34,7 +34,7 @@ export const Footer: React.FC = () => {
   const footerLinks = {
     product: [
       { href: '/key-stages', label: 'Browse Lessons' },
-      { href: '/pricing', label: 'Pricing' },
+      { href: '/register', label: 'Get Started' },
       { href: '/nurtured', label: 'For Schools' },
       { href: '/about', label: 'About Us' },
     ],

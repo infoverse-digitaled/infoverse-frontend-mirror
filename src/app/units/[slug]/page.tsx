@@ -48,12 +48,20 @@ export default function UnitPage() {
         <nav className="mb-3 text-sm font-medium text-gray-500">
           <Link href="/browse" className="hover:text-primary">Browse</Link>
           <span className="mx-2">/</span>
-          {unit.keyStageSlug ? (
+          {unit.keyStageSlug && (
+            <>
+              <Link href={`/key-stages/${unit.keyStageSlug}`} className="hover:text-primary">
+                {unit.keyStageTitle || unit.keyStageSlug.toUpperCase()}
+              </Link>
+              <span className="mx-2">/</span>
+            </>
+          )}
+          {unit.keyStageSlug && unit.subjectSlug ? (
             <Link href={`/subjects/${unit.keyStageSlug}/${unit.subjectSlug}`} className="hover:text-primary">
               {unit.subjectTitle}
             </Link>
           ) : (
-            <span>{unit.subjectTitle}</span>
+            <span>{unit.subjectTitle || 'Subject'}</span>
           )}
           <span className="mx-2">/</span>
           <span className="text-gray-900">{unit.title}</span>

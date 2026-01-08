@@ -22,8 +22,8 @@ export interface Unit {
   title: string;
   subjectSlug: string;
   subjectTitle: string;
-  keyStageSlug?: string;
-  keyStageTitle?: string;
+  keyStageSlug: string;
+  keyStageTitle: string;
   yearSlug?: string;
   yearTitle?: string;
   unitStudyOrder?: number;

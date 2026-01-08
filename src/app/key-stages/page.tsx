@@ -353,13 +353,13 @@ export default function KeyStagesPage() {
                     Get Started Free
                   </Button>
                 </Link>
-                <Link href="/pricing">
+                <Link href="/login">
                   <Button
                     variant="outline"
                     size="lg"
                     className="rounded-2xl px-10 py-4 text-lg border-white/30 text-white hover:bg-white hover:text-gray-900 transition-all duration-300"
                   >
-                    View Pricing
+                    Login
                   </Button>
                 </Link>
               </div>

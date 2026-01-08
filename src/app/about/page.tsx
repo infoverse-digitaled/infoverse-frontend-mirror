@@ -76,9 +76,9 @@ export default function AboutPage() {
                   Learn
                 </Button>
               </Link>
-              <Link href="/pricing">
+              <Link href="/register">
                 <Button variant="outline" size="lg" className="rounded-xl">
-                  Discover
+                  Get Started
                 </Button>
               </Link>
             </div>
@@ -107,7 +107,7 @@ export default function AboutPage() {
                     Explore
                   </Button>
                 </Link>
-                <Link href="/pricing" className="inline-flex items-center gap-2 font-medium text-gray-900 hover:text-primary transition-colors">
+                <Link href="/about" className="inline-flex items-center gap-2 font-medium text-gray-900 hover:text-primary transition-colors">
                   Learn more
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

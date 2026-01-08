@@ -213,8 +213,9 @@ export default function DashboardLayout({
         />
       )}
 
-      {/* Trial Expired Modal - blocks all content until payment */}
+      {/* Trial Expired Modal - temporarily disabled, paywall is off
       {isTrialExpired && <TrialExpiredModal daysOverdue={getDaysOverdue()} />}
+      */}
     </div>
   );
 }

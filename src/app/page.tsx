@@ -146,8 +146,27 @@ export default function Home() {
         {/* Content */}
         <Container size="xl" className="relative z-10 px-5 md:px-16">
           <div className="max-w-5xl mx-auto text-center">
+            {/* Brand Logo and Name */}
+            <div className="flex items-center justify-center gap-4 mb-8 animate-slide-up">
+              <div className="relative w-16 h-16 md:w-20 md:h-20 rounded-2xl overflow-hidden shadow-2xl shadow-white/20 border-2 border-white/30">
+                <Image
+                  src="/Transparent logo.png"
+                  alt="Infoverse Logo"
+                  fill
+                  className="object-cover"
+                  priority
+                />
+              </div>
+              <div className="text-left">
+                <h2 className="font-bold text-3xl md:text-4xl text-white tracking-tight">
+                  Infoverse
+                </h2>
+                <p className="text-white/70 text-sm md:text-base">Digital-Ed</p>
+              </div>
+            </div>
+
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white/90 text-sm mb-8 animate-slide-up">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white/90 text-sm mb-8 animate-slide-up delay-75">
               <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
               50+ Years of Combined Teaching Excellence
             </div>
@@ -170,7 +189,7 @@ export default function Home() {
 
             {/* CTA Buttons */}
             <div className="flex flex-wrap gap-4 justify-center animate-slide-up delay-300">
-              <Link href="/pricing">
+              <Link href="/register">
                 <Button
                   size="lg"
                   className="rounded-2xl px-10 py-4 text-lg shadow-2xl shadow-primary/40 hover:shadow-3xl hover:shadow-primary/50 hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group"
@@ -265,14 +284,18 @@ export default function Home() {
 
                 {/* Main card */}
                 <div className="relative bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
-                  {/* Image placeholder */}
+                  {/* Image placeholder with Infoverse branding */}
                   <div className="aspect-[4/3] bg-gradient-to-br from-primary/10 via-secondary/5 to-purple-500/10 flex items-center justify-center">
                     <div className="text-center p-8">
-                      <div className="w-24 h-24 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white">
-                        <svg className="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                        </svg>
+                      <div className="relative w-24 h-24 mx-auto mb-4 rounded-2xl overflow-hidden shadow-xl">
+                        <Image
+                          src="/Transparent logo.png"
+                          alt="Infoverse Logo"
+                          fill
+                          className="object-cover"
+                        />
                       </div>
+                      <h3 className="text-2xl font-bold text-gray-900 mb-1">Infoverse</h3>
                       <p className="text-gray-500 font-medium">Expert-Crafted Lessons</p>
                     </div>
                   </div>
@@ -552,6 +575,19 @@ export default function Home() {
 
             {/* Content */}
             <div className="relative z-10 p-10 md:p-20 text-center">
+              {/* Infoverse Logo and Brand */}
+              <div className="flex items-center justify-center gap-3 mb-8">
+                <div className="relative w-14 h-14 md:w-16 md:h-16 rounded-xl overflow-hidden shadow-xl border-2 border-white/30">
+                  <Image
+                    src="/Transparent logo.png"
+                    alt="Infoverse Logo"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <span className="text-2xl md:text-3xl font-bold text-white">Infoverse</span>
+              </div>
+
               <h2 className="font-serif font-bold text-4xl md:text-6xl lg:text-7xl leading-[1.1] tracking-tight text-white mb-8 max-w-4xl mx-auto">
                 Ready to transform your learning journey?
               </h2>
@@ -568,7 +604,7 @@ export default function Home() {
                     Get Started Free
                   </Button>
                 </Link>
-                <Link href="/pricing">
+                <Link href="/register">
                   <Button
                     variant="outline"
                     size="lg"

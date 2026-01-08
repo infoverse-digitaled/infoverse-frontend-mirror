@@ -1,15 +1,24 @@
 'use client';
 
-import { useAuth } from '@/contexts/AuthContext';
-import Link from 'next/link';
-import clsx from 'clsx';
+// NOTE: Temporarily disabled - paywall is disabled
+// Uncomment imports and code below when paywall is re-enabled
+
+// import { useAuth } from '@/contexts/AuthContext';
+// import Link from 'next/link';
+// import clsx from 'clsx';
 
 /**
  * Trial Banner Component
  * Shows trial days remaining across the entire platform
  * Self-manages visibility - only shows for users with active trial
+ *
+ * NOTE: Temporarily disabled - paywall is disabled
  */
 export function TrialBanner() {
+  // Temporarily disabled - paywall is disabled
+  return null;
+
+  /* Original code - uncomment when paywall is re-enabled
   const { user, loading, daysRemaining } = useAuth();
 
   // Don't render during loading or if no user
@@ -44,4 +53,5 @@ export function TrialBanner() {
       </Link>
     </div>
   );
+  */
 }

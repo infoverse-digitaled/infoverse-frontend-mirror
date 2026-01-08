@@ -84,23 +84,39 @@ export default function LessonPage() {
             Home
           </Link>
           {' / '}
-          <Link href="/subjects" className="hover:text-primary">
-            Subjects
+          <Link href="/key-stages" className="hover:text-primary">
+            Key Stages
           </Link>
           {' / '}
-          <Link
-            href={`/subjects/${lesson.keyStageSlug}/${lesson.subjectSlug}`}
-            className="hover:text-primary"
-          >
-            {lesson.subjectTitle}
-          </Link>
+          {lesson.keyStageSlug && (
+            <>
+              <Link href={`/key-stages/${lesson.keyStageSlug}`} className="hover:text-primary">
+                {lesson.keyStageTitle}
+              </Link>
+              {' / '}
+            </>
+          )}
+          {lesson.keyStageSlug && lesson.subjectSlug ? (
+            <Link
+              href={`/subjects/${lesson.keyStageSlug}/${lesson.subjectSlug}`}
+              className="hover:text-primary"
+            >
+              {lesson.subjectTitle}
+            </Link>
+          ) : (
+            <span>{lesson.subjectTitle}</span>
+          )}
           {' / '}
-          <Link
-            href={`/units/${lesson.unitSlug}`}
-            className="hover:text-primary"
-          >
-            {lesson.unitTitle}
-          </Link>
+          {lesson.unitSlug ? (
+            <Link
+              href={`/units/${lesson.unitSlug}`}
+              className="hover:text-primary"
+            >
+              {lesson.unitTitle}
+            </Link>
+          ) : (
+            <span>{lesson.unitTitle}</span>
+          )}
           {' / '}
           <span className="text-text-dark font-semibold">{lesson.title}</span>
         </nav>
