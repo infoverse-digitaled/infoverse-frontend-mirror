@@ -95,6 +95,9 @@ export default function SubjectPage() {
     );
   }
 
+  // Check if this is KS4 Maths (Coming Soon - no content available)
+  const isKs4Maths = keyStage === 'ks4' && slug === 'maths';
+
   if (error || !subject) {
     return (
       <div className="text-center py-16 bg-white rounded-xl shadow-soft">
@@ -107,6 +110,58 @@ export default function SubjectPage() {
         <Button onClick={() => router.back()} variant="outline">
           ← Back
         </Button>
+      </div>
+    );
+  }
+
+  // Show Coming Soon page for KS4 Maths
+  if (isKs4Maths) {
+    return (
+      <div className="space-y-8">
+        {/* Header Section */}
+        <Card className="p-6 shadow-soft">
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div className="flex items-center gap-4">
+              {icon}
+              <div>
+                <p className="text-sm text-gray-500">Subject Overview</p>
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+                  {subject.title}
+                </h1>
+                <p className="text-sm text-gray-500 mt-1">Key Stage: {subject.keyStageTitle}</p>
+              </div>
+            </div>
+            <Button variant="outline" onClick={() => router.back()}>
+              ← Back
+            </Button>
+          </div>
+        </Card>
+
+        {/* Coming Soon Section */}
+        <div className="text-center py-16 bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl border border-amber-200">
+          <div className="max-w-md mx-auto px-6">
+            <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg">
+              <svg className="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+              GCSE Maths Coming Soon
+            </h2>
+            <p className="text-gray-600 mb-6 leading-relaxed">
+              We&apos;re working with Oak National Academy to bring you comprehensive GCSE Maths content.
+              This includes Year 10 and Year 11 curriculum materials.
+            </p>
+            <p className="text-sm text-amber-700 bg-amber-100 px-4 py-2 rounded-lg inline-block">
+              Check back soon for updates!
+            </p>
+            <div className="mt-8">
+              <Button onClick={() => router.push('/key-stages/ks4')} variant="primary">
+                Explore Other KS4 Subjects
+              </Button>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
