@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui';
 import { cn } from '@/lib/utils/cn';
 import { useAuth } from '@/contexts/AuthContext';
@@ -13,6 +14,13 @@ export const Header: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
   const { user, logout } = useAuth();
   const moreDropdownRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
+
+  // Check if we're on a page that has its own sidebar navigation (dashboard pages)
+  // Hide the floating navbar on these pages to avoid overlap
+  const hasSidebarNav = pathname?.startsWith('/dashboard') ||
+    pathname?.startsWith('/browse') ||
+    pathname?.startsWith('/profile');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -94,6 +102,11 @@ export const Header: React.FC = () => {
 
   const navLinks = user ? authenticatedNavLinks : publicNavLinks;
 
+  // Don't render the floating navbar on pages with sidebar navigation
+  if (hasSidebarNav) {
+    return null;
+  }
+
   return (
     <>
       {/* Floating Bottom Navigation Bar */}
@@ -110,24 +123,24 @@ export const Header: React.FC = () => {
             scrolled ? 'px-2 py-1.5' : 'px-3 py-2'
           )}
         >
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 px-3 group">
+          {/* Logo and Business Name */}
+          <Link href="/" className="flex items-center gap-2 px-2 group">
             <div className={cn(
-              'relative rounded-xl overflow-hidden shadow-lg group-hover:shadow-xl group-hover:shadow-primary/20 transition-all duration-300 group-hover:scale-105',
-              scrolled ? 'w-8 h-8' : 'w-10 h-10'
+              'relative rounded-lg overflow-hidden bg-white transition-all duration-300 group-hover:scale-110',
+              scrolled ? 'w-7 h-7' : 'w-8 h-8'
             )}>
               <Image
                 src="/Transparent logo.png"
                 alt="Infoverse Logo"
-                width={40}
-                height={40}
+                width={32}
+                height={32}
                 className="object-cover"
                 priority
               />
             </div>
             <span className={cn(
-              'font-bold tracking-tight bg-gradient-to-r from-gray-900 via-primary to-gray-900 bg-clip-text text-transparent hidden md:block transition-all duration-300',
-              scrolled ? 'text-base' : 'text-lg'
+              'font-bold bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent hidden sm:block transition-all duration-300',
+              scrolled ? 'text-sm' : 'text-base'
             )}>
               Infoverse
             </span>

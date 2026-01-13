@@ -8,16 +8,14 @@ import { TrialExpiredModal } from '@/components/modals/TrialExpiredModal';
 export function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
-  // Don't show Header/Footer on auth pages and dashboard pages
+  // Don't show Header/Footer on auth pages
   const isAuthPage =
     pathname?.startsWith('/login') || pathname?.startsWith('/register');
-  const isDashboardPage =
-    pathname?.startsWith('/dashboard') || pathname?.startsWith('/browse') || pathname?.startsWith('/profile');
 
   // Always render the trial expired modal
   const trialModal = <TrialExpiredModal />;
 
-  if (isAuthPage || isDashboardPage) {
+  if (isAuthPage) {
     return (
       <>
         {children}

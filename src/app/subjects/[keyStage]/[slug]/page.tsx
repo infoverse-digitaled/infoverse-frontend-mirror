@@ -19,6 +19,9 @@ export default function SubjectPage() {
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
 
+  // Tier selection state for KS4 subjects
+  const [selectedTier, setSelectedTier] = useState<string | null>(null);
+
   // Enrollment hooks
   const { data: myProgress } = useMyProgress();
   const { enroll, isEnrolling, error: enrollError } = useEnroll();
@@ -31,22 +34,95 @@ export default function SubjectPage() {
   // Find the specific subject from the subjects list
   const subject = subjects?.find(s => s.slug === slug);
 
+  // Check if this is a KS4 tiered subject
+  const isKs4Maths = keyStage === 'ks4' && slug === 'maths';
+  const isKs4Science = keyStage === 'ks4' && slug === 'science';
+  const isKs4TieredSubject = isKs4Maths || isKs4Science;
+
+  // Exam subject selection state for KS4 Science
+  const [selectedExamSubject, setSelectedExamSubject] = useState<string | null>(null);
+
+  // Get available exam subjects from units (for Science)
+  const availableExamSubjects = useMemo(() => {
+    if (!units || !isKs4Science) return [];
+    const examSubjects = new Map<string, { slug: string; title: string; count: number }>();
+    units.forEach(unit => {
+      if (unit.examSubject && unit.examSubjectTitle) {
+        const existing = examSubjects.get(unit.examSubject);
+        if (existing) {
+          existing.count++;
+        } else {
+          examSubjects.set(unit.examSubject, { slug: unit.examSubject, title: unit.examSubjectTitle, count: 1 });
+        }
+      }
+    });
+    // Sort: Combined Science first, then alphabetically
+    return Array.from(examSubjects.values()).sort((a, b) => {
+      if (a.slug === 'combined-science') return -1;
+      if (b.slug === 'combined-science') return 1;
+      return a.title.localeCompare(b.title);
+    });
+  }, [units, isKs4Science]);
+
+  // Get available tiers from units (filtered by exam subject for Science)
+  const availableTiers = useMemo(() => {
+    if (!units || !isKs4TieredSubject) return [];
+    // For Science, only show tiers for the selected exam subject
+    const filteredUnits = isKs4Science && selectedExamSubject
+      ? units.filter(u => u.examSubject === selectedExamSubject)
+      : units;
+
+    const tiers = new Map<string, { slug: string; title: string; count: number }>();
+    filteredUnits.forEach(unit => {
+      if (unit.tier && unit.tierTitle) {
+        const existing = tiers.get(unit.tier);
+        if (existing) {
+          existing.count++;
+        } else {
+          tiers.set(unit.tier, { slug: unit.tier, title: unit.tierTitle, count: 1 });
+        }
+      }
+    });
+    // Sort so Foundation comes before Higher
+    return Array.from(tiers.values()).sort((a, b) =>
+      a.slug === 'foundation' ? -1 : b.slug === 'foundation' ? 1 : 0
+    );
+  }, [units, isKs4TieredSubject, isKs4Science, selectedExamSubject]);
+
   // Check if user is already enrolled in this subject
   const isEnrolled = useMemo(() => {
     return myProgress?.some(p => p.subjectSlug === slug && p.keyStage === keyStage) || false;
   }, [myProgress, slug, keyStage]);
 
-  // Pagination logic
+  // Filter units by selected tier and exam subject for KS4
+  const filteredUnits = useMemo(() => {
+    if (!units) return [];
+    let filtered = units;
+
+    // Filter by exam subject for Science
+    if (isKs4Science && selectedExamSubject) {
+      filtered = filtered.filter(unit => unit.examSubject === selectedExamSubject);
+    }
+
+    // Filter by tier
+    if (isKs4TieredSubject && selectedTier) {
+      filtered = filtered.filter(unit => unit.tier === selectedTier);
+    }
+
+    return filtered;
+  }, [units, isKs4TieredSubject, isKs4Science, selectedTier, selectedExamSubject]);
+
+  // Pagination logic - use filtered units
   const totalPages = useMemo(() => {
-    if (!units) return 0;
-    return Math.ceil(units.length / UNITS_PER_PAGE);
-  }, [units]);
+    if (!filteredUnits) return 0;
+    return Math.ceil(filteredUnits.length / UNITS_PER_PAGE);
+  }, [filteredUnits]);
 
   const paginatedUnits = useMemo(() => {
-    if (!units) return [];
+    if (!filteredUnits) return [];
     const startIndex = (currentPage - 1) * UNITS_PER_PAGE;
-    return units.slice(startIndex, startIndex + UNITS_PER_PAGE);
-  }, [units, currentPage]);
+    return filteredUnits.slice(startIndex, startIndex + UNITS_PER_PAGE);
+  }, [filteredUnits, currentPage]);
 
   const handleEnroll = async () => {
     if (!user) {
@@ -95,9 +171,6 @@ export default function SubjectPage() {
     );
   }
 
-  // Check if this is KS4 Maths (Coming Soon - no content available)
-  const isKs4Maths = keyStage === 'ks4' && slug === 'maths';
-
   if (error || !subject) {
     return (
       <div className="text-center py-16 bg-white rounded-xl shadow-soft">
@@ -107,61 +180,9 @@ export default function SubjectPage() {
         <p className="text-gray-500 mb-6">
           Unable to load this subject. Please try again later.
         </p>
-        <Button onClick={() => router.back()} variant="outline">
+        <Button onClick={() => router.push(`/key-stages/${keyStage}`)} variant="outline">
           ← Back
         </Button>
-      </div>
-    );
-  }
-
-  // Show Coming Soon page for KS4 Maths
-  if (isKs4Maths) {
-    return (
-      <div className="space-y-8">
-        {/* Header Section */}
-        <Card className="p-6 shadow-soft">
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <div className="flex items-center gap-4">
-              {icon}
-              <div>
-                <p className="text-sm text-gray-500">Subject Overview</p>
-                <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-                  {subject.title}
-                </h1>
-                <p className="text-sm text-gray-500 mt-1">Key Stage: {subject.keyStageTitle}</p>
-              </div>
-            </div>
-            <Button variant="outline" onClick={() => router.back()}>
-              ← Back
-            </Button>
-          </div>
-        </Card>
-
-        {/* Coming Soon Section */}
-        <div className="text-center py-16 bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl border border-amber-200">
-          <div className="max-w-md mx-auto px-6">
-            <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg">
-              <svg className="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
-              GCSE Maths Coming Soon
-            </h2>
-            <p className="text-gray-600 mb-6 leading-relaxed">
-              We&apos;re working with Oak National Academy to bring you comprehensive GCSE Maths content.
-              This includes Year 10 and Year 11 curriculum materials.
-            </p>
-            <p className="text-sm text-amber-700 bg-amber-100 px-4 py-2 rounded-lg inline-block">
-              Check back soon for updates!
-            </p>
-            <div className="mt-8">
-              <Button onClick={() => router.push('/key-stages/ks4')} variant="primary">
-                Explore Other KS4 Subjects
-              </Button>
-            </div>
-          </div>
-        </div>
       </div>
     );
   }
@@ -182,7 +203,7 @@ export default function SubjectPage() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <Button variant="outline" onClick={() => router.back()}>
+            <Button variant="outline" onClick={() => router.push(`/browse?ks=${keyStage.replace('ks', '')}`)}>
               ← Back
             </Button>
             {user && (
@@ -224,13 +245,192 @@ export default function SubjectPage() {
         )}
       </Card>
 
-      {/* Units Section */}
+      {/* Exam Subject Selection for KS4 Science */}
+      {isKs4Science && availableExamSubjects.length > 0 && !selectedExamSubject && (
+        <div>
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Choose Your Science Course</h2>
+            <p className="text-gray-600">Select the science course you're studying</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {availableExamSubjects.map((examSubject) => {
+              const getExamSubjectStyle = (slug: string) => {
+                switch (slug) {
+                  case 'combined-science':
+                    return { gradient: 'from-emerald-500 to-teal-600', icon: '🔬' };
+                  case 'biology':
+                    return { gradient: 'from-green-500 to-emerald-600', icon: '🧬' };
+                  case 'chemistry':
+                    return { gradient: 'from-blue-500 to-cyan-600', icon: '⚗️' };
+                  case 'physics':
+                    return { gradient: 'from-purple-500 to-indigo-600', icon: '⚛️' };
+                  default:
+                    return { gradient: 'from-gray-500 to-gray-600', icon: '🔬' };
+                }
+              };
+              const style = getExamSubjectStyle(examSubject.slug);
+
+              return (
+                <button
+                  key={examSubject.slug}
+                  onClick={() => {
+                    setSelectedExamSubject(examSubject.slug);
+                    setCurrentPage(1);
+                  }}
+                  className="group text-left"
+                >
+                  <Card hover className="p-8 h-full transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-1">
+                    <div className="flex items-start gap-4">
+                      <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shadow-lg bg-gradient-to-br ${style.gradient}`}>
+                        {style.icon}
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-xl font-bold text-gray-900 group-hover:text-primary transition-colors">
+                          {examSubject.title}
+                        </h3>
+                        <p className="text-gray-500 mt-1">
+                          {examSubject.count} unit{examSubject.count !== 1 ? 's' : ''} available
+                        </p>
+                        <p className="text-sm text-gray-400 mt-2">
+                          {examSubject.slug === 'combined-science'
+                            ? 'Covers all three sciences - ideal for most students'
+                            : `Separate ${examSubject.title} GCSE course`
+                          }
+                        </p>
+                      </div>
+                      <div className="text-gray-400 group-hover:text-primary transition-colors">
+                        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
+                    </div>
+                  </Card>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Tier Selection for KS4 (Maths or Science after exam subject selected) */}
+      {isKs4TieredSubject && availableTiers.length > 0 && !selectedTier && (isKs4Maths || (isKs4Science && selectedExamSubject)) && (
+        <div>
+          <div className="mb-6">
+            <div className="flex items-center gap-3 mb-2">
+              <h2 className="text-2xl font-bold text-gray-900">Choose Your Level</h2>
+              {isKs4Science && selectedExamSubject && (
+                <button
+                  onClick={() => {
+                    setSelectedExamSubject(null);
+                    setSelectedTier(null);
+                    setCurrentPage(1);
+                  }}
+                  className="text-sm text-primary hover:text-primary-dark flex items-center gap-1"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                  </svg>
+                  Change course
+                </button>
+              )}
+            </div>
+            <p className="text-gray-600">
+              {isKs4Science && selectedExamSubject
+                ? `Select Foundation or Higher for ${availableExamSubjects.find(e => e.slug === selectedExamSubject)?.title}`
+                : 'Select Foundation or Higher to view the available units'
+              }
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {availableTiers.map((tier) => (
+              <button
+                key={tier.slug}
+                onClick={() => {
+                  setSelectedTier(tier.slug);
+                  setCurrentPage(1);
+                }}
+                className="group text-left"
+              >
+                <Card hover className="p-8 h-full transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-1">
+                  <div className="flex items-start gap-4">
+                    <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shadow-lg ${
+                      tier.slug === 'foundation'
+                        ? 'bg-gradient-to-br from-blue-500 to-blue-600'
+                        : 'bg-gradient-to-br from-purple-500 to-purple-600'
+                    }`}>
+                      {tier.slug === 'foundation' ? '📘' : '📕'}
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-xl font-bold text-gray-900 group-hover:text-primary transition-colors">
+                        {tier.title}
+                      </h3>
+                      <p className="text-gray-500 mt-1">
+                        {tier.count} unit{tier.count !== 1 ? 's' : ''} available
+                      </p>
+                    </div>
+                    <div className="text-gray-400 group-hover:text-primary transition-colors">
+                      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </div>
+                  </div>
+                </Card>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Units Section - Show when tier is selected (for KS4) or always (for other key stages) */}
+      {(!isKs4TieredSubject || selectedTier) && (
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold text-gray-900">Units in {subject.title}</h2>
-          {units && units.length > 0 && (
+          <div className="flex flex-col gap-1">
+            <h2 className="text-2xl font-bold text-gray-900">
+              {isKs4Science && selectedExamSubject && selectedTier
+                ? `${availableExamSubjects.find(e => e.slug === selectedExamSubject)?.title} - ${availableTiers.find(t => t.slug === selectedTier)?.title}`
+                : selectedTier
+                  ? `${availableTiers.find(t => t.slug === selectedTier)?.title} Units`
+                  : `Units in ${subject.title}`
+              }
+            </h2>
+            {(selectedTier || selectedExamSubject) && (
+              <div className="flex items-center gap-3">
+                {isKs4Science && selectedExamSubject && (
+                  <button
+                    onClick={() => {
+                      setSelectedExamSubject(null);
+                      setSelectedTier(null);
+                      setCurrentPage(1);
+                    }}
+                    className="text-sm text-primary hover:text-primary-dark flex items-center gap-1"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    Change course
+                  </button>
+                )}
+                {selectedTier && (
+                  <button
+                    onClick={() => {
+                      setSelectedTier(null);
+                      setCurrentPage(1);
+                    }}
+                    className="text-sm text-primary hover:text-primary-dark flex items-center gap-1"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    Change level
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+          {filteredUnits && filteredUnits.length > 0 && (
             <span className="text-sm text-gray-500">
-              Showing {((currentPage - 1) * UNITS_PER_PAGE) + 1}-{Math.min(currentPage * UNITS_PER_PAGE, units.length)} of {units.length} units
+              Showing {((currentPage - 1) * UNITS_PER_PAGE) + 1}-{Math.min(currentPage * UNITS_PER_PAGE, filteredUnits.length)} of {filteredUnits.length} units
             </span>
           )}
         </div>
@@ -245,10 +445,33 @@ export default function SubjectPage() {
                   <div key={uniqueKey}>
                     <Link href={`/units/${unit.slug}`} className="block">
                       <Card hover className="p-5 flex items-center justify-between">
-                        <div>
-                          <CardTitle className="text-lg">Unit {unit.unitNumber}: {unit.title}</CardTitle>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <CardTitle className="text-lg">Unit {unit.unitNumber}: {unit.title}</CardTitle>
+                            {/* KS4 Tier Badge */}
+                            {unit.tierTitle && (
+                              <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
+                                unit.tier === 'higher'
+                                  ? 'bg-purple-100 text-purple-700'
+                                  : 'bg-blue-100 text-blue-700'
+                              }`}>
+                                {unit.tierTitle}
+                              </span>
+                            )}
+                            {/* KS4 Science Exam Subject Badge */}
+                            {unit.examSubjectTitle && (
+                              <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-green-100 text-green-700">
+                                {unit.examSubjectTitle}
+                              </span>
+                            )}
+                          </div>
                           <p className="text-sm text-gray-500 mt-1">
-                            {unit.numberOfLessons} lesson{unit.numberOfLessons !== 1 ? 's' : ''}
+                            {unit.year && <span>Year {unit.year} • </span>}
+                            {unit.numberOfLessons !== undefined ? (
+                              <>{unit.numberOfLessons} lesson{unit.numberOfLessons !== 1 ? 's' : ''}</>
+                            ) : (
+                              <span className="text-gray-400">Lessons available</span>
+                            )}
                           </p>
                         </div>
                         <Button variant="ghost" size="sm">
@@ -308,6 +531,7 @@ export default function SubjectPage() {
           </div>
         )}
       </div>
+      )}
     </div>
   );
 }

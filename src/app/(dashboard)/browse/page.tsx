@@ -1,26 +1,42 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { SubjectCard } from '@/components/lessons/SubjectCard';
+import { KeyStageSelector } from '@/components/lessons';
 import { useSubjects } from '@/lib/hooks/useOakData';
 import { Loading } from '@/components/ui';
-import clsx from 'clsx';
 
 export default function BrowsePage() {
-  const [selectedKeyStage, setSelectedKeyStage] = useState(1);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  // Get key stage from URL params, default to 1
+  const ksParam = searchParams.get('ks');
+  const initialKeyStage = ksParam ? parseInt(ksParam, 10) : 1;
+  const [selectedKeyStage, setSelectedKeyStage] = useState(initialKeyStage);
+
+  // Update URL when key stage changes
+  const handleKeyStageChange = (ks: number) => {
+    setSelectedKeyStage(ks);
+    router.replace(`/browse?ks=${ks}`, { scroll: false });
+  };
+
+  // Sync state with URL params when they change (e.g., back navigation)
+  useEffect(() => {
+    if (ksParam) {
+      const ks = parseInt(ksParam, 10);
+      if (ks >= 1 && ks <= 4 && ks !== selectedKeyStage) {
+        setSelectedKeyStage(ks);
+      }
+    }
+  }, [ksParam]);
 
   const {
     data: subjects,
     error,
     isLoading,
   } = useSubjects({ keyStageSlug: `ks${selectedKeyStage}` });
-
-  const keyStages = [
-      { id: 1, label: 'Key Stage 1' },
-      { id: 2, label: 'Key Stage 2' },
-      { id: 3, label: 'Key Stage 3' },
-      { id: 4, label: 'Key Stage 4' },
-  ];
 
   return (
     <div className="space-y-4 sm:space-y-6 lg:space-y-8">
@@ -35,23 +51,10 @@ export default function BrowsePage() {
       </div>
 
       {/* Key Stage Selector Tabs */}
-      <div className="bg-white p-1 sm:p-1.5 rounded-xl shadow-soft flex sm:inline-flex overflow-x-auto max-w-full gap-0.5 sm:gap-1">
-         {keyStages.map((ks) => (
-             <button
-                key={ks.id}
-                onClick={() => setSelectedKeyStage(ks.id)}
-                className={clsx(
-                    "flex-1 sm:flex-none px-3 sm:px-6 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-all whitespace-nowrap",
-                    selectedKeyStage === ks.id
-                        ? "bg-primary text-white shadow-md"
-                        : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"
-                )}
-             >
-                <span className="hidden sm:inline">{ks.label}</span>
-                <span className="sm:hidden">KS{ks.id}</span>
-             </button>
-         ))}
-      </div>
+      <KeyStageSelector
+        selectedKeyStage={selectedKeyStage}
+        onSelect={handleKeyStageChange}
+      />
 
       {/* Subjects Grid */}
       {isLoading ? (

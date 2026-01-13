@@ -29,6 +29,13 @@ export interface Unit {
   unitStudyOrder?: number;
   numberOfLessons: number;
   unitNumber?: number;
+  year?: number | string;
+  // KS4 tier info (Foundation/Higher for Maths and Science)
+  tier?: 'foundation' | 'higher';
+  tierTitle?: string;
+  // KS4 Science exam subject info (Combined science, Biology, Chemistry, Physics)
+  examSubject?: string;
+  examSubjectTitle?: string;
 }
 
 export interface Lesson {

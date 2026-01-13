@@ -260,67 +260,40 @@ export default function KeyStagePage() {
             {subjects && subjects.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                 {subjects.map((subject, index) => {
-                  // Check if this is KS4 Maths (Coming Soon)
-                  const isKs4Maths = slug === 'ks4' && subject.slug === 'maths';
-
                   const cardContent = (
-                    <div className={`group bg-white border border-gray-200 rounded-2xl p-8 ${isKs4Maths ? 'opacity-75' : 'hover:shadow-xl hover:-translate-y-2'} transition-all duration-300 h-full flex flex-col relative overflow-hidden`}>
-                      {/* Coming Soon Banner for KS4 Maths */}
-                      {isKs4Maths && (
-                        <div className="absolute top-4 right-4 z-20">
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-bold rounded-full shadow-lg">
-                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            Coming Soon
-                          </span>
-                        </div>
-                      )}
-
+                    <div className="group bg-white border border-gray-200 rounded-2xl p-8 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 h-full flex flex-col relative overflow-hidden">
                       {/* Gradient hover effect */}
-                      <div className={`absolute inset-0 bg-gradient-to-br ${stageGradient.from}/5 ${stageGradient.to}/5 opacity-0 ${!isKs4Maths ? 'group-hover:opacity-100' : ''} transition-opacity duration-300`} />
+                      <div className={`absolute inset-0 bg-gradient-to-br ${stageGradient.from}/5 ${stageGradient.to}/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
 
                       {/* Corner decoration */}
-                      <div className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-br ${stageGradient.from}/10 ${stageGradient.to}/10 rounded-bl-[100px] opacity-0 ${!isKs4Maths ? 'group-hover:opacity-100' : ''} transition-opacity duration-300`} />
+                      <div className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-br ${stageGradient.from}/10 ${stageGradient.to}/10 rounded-bl-[100px] opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
 
                       <div className="relative z-10">
                         {/* Subject Icon */}
-                        <div className={`mb-5 transform ${!isKs4Maths ? 'group-hover:scale-110' : ''} transition-transform duration-300 ${isKs4Maths ? 'grayscale-[30%]' : ''}`}>
+                        <div className="mb-5 transform group-hover:scale-110 transition-transform duration-300">
                           <SubjectIcon title={subject.title} />
                         </div>
 
                         {/* Subject Title */}
-                        <h3 className={`font-serif font-bold text-xl md:text-2xl leading-tight mb-3 ${isKs4Maths ? 'text-gray-500' : 'text-gray-900 group-hover:text-primary'} transition-colors duration-300`}>
+                        <h3 className="font-serif font-bold text-xl md:text-2xl leading-tight mb-3 text-gray-900 group-hover:text-primary transition-colors duration-300">
                           {subject.title}
                         </h3>
 
                         {/* Description */}
                         <p className="text-base text-gray-600 leading-relaxed mb-6 flex-grow">
-                          {isKs4Maths
-                            ? 'GCSE Maths content coming soon from Oak National Academy'
-                            : `Explore units and lessons for ${subject.title}`
-                          }
+                          Explore units and lessons for {subject.title}
                         </p>
 
                         {/* Footer */}
                         <div className="flex items-center justify-between">
-                          {isKs4Maths ? (
-                            <div className="inline-flex items-center gap-2 font-medium text-gray-400">
-                              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                              </svg>
-                              Not available yet
-                            </div>
-                          ) : (
-                            <div className="inline-flex items-center gap-2 font-medium text-gray-900 group-hover:text-primary transition-colors duration-300">
-                              View units
-                              <svg className="w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                              </svg>
-                            </div>
-                          )}
+                          <div className="inline-flex items-center gap-2 font-medium text-gray-900 group-hover:text-primary transition-colors duration-300">
+                            View units
+                            <svg className="w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                            </svg>
+                          </div>
 
-                          {!user && !isKs4Maths && (
+                          {!user && (
                             <div className="flex items-center gap-1.5 text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded-lg">
                               <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -332,19 +305,6 @@ export default function KeyStagePage() {
                       </div>
                     </div>
                   );
-
-                  // If KS4 Maths, don't wrap in Link (make it unclickable)
-                  if (isKs4Maths) {
-                    return (
-                      <div
-                        key={subject.slug}
-                        className="animate-slide-up cursor-not-allowed"
-                        style={{ animationDelay: `${100 + index * 50}ms` }}
-                      >
-                        {cardContent}
-                      </div>
-                    );
-                  }
 
                   return (
                     <Link
