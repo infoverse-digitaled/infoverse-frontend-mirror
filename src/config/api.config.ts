@@ -26,6 +26,8 @@ export const API_ENDPOINTS = {
   // Content/Blog endpoints
   contentPosts: '/content/posts',
   contentPost: (slug: string) => `/content/posts/${slug}`,
+  // Bug Report / Feedback
+  bugReport: '/public/bug-report',
 } as const;
 
 export const API_CONFIG = {
