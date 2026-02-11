@@ -1,0 +1,9 @@
+node_modules
+.next
+.git
+.gitignore
+.env*
+netlify.toml
+README.md
+PRD.md
+.DS_Store
