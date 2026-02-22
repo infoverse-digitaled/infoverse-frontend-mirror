@@ -6,14 +6,14 @@ steps:
       - '--build-arg'
       - 'NEXT_PUBLIC_API_URL=${_NEXT_PUBLIC_API_URL}'
       - '-t'
-      - 'gcr.io/$PROJECT_ID/infoverse-frontend:$COMMIT_SHA'
+      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/infoverse/infoverse-frontend:$COMMIT_SHA'
       - '.'
 
-  # Push the image to Container Registry
+  # Push the image to Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'push'
-      - 'gcr.io/$PROJECT_ID/infoverse-frontend:$COMMIT_SHA'
+      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/infoverse/infoverse-frontend:$COMMIT_SHA'
 
   # Deploy to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -22,7 +22,7 @@ steps:
       - 'run'
       - 'deploy'
       - 'infoverse-frontend'
-      - '--image=gcr.io/$PROJECT_ID/infoverse-frontend:$COMMIT_SHA'
+      - '--image=europe-west1-docker.pkg.dev/$PROJECT_ID/infoverse/infoverse-frontend:$COMMIT_SHA'
       - '--region=europe-west1'
       - '--platform=managed'
       - '--allow-unauthenticated'
@@ -34,4 +34,4 @@ options:
   logging: CLOUD_LOGGING_ONLY
 
 images:
-  - 'gcr.io/$PROJECT_ID/infoverse-frontend:$COMMIT_SHA'
+  - 'europe-west1-docker.pkg.dev/$PROJECT_ID/infoverse/infoverse-frontend:$COMMIT_SHA'
