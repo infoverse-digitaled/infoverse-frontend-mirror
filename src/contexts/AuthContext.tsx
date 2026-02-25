@@ -8,6 +8,7 @@ import {
   ReactNode,
 } from 'react';
 import authApiClient from '@/lib/api/auth-client';
+import { API_ENDPOINTS } from '@/config/api.config';
 
 interface Subscription {
   plan: 'free' | 'premium';
@@ -39,6 +40,8 @@ interface AuthContextType {
   loading: boolean;
   isTrialExpired: boolean;
   daysRemaining: number | null;
+  forgotPassword: (email: string) => Promise<void>;
+  resetPassword: (password: string, token: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -106,7 +109,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const fetchUser = async () => {
     try {
-      const res = await authApiClient.get('/auth/me');
+      const res = await authApiClient.get(API_ENDPOINTS.me);
       setUser(res.data.data);
     } catch (error) {
       console.error('Failed to fetch user:', error);
@@ -117,7 +120,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const login = async (email: string, password: string) => {
-    const res = await authApiClient.post('/auth/login', { email, password });
+    const res = await authApiClient.post(API_ENDPOINTS.login, { email, password });
     const { token, user: userData } = res.data.data;
     localStorage.setItem('token', token);
     setUser(userData);
@@ -134,12 +137,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       payload.licenseKey = licenseKey;
     }
 
-    const res = await authApiClient.post('/auth/register', payload);
+    const res = await authApiClient.post(API_ENDPOINTS.register, payload);
     const { token, user: userData, skipPayment } = res.data.data;
     localStorage.setItem('token', token);
     setUser(userData);
 
     return { skipPayment: !!skipPayment };
+  };
+
+  const forgotPassword = async (email: string) => {
+    await authApiClient.post(API_ENDPOINTS.forgotPassword, { email });
+  };
+
+  const resetPassword = async (password: string, token: string) => {
+    await authApiClient.post(API_ENDPOINTS.resetPassword, { password, token });
   };
 
   const logout = async () => {
@@ -153,7 +164,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, setTokenAndFetchUser, loading, isTrialExpired, daysRemaining }}>
+    <AuthContext.Provider value={{
+      user,
+      login,
+      register,
+      logout,
+      setTokenAndFetchUser,
+      loading,
+      isTrialExpired,
+      daysRemaining,
+      forgotPassword,
+      resetPassword
+    }}>
       {children}
     </AuthContext.Provider>
   );

@@ -26,6 +26,12 @@ export const API_ENDPOINTS = {
   // Content/Blog endpoints
   contentPosts: '/content/posts',
   contentPost: (slug: string) => `/content/posts/${slug}`,
+  // Auth endpoints
+  login: '/auth/login',
+  register: '/auth/register',
+  me: '/auth/me',
+  forgotPassword: '/auth/forgot-password',
+  resetPassword: '/auth/reset-password',
   // Bug Report / Feedback
   bugReport: '/public/bug-report',
 } as const;
