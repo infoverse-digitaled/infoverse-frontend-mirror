@@ -57,9 +57,40 @@ export function TrialExpiredModal() {
 
   useEffect(() => {
     // Show modal if user is logged in and trial is expired
-    // But NOT on the pricing or payment pages
-    const isPaymentPage = pathname?.startsWith('/pricing') || pathname?.startsWith('/payment');
-    if (user && isTrialExpired && !isPaymentPage) {
+    if (!user || !isTrialExpired) {
+      setIsOpen(false);
+      return;
+    }
+
+    // INDUSTRY STANDARD: Never block auth, pricing, landing, or legal pages
+    const publicExemptions = [
+      '/',
+      '/login',
+      '/register',
+      '/forgot-password',
+      '/reset-password',
+      '/pricing',
+      '/payment',
+      '/about',
+      '/contact',
+      '/privacy',
+      '/terms',
+      '/cookies',
+      '/auth/callback'
+    ];
+
+    const isExempt = publicExemptions.some(path => pathname === path || pathname?.startsWith(path + '/'));
+    
+    // We only want to block "product" pages (dashboard, browse, lessons, etc.)
+    const isProductPage = 
+      pathname?.startsWith('/dashboard') || 
+      pathname?.startsWith('/browse') || 
+      pathname?.startsWith('/lessons') ||
+      pathname?.startsWith('/key-stages') ||
+      pathname?.startsWith('/subjects') ||
+      pathname?.startsWith('/units');
+
+    if (isProductPage && !isExempt) {
       setIsOpen(true);
     } else {
       setIsOpen(false);

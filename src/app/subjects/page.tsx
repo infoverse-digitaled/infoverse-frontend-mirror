@@ -1,11 +1,26 @@
 'use client';
 
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Container, Card, CardHeader, CardTitle, CardContent, Loading } from '@/components/ui';
+import { Container, Card, CardHeader, CardTitle, CardContent, Loading, Button } from '@/components/ui';
 import { useSubjects } from '@/lib/hooks/useOakData';
 
 export default function SubjectsPage() {
+  const router = useRouter();
   const { data: subjects, error, isLoading } = useSubjects();
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (!isLoading && error) {
+      timer = setTimeout(() => {
+        router.push('/');
+      }, 3000);
+    }
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [isLoading, error, router]);
 
   if (isLoading) {
     return (
@@ -22,9 +37,12 @@ export default function SubjectsPage() {
           <h2 className="text-2xl font-bold text-text-dark mb-4">
             Error Loading Subjects
           </h2>
-          <p className="text-text-light">
-            Unable to load subjects. Please try again later.
+          <p className="text-text-light mb-6">
+            Unable to load subjects. Redirecting you automatically...
           </p>
+          <Button onClick={() => router.push('/')} variant="outline">
+            ← Go back home
+          </Button>
         </div>
       </Container>
     );

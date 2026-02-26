@@ -1,7 +1,8 @@
 'use client';
+import { useEffect } from 'react';
 import { ContentRenderer } from '@/components/quiz/ContentRenderer';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import {
   Container,
   Card,
@@ -26,6 +27,7 @@ export default function LessonPage() {
   const params = useParams();
   const slug = params.slug as string;
   const { user } = useAuth();
+  const router = useRouter();
 
   const { data: lesson, error, isLoading } = useLesson(slug);
   const { data: quizData, isLoading: quizLoading } = useLessonQuiz(slug);
@@ -49,6 +51,18 @@ export default function LessonPage() {
     return context;
   };
 
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (!isLoading && (error || !lesson)) {
+      timer = setTimeout(() => {
+        router.push('/subjects');
+      }, 3000);
+    }
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [isLoading, error, lesson, router]);
+
   if (isLoading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
@@ -65,11 +79,11 @@ export default function LessonPage() {
             Error Loading Lesson
           </h2>
           <p className="text-text-light mb-6">
-            Unable to load this lesson. Please try again later.
+            Unable to load this lesson. Redirecting you automatically...
           </p>
-          <Link href="/subjects">
-            <Button variant="primary">Back to Subjects</Button>
-          </Link>
+          <Button onClick={() => router.push('/subjects')} variant="primary">
+            Go back now
+          </Button>
         </div>
       </Container>
     );

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { Card, CardTitle, Loading, Button } from '@/components/ui';
@@ -144,6 +144,18 @@ export default function SubjectPage() {
   const isLoading = subjectsLoading || unitsLoading;
   const error = subjectsError || unitsError;
 
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (!isLoading && (error || !subject)) {
+      timer = setTimeout(() => {
+        router.push(`/browse?ks=${keyStage.replace('ks', '')}`);
+      }, 3000);
+    }
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [isLoading, error, subject, router, keyStage]);
+
   // Debug: Check for duplicate or missing slugs
   if (units && units.length > 0) {
     const slugs = units.map(u => u.slug);
@@ -178,10 +190,10 @@ export default function SubjectPage() {
           Error Loading Subject
         </h2>
         <p className="text-gray-500 mb-6">
-          Unable to load this subject. Please try again later.
+          Unable to load this subject. Redirecting you automatically...
         </p>
-        <Button onClick={() => router.push(`/key-stages/${keyStage}`)} variant="outline">
-          ← Back
+        <Button onClick={() => router.push(`/browse?ks=${keyStage.replace('ks', '')}`)} variant="outline">
+          ← Go back now
         </Button>
       </div>
     );
@@ -193,6 +205,9 @@ export default function SubjectPage() {
       <Card className="p-6 shadow-soft">
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-4">
+            <Button variant="outline" onClick={() => router.push(`/browse?ks=${keyStage.replace('ks', '')}`)}>
+              ← Back
+            </Button>
             {icon}
             <div>
               <p className="text-sm text-gray-500">Subject Overview</p>
@@ -203,9 +218,6 @@ export default function SubjectPage() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <Button variant="outline" onClick={() => router.push(`/browse?ks=${keyStage.replace('ks', '')}`)}>
-              ← Back
-            </Button>
             {user && (
               isEnrolled ? (
                 <div className="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-700 rounded-lg border border-green-200">

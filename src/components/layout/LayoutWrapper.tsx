@@ -13,17 +13,14 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const { shouldShowFeedback, dismissFeedback } = useFeedbackTimer();
 
   // Don't show Header/Footer on auth pages
-  const isAuthPage =
-    pathname?.startsWith('/login') || pathname?.startsWith('/register');
-
-  // Always render the trial expired modal
-  const trialModal = <TrialExpiredModal />;
+  const authPaths = ['/login', '/register', '/onboarding', '/forgot-password', '/reset-password', '/auth/callback'];
+  const isAuthPage = authPaths.some(path => pathname === path || pathname?.startsWith(path + '/'));
 
   if (isAuthPage) {
     return (
       <>
         {children}
-        {trialModal}
+        <TrialExpiredModal />
       </>
     );
   }
@@ -33,7 +30,7 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
       <Header />
       <main className="flex-grow">{children}</main>
       <Footer />
-      {trialModal}
+      <TrialExpiredModal />
       <BugReportButton />
       <BugReportModal isOpen={shouldShowFeedback} onClose={dismissFeedback} />
     </>
