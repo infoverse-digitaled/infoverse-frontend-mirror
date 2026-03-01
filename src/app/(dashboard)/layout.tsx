@@ -60,9 +60,6 @@ export default function DashboardLayout({
     return Math.max(0, diffDays);
   };
 
-  // Debug logging
-  console.log('[Dashboard] isTrialExpired:', isTrialExpired, 'daysRemaining:', daysRemaining, 'user subscription:', user?.subscription);
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
