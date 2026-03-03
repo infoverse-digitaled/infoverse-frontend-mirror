@@ -156,13 +156,9 @@ export default function SubjectPage() {
     };
   }, [isLoading, error, subject, router, keyStage]);
 
-  // Debug: Check for duplicate or missing slugs
+  // Debug: Check for missing slugs
   if (units && units.length > 0) {
     const slugs = units.map(u => u.slug);
-    const uniqueSlugs = new Set(slugs);
-    if (slugs.length !== uniqueSlugs.size) {
-      console.warn('⚠️ Duplicate unit slugs detected:', slugs);
-    }
     const undefinedSlugs = slugs.filter(s => !s);
     if (undefinedSlugs.length > 0) {
       console.warn('⚠️ Units with undefined slugs:', undefinedSlugs.length);
@@ -451,7 +447,9 @@ export default function SubjectPage() {
           <>
             <div className="grid grid-cols-1 gap-4">
               {paginatedUnits.map((unit, index) => {
-                const uniqueKey = unit.slug || `${unit.subjectSlug}-${unit.unitNumber || index}`;
+                const uniqueKey = unit.slug 
+                  ? `${unit.slug}-${unit.tier || 'none'}-${unit.examSubject || 'none'}`
+                  : `${unit.subjectSlug}-${unit.unitNumber || index}`;
 
                 return (
                   <div key={uniqueKey}>
