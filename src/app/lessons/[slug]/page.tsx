@@ -92,73 +92,51 @@ export default function LessonPage() {
   return (
     <div className="bg-background-light min-h-screen py-16">
       <Container>
-        {/* Breadcrumb */}
-        <nav className="mb-8 text-sm text-text-light">
-          <Link href="/" className="hover:text-primary">
-            Home
-          </Link>
-          {' / '}
-          <Link href="/key-stages" className="hover:text-primary">
-            Key Stages
-          </Link>
-          {' / '}
-          {lesson.keyStageSlug && (
-            <>
-              <Link href={`/key-stages/${lesson.keyStageSlug}`} className="hover:text-primary">
-                {lesson.keyStageTitle}
+        {/* Header: Back button + Lesson title */}
+        <div className="mb-10">
+          {/* Back button row */}
+          <div className="mb-6">
+            {lesson.unitSlug ? (
+              <Link href={`/units/${lesson.unitSlug}`}>
+                <Button variant="outline" className="flex items-center gap-2">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                  </svg>
+                  Back to Unit
+                </Button>
               </Link>
-              {' / '}
-            </>
-          )}
-          {lesson.keyStageSlug && lesson.subjectSlug ? (
-            <Link
-              href={`/subjects/${lesson.keyStageSlug}/${lesson.subjectSlug}`}
-              className="hover:text-primary"
-            >
-              {lesson.subjectTitle}
-            </Link>
-          ) : (
-            <span>{lesson.subjectTitle}</span>
-          )}
-          {' / '}
-          {lesson.unitSlug ? (
-            <Link
-              href={`/units/${lesson.unitSlug}`}
-              className="hover:text-primary"
-            >
-              {lesson.unitTitle}
-            </Link>
-          ) : (
-            <span>{lesson.unitTitle}</span>
-          )}
-          {' / '}
-          <span className="text-text-dark font-semibold">{lesson.title}</span>
-        </nav>
+            ) : (
+              <Button variant="outline" onClick={() => router.back()} className="flex items-center gap-2">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Back
+              </Button>
+            )}
+          </div>
 
-        <div className="mb-12">
+          {/* Lesson title block */}
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-16 h-16 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xl">
+            <div className="w-14 h-14 rounded-2xl bg-primary text-white flex items-center justify-center font-bold text-xl shrink-0">
               {lesson.lessonNumber}
             </div>
             <div>
-              <h1 className="text-4xl md:text-5xl font-bold text-text-dark">
+              <h1 className="text-3xl md:text-4xl font-bold text-text-dark">
                 {lesson.title}
               </h1>
+              <div className="flex flex-wrap gap-3 text-sm text-text-light mt-1.5">
+                <span>{lesson.subjectTitle}</span>
+                <span className="text-gray-300">•</span>
+                <span>{lesson.keyStageTitle}</span>
+                <span className="text-gray-300">•</span>
+                <span>{lesson.unitTitle}</span>
+              </div>
             </div>
-          </div>
-          <div className="flex flex-wrap gap-4 text-lg text-text-light">
-            <span>{lesson.subjectTitle}</span>
-            <span>•</span>
-            <span>{lesson.keyStageTitle}</span>
-            <span>•</span>
-            <span>{lesson.unitTitle}</span>
           </div>
           {lesson.expired && (
-            <div className="mt-4">
-              <span className="inline-block px-4 py-2 bg-secondary text-white rounded-button">
-                Content may be outdated
-              </span>
-            </div>
+            <span className="inline-block px-4 py-2 bg-secondary text-white rounded-button text-sm">
+              Content may be outdated
+            </span>
           )}
         </div>
 

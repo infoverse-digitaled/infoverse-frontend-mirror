@@ -58,33 +58,26 @@ export default function UnitPage() {
   return (
     <div className="space-y-8">
       {/* Header with Breadcrumbs and Title */}
-      <Card className="p-6 shadow-soft">
+      <Card className="p-8 shadow-soft">
         <div className="flex items-start gap-6">
-          <Button variant="outline" onClick={() => router.back()} className="shrink-0 mt-1">
-            ← Back
-          </Button>
+          {unit.keyStageSlug && unit.subjectSlug ? (
+            <Link href={`/subjects/${unit.keyStageSlug}/${unit.subjectSlug}`} className="shrink-0 mt-1">
+              <Button variant="outline" className="flex items-center gap-2">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Back to Subject
+              </Button>
+            </Link>
+          ) : (
+            <Button variant="outline" onClick={() => router.push('/browse')} className="shrink-0 mt-1 flex items-center gap-2">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              Browse
+            </Button>
+          )}
           <div className="flex-1">
-            <nav className="mb-3 text-sm font-medium text-gray-500">
-              <Link href="/browse" className="hover:text-primary">Browse</Link>
-              <span className="mx-2">/</span>
-              {unit.keyStageSlug && (
-                <>
-                  <Link href={`/key-stages/${unit.keyStageSlug}`} className="hover:text-primary">
-                    {unit.keyStageTitle || unit.keyStageSlug.toUpperCase()}
-                  </Link>
-                  <span className="mx-2">/</span>
-                </>
-              )}
-              {unit.keyStageSlug && unit.subjectSlug ? (
-                <Link href={`/subjects/${unit.keyStageSlug}/${unit.subjectSlug}`} className="hover:text-primary">
-                  {unit.subjectTitle}
-                </Link>
-              ) : (
-                <span>{unit.subjectTitle || 'Subject'}</span>
-              )}
-              <span className="mx-2">/</span>
-              <span className="text-gray-900">{unit.title}</span>
-            </nav>
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
               Unit {unit.unitNumber}: {unit.title}
             </h1>
@@ -104,27 +97,57 @@ export default function UnitPage() {
       </Card>
 
       {/* Lessons List */}
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">Lessons in this Unit</h2>
-        {lessons && lessons.length > 0 ? (
-          <div className="space-y-4">
-            {lessons
-              .sort((a, b) => a.lessonNumber - b.lessonNumber)
-              .map((lesson) => (
-                <LessonCard
-                  key={lesson.slug}
-                  lesson={lesson}
-                  subjectSlug={unit.subjectSlug}
-                />
-              ))}
-          </div>
-        ) : (
-          <div className="text-center py-12 bg-white rounded-xl shadow-soft">
-            <p className="text-lg text-gray-500">
-              No lessons found for this unit yet.
-            </p>
-          </div>
-        )}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-soft overflow-hidden">
+        {/* Section header */}
+        <div className="px-8 py-6 border-b border-gray-100 flex items-center justify-between flex-wrap gap-3">
+          <h2 className="text-xl font-bold text-gray-900">Lessons in this Unit</h2>
+          {lessons && lessons.length > 0 && (
+            <span className="text-sm font-medium text-gray-400 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100">
+              {lessons.length} lesson{lessons.length !== 1 ? 's' : ''}
+            </span>
+          )}
+        </div>
+
+        <div className="p-6">
+          {lessons && lessons.length > 0 ? (
+            <div className="flex flex-col gap-3">
+              {lessons
+                .sort((a, b) => a.lessonNumber - b.lessonNumber)
+                .map((lesson) => (
+                  <Link key={lesson.slug} href={`/lessons/${lesson.slug}`} className="block group">
+                    <div className="flex items-center justify-between px-6 py-5 rounded-xl border border-gray-100 bg-gray-50/60 hover:bg-white hover:border-primary/30 hover:shadow-md transition-all duration-200">
+                      <div className="flex items-center gap-5 flex-1 min-w-0">
+                        {/* Lesson number badge */}
+                        <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-sm font-bold shrink-0">
+                          {lesson.lessonNumber}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-base font-semibold text-gray-900 group-hover:text-primary transition-colors line-clamp-1">
+                            {lesson.title}
+                          </h3>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0 text-gray-400 group-hover:text-primary transition-colors">
+                        <span className="text-sm font-medium hidden sm:block">Start Lesson</span>
+                        <svg className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+            </div>
+          ) : (
+            <div className="text-center py-16">
+              <div className="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <svg className="w-7 h-7 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+              </div>
+              <p className="text-base font-medium text-gray-500">No lessons found for this unit yet.</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
