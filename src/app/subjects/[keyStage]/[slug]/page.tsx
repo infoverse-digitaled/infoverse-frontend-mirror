@@ -196,9 +196,9 @@ export default function SubjectPage() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Header Section */}
-      <Card className="p-6 shadow-soft">
+      <Card className="p-8 shadow-soft">
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-4">
             <Button variant="outline" onClick={() => router.push(`/browse?ks=${keyStage.replace('ks', '')}`)}>
@@ -391,10 +391,11 @@ export default function SubjectPage() {
 
       {/* Units Section - Show when tier is selected (for KS4) or always (for other key stages) */}
       {(!isKs4TieredSubject || selectedTier) && (
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex flex-col gap-1">
-            <h2 className="text-2xl font-bold text-gray-900">
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-soft overflow-hidden">
+        {/* Units section header */}
+        <div className="px-8 py-6 border-b border-gray-100 flex items-center justify-between flex-wrap gap-3">
+          <div className="flex flex-col gap-1.5">
+            <h2 className="text-xl font-bold text-gray-900">
               {isKs4Science && selectedExamSubject && selectedTier
                 ? `${availableExamSubjects.find(e => e.slug === selectedExamSubject)?.title} - ${availableTiers.find(t => t.slug === selectedTier)?.title}`
                 : selectedTier
@@ -403,7 +404,7 @@ export default function SubjectPage() {
               }
             </h2>
             {(selectedTier || selectedExamSubject) && (
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-4">
                 {isKs4Science && selectedExamSubject && (
                   <button
                     onClick={() => {
@@ -411,7 +412,7 @@ export default function SubjectPage() {
                       setSelectedTier(null);
                       setCurrentPage(1);
                     }}
-                    className="text-sm text-primary hover:text-primary-dark flex items-center gap-1"
+                    className="text-sm text-primary hover:text-primary-dark flex items-center gap-1.5"
                   >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -425,7 +426,7 @@ export default function SubjectPage() {
                       setSelectedTier(null);
                       setCurrentPage(1);
                     }}
-                    className="text-sm text-primary hover:text-primary-dark flex items-center gap-1"
+                    className="text-sm text-primary hover:text-primary-dark flex items-center gap-1.5"
                   >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -437,15 +438,16 @@ export default function SubjectPage() {
             )}
           </div>
           {filteredUnits && filteredUnits.length > 0 && (
-            <span className="text-sm text-gray-500">
-              Showing {((currentPage - 1) * UNITS_PER_PAGE) + 1}-{Math.min(currentPage * UNITS_PER_PAGE, filteredUnits.length)} of {filteredUnits.length} units
+            <span className="text-sm font-medium text-gray-400 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100">
+              {filteredUnits.length} unit{filteredUnits.length !== 1 ? 's' : ''}
             </span>
           )}
         </div>
+        <div className="p-6">
 
         {paginatedUnits && paginatedUnits.length > 0 ? (
           <>
-            <div className="grid grid-cols-1 gap-4">
+            <div className="flex flex-col gap-3">
               {paginatedUnits.map((unit, index) => {
                 const uniqueKey = unit.slug 
                   ? `${unit.slug}-${unit.tier || 'none'}-${unit.examSubject || 'none'}`
@@ -453,41 +455,50 @@ export default function SubjectPage() {
 
                 return (
                   <div key={uniqueKey}>
-                    <Link href={`/units/${unit.slug}`} className="block">
-                      <Card hover className="p-5 flex items-center justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <CardTitle className="text-lg">Unit {unit.unitNumber}: {unit.title}</CardTitle>
-                            {/* KS4 Tier Badge */}
-                            {unit.tierTitle && (
-                              <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
-                                unit.tier === 'higher'
-                                  ? 'bg-purple-100 text-purple-700'
-                                  : 'bg-blue-100 text-blue-700'
-                              }`}>
-                                {unit.tierTitle}
-                              </span>
-                            )}
-                            {/* KS4 Science Exam Subject Badge */}
-                            {unit.examSubjectTitle && (
-                              <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-green-100 text-green-700">
-                                {unit.examSubjectTitle}
-                              </span>
-                            )}
+                    <Link href={`/units/${unit.slug}`} className="block group">
+                      <div className="flex items-center justify-between px-6 py-5 rounded-xl border border-gray-100 bg-gray-50/60 hover:bg-white hover:border-primary/30 hover:shadow-md transition-all duration-200">
+                        <div className="flex items-center gap-5 flex-1 min-w-0">
+                          {/* Unit number badge */}
+                          <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-sm font-bold shrink-0">
+                            {unit.unitNumber || index + 1}
                           </div>
-                          <p className="text-sm text-gray-500 mt-1">
-                            {unit.year && <span>Year {unit.year} • </span>}
-                            {unit.numberOfLessons !== undefined ? (
-                              <>{unit.numberOfLessons} lesson{unit.numberOfLessons !== 1 ? 's' : ''}</>
-                            ) : (
-                              <span className="text-gray-400">Lessons available</span>
-                            )}
-                          </p>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <CardTitle className="text-base group-hover:text-primary transition-colors">{unit.title}</CardTitle>
+                              {/* KS4 Tier Badge */}
+                              {unit.tierTitle && (
+                                <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
+                                  unit.tier === 'higher'
+                                    ? 'bg-purple-100 text-purple-700'
+                                    : 'bg-blue-100 text-blue-700'
+                                }`}>
+                                  {unit.tierTitle}
+                                </span>
+                              )}
+                              {/* KS4 Science Exam Subject Badge */}
+                              {unit.examSubjectTitle && (
+                                <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-green-100 text-green-700">
+                                  {unit.examSubjectTitle}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-sm text-gray-400 mt-0.5">
+                              {unit.year && <span>Year {unit.year} · </span>}
+                              {unit.numberOfLessons !== undefined ? (
+                                <>{unit.numberOfLessons} lesson{unit.numberOfLessons !== 1 ? 's' : ''}</>
+                              ) : (
+                                <span>Lessons available</span>
+                              )}
+                            </p>
+                          </div>
                         </div>
-                        <Button variant="ghost" size="sm">
-                          View Unit →
-                        </Button>
-                      </Card>
+                        <div className="flex items-center gap-2 shrink-0 text-gray-400 group-hover:text-primary transition-colors">
+                          <span className="text-sm font-medium hidden sm:block">View Unit</span>
+                          <svg className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </div>
+                      </div>
                     </Link>
                   </div>
                 );
@@ -496,7 +507,7 @@ export default function SubjectPage() {
 
             {/* Pagination Controls */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-center gap-2 mt-6">
+              <div className="flex items-center justify-center gap-2 mt-8 pt-6 border-t border-gray-100">
                 <Button
                   variant="outline"
                   size="sm"
@@ -511,9 +522,9 @@ export default function SubjectPage() {
                     <button
                       key={page}
                       onClick={() => setCurrentPage(page)}
-                      className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
+                      className={`w-9 h-9 rounded-lg text-sm font-medium transition-colors ${
                         currentPage === page
-                          ? 'bg-primary text-white'
+                          ? 'bg-primary text-white shadow-sm'
                           : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                       }`}
                     >
@@ -534,12 +545,16 @@ export default function SubjectPage() {
             )}
           </>
         ) : (
-          <div className="text-center py-12 bg-white rounded-xl shadow-soft">
-            <p className="text-lg text-gray-500">
-              No units found for this subject yet.
-            </p>
+          <div className="text-center py-16">
+            <div className="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <svg className="w-7 h-7 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              </svg>
+            </div>
+            <p className="text-base font-medium text-gray-500">No units found for this subject yet.</p>
           </div>
         )}
+        </div>
       </div>
       )}
     </div>
