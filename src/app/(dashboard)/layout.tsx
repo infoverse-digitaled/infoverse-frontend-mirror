@@ -51,16 +51,6 @@ export default function DashboardLayout({
     }
   }, [user, loading, router]);
 
-  // Calculate days overdue for the modal
-  const getDaysOverdue = (): number => {
-    if (!user?.subscription?.trialEndsAt) return 0;
-    const trialEnd = new Date(user.subscription.trialEndsAt);
-    const now = new Date();
-    const diffTime = now.getTime() - trialEnd.getTime();
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-    return Math.max(0, diffDays);
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -212,9 +202,8 @@ export default function DashboardLayout({
         />
       )}
 
-      {/* Trial Expired Modal - temporarily disabled, paywall is off
-      {isTrialExpired && <TrialExpiredModal daysOverdue={getDaysOverdue()} />}
-      */}
+      {/* Trial Expired Modal */}
+      {isTrialExpired && <TrialExpiredModal />}
     </div>
   );
 }

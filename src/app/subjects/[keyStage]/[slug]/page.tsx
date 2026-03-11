@@ -198,19 +198,21 @@ export default function SubjectPage() {
   return (
     <div className="space-y-6">
       {/* Header Section */}
-      <Card className="p-8 shadow-soft">
-        <div className="flex items-center justify-between flex-wrap gap-4">
-          <div className="flex items-center gap-4">
-            <Button variant="outline" onClick={() => router.push(`/browse?ks=${keyStage.replace('ks', '')}`)}>
+      <Card className="p-6 md:p-8 shadow-soft">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 md:gap-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <Button className="w-full sm:w-auto justify-center" variant="outline" onClick={() => router.push(`/browse?ks=${keyStage.replace('ks', '')}`)}>
               ← Back
             </Button>
-            {icon}
-            <div>
-              <p className="text-sm text-gray-500">Subject Overview</p>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-                {subject.title}
-              </h1>
-              <p className="text-sm text-gray-500 mt-1">Key Stage: {subject.keyStageTitle}</p>
+            <div className="flex items-center gap-4">
+              {icon}
+              <div>
+                <p className="text-sm text-gray-500">Subject Overview</p>
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+                  {subject.title}
+                </h1>
+                <p className="text-sm text-gray-500 mt-1">Key Stage: {subject.keyStageTitle}</p>
+              </div>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -255,12 +257,13 @@ export default function SubjectPage() {
 
       {/* Exam Subject Selection for KS4 Science */}
       {isKs4Science && availableExamSubjects.length > 0 && !selectedExamSubject && (
-        <div>
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Choose Your Science Course</h2>
-            <p className="text-gray-600">Select the science course you're studying</p>
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-soft overflow-hidden">
+          <div className="px-6 md:px-8 py-5 border-b border-gray-100">
+            <h2 className="text-lg md:text-xl font-bold text-gray-900">Choose Your Science Course</h2>
+            <p className="text-sm text-gray-500 mt-1">Select the science course you're studying</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="p-4 sm:p-6 md:p-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
             {availableExamSubjects.map((examSubject) => {
               const getExamSubjectStyle = (slug: string) => {
                 switch (slug) {
@@ -287,7 +290,7 @@ export default function SubjectPage() {
                   }}
                   className="group text-left"
                 >
-                  <Card hover className="p-8 h-full transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-1">
+                  <Card hover className="p-6 md:p-8 h-full transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-1">
                     <div className="flex items-start gap-4">
                       <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shadow-lg bg-gradient-to-br ${style.gradient}`}>
                         {style.icon}
@@ -316,40 +319,42 @@ export default function SubjectPage() {
                 </button>
               );
             })}
+            </div>
           </div>
         </div>
       )}
 
       {/* Tier Selection for KS4 (Maths or Science after exam subject selected) */}
       {isKs4TieredSubject && availableTiers.length > 0 && !selectedTier && (isKs4Maths || (isKs4Science && selectedExamSubject)) && (
-        <div>
-          <div className="mb-6">
-            <div className="flex items-center gap-3 mb-2">
-              <h2 className="text-2xl font-bold text-gray-900">Choose Your Level</h2>
-              {isKs4Science && selectedExamSubject && (
-                <button
-                  onClick={() => {
-                    setSelectedExamSubject(null);
-                    setSelectedTier(null);
-                    setCurrentPage(1);
-                  }}
-                  className="text-sm text-primary hover:text-primary-dark flex items-center gap-1"
-                >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                  </svg>
-                  Change course
-                </button>
-              )}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-soft overflow-hidden">
+          <div className="px-6 md:px-8 py-5 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h2 className="text-lg md:text-xl font-bold text-gray-900">Choose Your Level</h2>
+              <p className="text-sm text-gray-500 mt-1">
+                {isKs4Science && selectedExamSubject
+                  ? `Select Foundation or Higher for ${availableExamSubjects.find(e => e.slug === selectedExamSubject)?.title}`
+                  : 'Select Foundation or Higher to view the available units'
+                }
+              </p>
             </div>
-            <p className="text-gray-600">
-              {isKs4Science && selectedExamSubject
-                ? `Select Foundation or Higher for ${availableExamSubjects.find(e => e.slug === selectedExamSubject)?.title}`
-                : 'Select Foundation or Higher to view the available units'
-              }
-            </p>
+            {isKs4Science && selectedExamSubject && (
+              <button
+                onClick={() => {
+                  setSelectedExamSubject(null);
+                  setSelectedTier(null);
+                  setCurrentPage(1);
+                }}
+                className="text-sm text-primary hover:text-primary-dark flex items-center gap-1.5 whitespace-nowrap"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Change course
+              </button>
+            )}
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="p-4 sm:p-6 md:p-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
             {availableTiers.map((tier) => (
               <button
                 key={tier.slug}
@@ -359,7 +364,7 @@ export default function SubjectPage() {
                 }}
                 className="group text-left"
               >
-                <Card hover className="p-8 h-full transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-1">
+                <Card hover className="p-6 md:p-8 h-full transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-1">
                   <div className="flex items-start gap-4">
                     <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shadow-lg ${
                       tier.slug === 'foundation'
@@ -385,6 +390,7 @@ export default function SubjectPage() {
                 </Card>
               </button>
             ))}
+            </div>
           </div>
         </div>
       )}
@@ -393,9 +399,9 @@ export default function SubjectPage() {
       {(!isKs4TieredSubject || selectedTier) && (
       <div className="bg-white rounded-2xl border border-gray-100 shadow-soft overflow-hidden">
         {/* Units section header */}
-        <div className="px-8 py-6 border-b border-gray-100 flex items-center justify-between flex-wrap gap-3">
-          <div className="flex flex-col gap-1.5">
-            <h2 className="text-xl font-bold text-gray-900">
+        <div className="px-6 md:px-8 py-5 border-b border-gray-100 flex items-center justify-between flex-wrap gap-3">
+          <div className="flex flex-col gap-1.5 min-w-0">
+            <h2 className="text-lg md:text-xl font-bold text-gray-900 truncate">
               {isKs4Science && selectedExamSubject && selectedTier
                 ? `${availableExamSubjects.find(e => e.slug === selectedExamSubject)?.title} - ${availableTiers.find(t => t.slug === selectedTier)?.title}`
                 : selectedTier
@@ -404,7 +410,7 @@ export default function SubjectPage() {
               }
             </h2>
             {(selectedTier || selectedExamSubject) && (
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3 flex-wrap">
                 {isKs4Science && selectedExamSubject && (
                   <button
                     onClick={() => {
@@ -412,7 +418,7 @@ export default function SubjectPage() {
                       setSelectedTier(null);
                       setCurrentPage(1);
                     }}
-                    className="text-sm text-primary hover:text-primary-dark flex items-center gap-1.5"
+                    className="text-sm text-primary hover:text-primary-dark flex items-center gap-1.5 whitespace-nowrap"
                   >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -426,7 +432,7 @@ export default function SubjectPage() {
                       setSelectedTier(null);
                       setCurrentPage(1);
                     }}
-                    className="text-sm text-primary hover:text-primary-dark flex items-center gap-1.5"
+                    className="text-sm text-primary hover:text-primary-dark flex items-center gap-1.5 whitespace-nowrap"
                   >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -438,12 +444,12 @@ export default function SubjectPage() {
             )}
           </div>
           {filteredUnits && filteredUnits.length > 0 && (
-            <span className="text-sm font-medium text-gray-400 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100">
+            <span className="text-sm font-medium text-gray-400 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100 shrink-0">
               {filteredUnits.length} unit{filteredUnits.length !== 1 ? 's' : ''}
             </span>
           )}
         </div>
-        <div className="p-6">
+        <div className="p-4 sm:p-6 md:p-8">
 
         {paginatedUnits && paginatedUnits.length > 0 ? (
           <>
@@ -456,8 +462,8 @@ export default function SubjectPage() {
                 return (
                   <div key={uniqueKey}>
                     <Link href={`/units/${unit.slug}`} className="block group">
-                      <div className="flex items-center justify-between px-6 py-5 rounded-xl border border-gray-100 bg-gray-50/60 hover:bg-white hover:border-primary/30 hover:shadow-md transition-all duration-200">
-                        <div className="flex items-center gap-5 flex-1 min-w-0">
+                      <div className="flex items-center justify-between px-4 sm:px-6 py-4 sm:py-5 rounded-xl border border-gray-100 bg-gray-50/60 hover:bg-white hover:border-primary/30 hover:shadow-md transition-all duration-200">
+                        <div className="flex items-center gap-4 sm:gap-5 flex-1 min-w-0">
                           {/* Unit number badge */}
                           <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-sm font-bold shrink-0">
                             {unit.unitNumber || index + 1}
@@ -507,22 +513,23 @@ export default function SubjectPage() {
 
             {/* Pagination Controls */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-center gap-2 mt-8 pt-6 border-t border-gray-100">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 md:gap-4 mt-8 pt-6 border-t border-gray-100">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                   disabled={currentPage === 1}
+                  className="w-full sm:w-auto shrink-0 justify-center"
                 >
                   ← Previous
                 </Button>
 
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1.5 flex-wrap justify-center overflow-x-auto max-w-full">
                   {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                     <button
                       key={page}
                       onClick={() => setCurrentPage(page)}
-                      className={`w-9 h-9 rounded-lg text-sm font-medium transition-colors ${
+                      className={`w-9 h-9 shrink-0 rounded-lg text-sm font-medium transition-colors ${
                         currentPage === page
                           ? 'bg-primary text-white shadow-sm'
                           : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -538,6 +545,7 @@ export default function SubjectPage() {
                   size="sm"
                   onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                   disabled={currentPage === totalPages}
+                  className="w-full sm:w-auto shrink-0 justify-center"
                 >
                   Next →
                 </Button>
