@@ -52,13 +52,13 @@ export function TrialBanner() {
   return (
     <div
       className={clsx(
-        'flex items-center justify-between gap-4 px-5 py-3 rounded-xl text-sm font-medium mb-6',
+        'flex items-start sm:items-center justify-between gap-3 sm:gap-4 px-4 sm:px-5 py-3 rounded-xl text-sm font-medium mb-6',
         currentTier === 'red'   && 'bg-red-50 border border-red-200 text-red-800',
         currentTier === 'amber' && 'bg-amber-50 border border-amber-200 text-amber-800',
         currentTier === 'calm'  && 'bg-primary/5 border border-primary/20 text-primary'
       )}
     >
-      <div className="flex items-center gap-3">
+      <div className="flex items-start sm:items-center gap-2 sm:gap-3 flex-wrap flex-1 mt-0.5 sm:mt-0">
         {/* Pulsing urgency dot */}
         <span
           className={clsx(

@@ -7,7 +7,6 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import clsx from 'clsx';
 import { Button } from '@/components/ui';
-import { TrialExpiredModal } from '@/components/subscription';
 import { TrialBanner } from '@/components/TrialBanner';
 
 interface NavItemProps {
@@ -201,9 +200,6 @@ export default function DashboardLayout({
             onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
-
-      {/* Trial Expired Modal */}
-      {isTrialExpired && <TrialExpiredModal />}
     </div>
   );
 }

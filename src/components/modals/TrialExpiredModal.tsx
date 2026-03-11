@@ -81,14 +81,10 @@ export function TrialExpiredModal() {
 
     const isExempt = publicExemptions.some(path => pathname === path || pathname?.startsWith(path + '/'));
     
-    // We only want to block "product" pages (dashboard, browse, lessons, etc.)
+    // We only want to block strict product pages that require an active sub
     const isProductPage = 
       pathname?.startsWith('/dashboard') || 
-      pathname?.startsWith('/browse') || 
-      pathname?.startsWith('/lessons') ||
-      pathname?.startsWith('/key-stages') ||
-      pathname?.startsWith('/subjects') ||
-      pathname?.startsWith('/units');
+      pathname?.startsWith('/lessons');
 
     if (isProductPage && !isExempt) {
       setIsOpen(true);
@@ -96,6 +92,18 @@ export function TrialExpiredModal() {
       setIsOpen(false);
     }
   }, [user, isTrialExpired, pathname]);
+
+  // Allow other components to programmatically trigger the paywall
+  useEffect(() => {
+    const handleShowPaywall = () => {
+      if (isTrialExpired) {
+        setIsOpen(true);
+      }
+    };
+    
+    window.addEventListener('show-paywall', handleShowPaywall);
+    return () => window.removeEventListener('show-paywall', handleShowPaywall);
+  }, [isTrialExpired]);
 
   const handleProceedToPayment = async (planCode: string) => {
     try {
@@ -126,6 +134,16 @@ export function TrialExpiredModal() {
 
       {/* Modal */}
       <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 p-6 sm:p-8">
+        {/* Dismiss button */}
+        <button
+          onClick={() => setIsOpen(false)}
+          aria-label="Close"
+          className="absolute top-4 right-4 p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+        >
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
         {/* Warning Icon */}
         <div className="w-20 h-20 mx-auto mb-5 bg-orange-100 rounded-full flex items-center justify-center">
           <svg className="w-10 h-10 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">

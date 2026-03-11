@@ -63,6 +63,17 @@ export default function LessonPage() {
     };
   }, [isLoading, error, lesson, router]);
 
+  // Redirect expired users away from actual lesson content immediately
+  useEffect(() => {
+    if (isTrialExpired) {
+      if (lesson?.unitSlug) {
+        router.replace(`/units/${lesson.unitSlug}`);
+      } else if (!isLoading) {
+        router.replace('/browse');
+      }
+    }
+  }, [isTrialExpired, router, lesson?.unitSlug, isLoading]);
+
   if (isLoading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
@@ -142,73 +153,50 @@ export default function LessonPage() {
           )}
         </div>
 
-        {/* Content — gated when trial has expired */}
-        {isTrialExpired ? (
-          <div className="mt-4 rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50 p-6 sm:p-8 md:p-10 text-center">
-            <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-5">
-              <svg className="w-8 h-8 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
-            </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">Your free trial has ended</h2>
-            <p className="text-gray-500 mb-6 max-w-sm mx-auto">
-              Subscribe to unlock this lesson, all videos, quizzes, and the AI tutor.
-            </p>
-            <Link href="/pricing">
-              <Button variant="primary" size="lg" className="px-8">
-                View plans & subscribe
-              </Button>
-            </Link>
-            <p className="text-xs text-gray-400 mt-4">You can still browse all subjects and units for free.</p>
-          </div>
+        {lesson.description && (
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle>Lesson Description</CardTitle>
+            </CardHeader>
+            <CardContent className="prose max-w-none">
+              <ContentRenderer content={lesson.description} />
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Video Player */}
+        <VideoPlayer
+          assets={assetsData || null}
+          transcript={transcriptData || null}
+          isLoading={assetsLoading}
+        />
+
+        {/* Downloadable Resources */}
+        <AssetDownloads assets={assetsData || null} />
+
+        {/* Quiz Sections */}
+        {quizLoading ? (
+          <Card className="mb-8">
+            <CardContent className="py-8 flex items-center justify-center">
+              <Loading size="md" />
+              <span className="ml-3 text-gray-500">Loading quizzes...</span>
+            </CardContent>
+          </Card>
         ) : (
           <>
-            {lesson.description && (
-              <Card className="mb-8">
-                <CardHeader>
-                  <CardTitle>Lesson Description</CardTitle>
-                </CardHeader>
-                <CardContent className="prose max-w-none">
-                  <ContentRenderer content={lesson.description} />
-                </CardContent>
-              </Card>
+            {quizData?.starterQuiz && quizData.starterQuiz.length > 0 && (
+              <QuizSection
+                title="Starter Quiz"
+                questions={quizData.starterQuiz}
+                variant="starter"
+              />
             )}
-
-            {/* Video Player */}
-            <VideoPlayer
-              assets={assetsData || null}
-              transcript={transcriptData || null}
-              isLoading={assetsLoading}
-            />
-
-            {/* Downloadable Resources */}
-            <AssetDownloads assets={assetsData || null} />
-
-            {/* Quiz Sections */}
-            {quizLoading ? (
-              <Card className="mb-8">
-                <CardContent className="py-8 flex items-center justify-center">
-                  <Loading size="md" />
-                  <span className="ml-3 text-gray-500">Loading quizzes...</span>
-                </CardContent>
-              </Card>
-            ) : (
-              <>
-                {quizData?.starterQuiz && quizData.starterQuiz.length > 0 && (
-                  <QuizSection
-                    title="Starter Quiz"
-                    questions={quizData.starterQuiz}
-                    variant="starter"
-                  />
-                )}
-                {quizData?.exitQuiz && quizData.exitQuiz.length > 0 && (
-                  <QuizSection
-                    title="Exit Quiz"
-                    questions={quizData.exitQuiz}
-                    variant="exit"
-                  />
-                )}
-              </>
+            {quizData?.exitQuiz && quizData.exitQuiz.length > 0 && (
+              <QuizSection
+                title="Exit Quiz"
+                questions={quizData.exitQuiz}
+                variant="exit"
+              />
             )}
           </>
         )}
