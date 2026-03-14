@@ -11,9 +11,10 @@ export function useFeedbackTimer() {
   useEffect(() => {
     const lastPrompt = localStorage.getItem(STORAGE_KEY);
     if (!lastPrompt) {
-      // Never prompted before — show after a short delay so it doesn't flash on first load
-      const timer = setTimeout(() => setShouldShowFeedback(true), 5000);
-      return () => clearTimeout(timer);
+      // First time visiting: don't bombard them with a popup.
+      // Silently set the baseline timestamp so they are asked later.
+      localStorage.setItem(STORAGE_KEY, Date.now().toString());
+      return;
     }
 
     const elapsed = Date.now() - parseInt(lastPrompt, 10);

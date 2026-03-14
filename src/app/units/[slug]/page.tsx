@@ -6,11 +6,13 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { Card, Loading, Button } from '@/components/ui';
 import { useUnit, useLessons } from '@/lib/hooks/useOakData';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function UnitPage() {
   const params = useParams();
   const router = useRouter();
   const slug = params.slug as string;
+  const { isTrialExpired } = useAuth();
 
   const { data: unit, error: unitError, isLoading: unitLoading } = useUnit(slug);
   const { data: lessons, error: lessonsError, isLoading: lessonsLoading } = useLessons({ unitSlug: slug });
@@ -112,12 +114,25 @@ export default function UnitPage() {
             <div className="flex flex-col gap-3">
               {lessons
                 .sort((a, b) => a.lessonNumber - b.lessonNumber)
-                .map((lesson) => (
-                  <Link key={lesson.slug} href={`/lessons/${lesson.slug}`} className="block group">
-                    <div className="flex items-center justify-between px-4 sm:px-6 py-4 sm:py-5 rounded-xl border border-gray-100 bg-gray-50/60 hover:bg-white hover:border-primary/30 hover:shadow-md transition-all duration-200">
-                      <div className="flex items-center gap-4 sm:gap-5 flex-1 min-w-0">
-                        {/* Lesson number badge */}
-                        <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-sm font-bold shrink-0">
+                .map((lesson) => {
+                  const handleLessonClick = (e: React.MouseEvent) => {
+                    if (isTrialExpired) {
+                      e.preventDefault();
+                      window.dispatchEvent(new Event('show-paywall'));
+                    }
+                  };
+
+                  return (
+                    <Link 
+                      key={lesson.slug} 
+                      href={`/lessons/${lesson.slug}`} 
+                      onClick={handleLessonClick}
+                      className="block group"
+                    >
+                      <div className="flex items-center justify-between px-4 sm:px-6 py-4 sm:py-5 rounded-xl border border-gray-100 bg-gray-50/60 hover:bg-white hover:border-primary/30 hover:shadow-md transition-all duration-200">
+                        <div className="flex items-center gap-4 sm:gap-5 flex-1 min-w-0">
+                          {/* Lesson number badge */}
+                          <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-sm font-bold shrink-0">
                           {lesson.lessonNumber}
                         </div>
                         <div className="flex-1 min-w-0">
@@ -129,12 +144,17 @@ export default function UnitPage() {
                       <div className="flex items-center gap-2 shrink-0 text-gray-400 group-hover:text-primary transition-colors">
                         <span className="text-sm font-medium hidden sm:block">Start Lesson</span>
                         <svg className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          {isTrialExpired ? (
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                          ) : (
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          )}
                         </svg>
                       </div>
                     </div>
                   </Link>
-                ))}
+                );
+              })}
             </div>
           ) : (
             <div className="text-center py-16">
