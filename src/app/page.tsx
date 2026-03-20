@@ -3,8 +3,10 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button, Container } from '@/components/ui';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function Home() {
+  const { user, isTrialExpired } = useAuth();
   const features = [
     {
       tagline: 'Content',
@@ -189,12 +191,20 @@ export default function Home() {
 
             {/* CTA Buttons */}
             <div className="flex flex-wrap gap-4 justify-center animate-slide-up delay-300">
-              <Link href="/pricing">
+              <Link href={!user ? "/pricing" : isTrialExpired ? "/pricing" : "/dashboard"}>
                 <Button
                   size="lg"
                   className="rounded-2xl px-10 py-4 text-lg shadow-2xl shadow-primary/40 hover:shadow-3xl hover:shadow-primary/50 hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group"
                 >
-                  <span className="relative z-10">Start free trial</span>
+                  <span className="relative z-10">
+                    {!user 
+                      ? 'Start free trial' 
+                      : user.subscription?.status === 'active' 
+                        ? 'Go to dashboard' 
+                        : isTrialExpired 
+                          ? 'Upgrade to premium' 
+                          : 'Continue learning'}
+                  </span>
                   <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
                 </Button>
               </Link>
@@ -595,24 +605,32 @@ export default function Home() {
                 Join thousands of students already improving their grades with UK-standard curriculum content.
               </p>
               <div className="flex flex-wrap gap-4 justify-center">
-                <Link href="/register">
+                <Link href={!user ? "/register" : isTrialExpired ? "/pricing" : "/dashboard"}>
                   <Button
                     variant="secondary"
                     size="lg"
                     className="rounded-2xl px-10 py-4 text-lg shadow-2xl hover:shadow-3xl hover:-translate-y-1 transition-all duration-300"
                   >
-                    Get Started Free
+                    {!user 
+                      ? 'Get Started Free' 
+                      : user.subscription?.status === 'active' 
+                        ? 'Go to Dashboard' 
+                        : isTrialExpired 
+                          ? 'Proceed to Payment' 
+                          : 'Continue Learning'}
                   </Button>
                 </Link>
-                <Link href="/register">
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    className="rounded-2xl px-10 py-4 text-lg border-white/30 text-white hover:bg-white hover:text-gray-900 transition-all duration-300"
-                  >
-                    View Pricing
-                  </Button>
-                </Link>
+                {(!user || isTrialExpired) && (
+                  <Link href="/pricing">
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="rounded-2xl px-10 py-4 text-lg border-white/30 text-white hover:bg-white hover:text-gray-900 transition-all duration-300"
+                    >
+                      View Pricing
+                    </Button>
+                  </Link>
+                )}
               </div>
             </div>
           </div>

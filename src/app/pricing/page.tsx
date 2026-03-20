@@ -71,7 +71,7 @@ export default function PricingPage() {
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
-  const { user } = useAuth();
+  const { user, isTrialExpired } = useAuth();
   const router = useRouter();
 
   const handleSelectPlan = async (planCode: string) => {
@@ -85,11 +85,7 @@ export default function PricingPage() {
       setLoadingPlan(planCode);
       setError(null);
 
-      // Check if user's trial has expired - if so, go to payment
-      const isTrialExpired = user.subscription?.status === 'trialing' &&
-        user.subscription?.trialEndsAt &&
-        new Date(user.subscription.trialEndsAt) < new Date();
-
+      // Check if user's trial has expired or they belong to a cancelled/past-due tier
       if (isTrialExpired) {
         // Trial expired - initiate payment
         const response = await authApiClient.post<{ authorization_url: string }>(
@@ -208,13 +204,22 @@ export default function PricingPage() {
                     fullWidth
                     className="rounded-xl mb-4"
                   >
-                    {user?.subscription?.status === 'trialing' && user?.subscription?.trialEndsAt && new Date(user.subscription.trialEndsAt) < new Date()
+                    {isTrialExpired || user?.subscription?.status === 'active'
                       ? 'Subscribe Now'
                       : 'Start 7-day free trial'}
                   </Button>
-                  <p className="text-center text-sm text-gray-500 mb-8">
-                    No credit card required
-                  </p>
+                  
+                  {!isTrialExpired && user?.subscription?.status !== 'active' && (
+                    <p className="text-center text-sm text-gray-500 mb-8">
+                      No credit card required
+                    </p>
+                  )}
+                  
+                  {(isTrialExpired || user?.subscription?.status === 'active') && (
+                    <p className="text-center text-sm text-gray-400 mb-8 italic">
+                      Secure payment via Paystack
+                    </p>
+                  )}
 
                   {/* Divider */}
                   <div className="border-t border-gray-200 mb-8" />
