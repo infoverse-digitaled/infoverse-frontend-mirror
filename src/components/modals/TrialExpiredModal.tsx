@@ -37,15 +37,15 @@ export function TrialExpiredModal() {
           {
             id: 'annual',
             name: 'Annual Plan',
-            price: '₦40,000',
-            description: 'Best value - save 33%',
+            price: '₦25,000',
+            description: 'Best value - save 30%',
             planCode: '',
             recommended: true,
           },
           {
             id: 'monthly',
             name: 'Monthly Plan',
-            price: '₦5,000',
+            price: '₦3,000',
             description: 'Billed monthly',
             planCode: '',
           },

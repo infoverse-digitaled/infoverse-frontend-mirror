@@ -62,9 +62,17 @@ export default function DashboardLayout({
     return null;
   }
 
-  // Determine user badge based on role (defaulting to Free if not present)
-  const userRole = user.role === 'premium' ? 'Premium' : 'Free';
-  const isPremium = userRole === 'Premium';
+  // Determine user badge based on dynamic subscription status
+  let userRole = 'Free';
+  let roleColorClass = "bg-gray-100 text-gray-600";
+
+  if (user.subscription?.status === 'active') {
+    userRole = 'Premium';
+    roleColorClass = "bg-primary/10 text-primary";
+  } else if (!isTrialExpired && user.subscription?.status === 'trialing') {
+    userRole = 'Free Trial';
+    roleColorClass = "bg-orange-100 text-orange-600";
+  }
 
   return (
     <div className="min-h-screen bg-background-light flex">
@@ -163,10 +171,10 @@ export default function DashboardLayout({
              <div className="flex-1 min-w-0">
                  <p className="text-sm font-bold text-gray-900 truncate">{user.name}</p>
                  <span className={clsx(
-                    "inline-flex items-center px-2 py-0.5 rounded text-xs font-medium",
-                    isPremium ? "bg-primary/10 text-primary" : "bg-gray-100 text-gray-600"
+                    "inline-flex items-center px-2 py-0.5 mt-0.5 rounded text-xs font-bold uppercase tracking-wider",
+                    roleColorClass
                  )}>
-                    {userRole} Account
+                    {userRole}
                  </span>
              </div>
           </div>

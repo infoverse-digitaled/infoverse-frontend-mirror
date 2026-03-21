@@ -15,15 +15,15 @@ export function SubscribeModal({ onClose }: SubscribeModalProps) {
     {
       id: 'annual',
       name: 'Annual Plan',
-      price: '₦40,000',
-      description: 'Best value - save 33%',
+      price: '₦25,000',
+      description: 'Best value - save 30%',
       planCode: 'PLN_t56h44wx8f2vcw7',
       recommended: true,
     },
     {
       id: 'monthly',
       name: 'Monthly Plan',
-      price: '₦5,000',
+      price: '₦3,000',
       description: 'Billed monthly',
       planCode: 'PLN_vnfkw3ejctr7fe4',
     },
