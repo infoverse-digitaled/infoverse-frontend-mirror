@@ -21,37 +21,25 @@ export function TrialExpiredModal({ daysOverdue = 0 }: TrialExpiredModalProps) {
   const [error, setError] = useState<string | null>(null);
   const [plans, setPlans] = useState<Plan[]>([]);
 
-  // Fetch plans from API on mount
+  // Use static plans to guarantee pricing consistency across the app
   useEffect(() => {
-    const fetchPlans = async () => {
-      try {
-        const response = await authApiClient.get('/payment/plans');
-        if (response.data?.plans) {
-          setPlans(response.data.plans);
-        }
-      } catch (err) {
-        console.error('Failed to fetch plans:', err);
-        // Fallback plans if API fails
-        setPlans([
-          {
-            id: 'annual',
-            name: 'Annual Plan',
-            price: '₦25,000',
-            description: 'Best value - save 30%',
-            planCode: '',
-            recommended: true,
-          },
-          {
-            id: 'monthly',
-            name: 'Monthly Plan',
-            price: '₦3,000',
-            description: 'Billed monthly',
-            planCode: '',
-          },
-        ]);
-      }
-    };
-    fetchPlans();
+    setPlans([
+      {
+        id: 'annual',
+        name: 'Annual Plan',
+        price: '₦25,000',
+        description: 'Best value - save 30%',
+        planCode: 'PLN_t56h44wx8f2vcw7',
+        recommended: true,
+      },
+      {
+        id: 'monthly',
+        name: 'Monthly Plan',
+        price: '₦3,000',
+        description: 'Billed monthly',
+        planCode: 'PLN_vnfkw3ejctr7fe4',
+      },
+    ]);
   }, []);
 
   const handleProceedToPayment = async (planCode: string) => {
