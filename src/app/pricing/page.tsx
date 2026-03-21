@@ -20,7 +20,7 @@ const plans: Plan[] = [
   {
     id: 'monthly',
     name: 'Monthly',
-    price: '₦5,000',
+    price: '₦3,000',
     description: 'Per month, billed monthly',
     planCode: 'PLN_vnfkw3ejctr7fe4',
     features: [
@@ -32,8 +32,8 @@ const plans: Plan[] = [
   {
     id: 'annual',
     name: 'Annual',
-    price: '₦40,000',
-    description: 'Per year, save 33%',
+    price: '₦25,000',
+    description: 'Per year, save 30%',
     planCode: 'PLN_t56h44wx8f2vcw7',
     features: [
       '100+ curriculum lessons',
