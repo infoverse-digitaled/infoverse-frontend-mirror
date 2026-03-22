@@ -4,10 +4,12 @@ import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Container } from '@/components/ui';
 import authApiClient from '@/lib/api/auth-client';
+import { useAuth } from '@/contexts/AuthContext';
 
 function PaymentCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { fetchUser } = useAuth();
   const [status, setStatus] = useState<'verifying' | 'success' | 'failed'>('verifying');
   const [message, setMessage] = useState('Verifying your payment...');
 
@@ -31,6 +33,8 @@ function PaymentCallbackContent() {
         });
 
         if (response.data?.success) {
+          await fetchUser();
+          
           setStatus('success');
           setMessage('Payment successful! Redirecting to dashboard...');
 

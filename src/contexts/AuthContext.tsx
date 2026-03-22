@@ -37,6 +37,7 @@ interface AuthContextType {
   register: (name: string, email: string, password: string, licenseKey?: string) => Promise<RegisterResult>;
   logout: () => Promise<void>;
   setTokenAndFetchUser: (token: string) => Promise<void>;
+  fetchUser: () => Promise<void>;
   loading: boolean;
   isTrialExpired: boolean;
   daysRemaining: number | null;
@@ -164,6 +165,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       register,
       logout,
       setTokenAndFetchUser,
+      fetchUser,
       loading,
       isTrialExpired,
       daysRemaining,
