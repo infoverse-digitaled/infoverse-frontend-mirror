@@ -14,6 +14,7 @@ interface Plan {
   description: string;
   planCode: string;
   features: string[];
+  recommended?: boolean;
 }
 
 const DEFAULT_PLANS: Plan[] = [
@@ -21,7 +22,7 @@ const DEFAULT_PLANS: Plan[] = [
     id: 'monthly',
     name: 'Monthly',
     price: '₦3,000',
-    description: 'Per month, billed monthly',
+    description: 'Billed monthly',
     planCode: 'PLN_sgry7evrd03iw15', // Updated to match new backend
     features: [
       '100+ curriculum lessons',
@@ -33,8 +34,9 @@ const DEFAULT_PLANS: Plan[] = [
     id: 'annual',
     name: 'Annual',
     price: '₦25,000',
-    description: 'Per year, save 30%',
+    description: 'Best value - save 30%',
     planCode: 'PLN_alwct8bj4ybmjqf', // Updated to match new backend
+    recommended: true,
     features: [
       '100+ curriculum lessons',
       'AI-powered learning support',
@@ -202,16 +204,32 @@ export default function PricingPage() {
               {displayPlans.map((plan) => (
                 <div
                   key={plan.id}
-                  className="bg-white border border-gray-200 rounded-2xl p-6 md:p-8 flex flex-col"
+                  className={`bg-white border-2 rounded-2xl p-6 md:p-8 flex flex-col relative transition-all duration-300 ${
+                    plan.recommended
+                      ? 'border-primary shadow-2xl md:scale-105 z-10'
+                      : 'border-gray-100 shadow-md'
+                  }`}
                 >
+                  {plan.recommended && (
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-primary text-white px-4 py-1 rounded-full text-sm font-bold tracking-wide shadow-md">
+                      Most Popular
+                    </div>
+                  )}
+
                   {/* Plan Title */}
                   <div className="mb-8">
                     <h3 className="font-serif font-bold text-xl md:text-2xl leading-tight text-gray-900 mb-1">
                       {plan.name}
                     </h3>
-                    <p className="text-base text-gray-600">
-                      {plan.description}
-                    </p>
+                    {plan.recommended ? (
+                      <p className="text-base font-bold text-primary mt-2">
+                        {plan.description}
+                      </p>
+                    ) : (
+                      <p className="text-base text-gray-600 mt-2">
+                        {plan.description}
+                      </p>
+                    )}
                   </div>
 
                   {/* Divider */}
