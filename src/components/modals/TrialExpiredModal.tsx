@@ -22,25 +22,38 @@ export function TrialExpiredModal() {
   const [plans, setPlans] = useState<Plan[]>([]);
   const pathname = usePathname();
 
-  // Use static plans to guarantee pricing consistency across the app
+  // Fetch plans dynamically from backend to ensure planCodes are always synced
   useEffect(() => {
-    setPlans([
-      {
-        id: 'annual',
-        name: 'Annual Plan',
-        price: '₦25,000',
-        description: 'Best value - save 30%',
-        planCode: 'PLN_t56h44wx8f2vcw7',
-        recommended: true,
-      },
-      {
-        id: 'monthly',
-        name: 'Monthly Plan',
-        price: '₦3,000',
-        description: 'Billed monthly',
-        planCode: 'PLN_vnfkw3ejctr7fe4',
-      },
-    ]);
+    const fetchPlans = async () => {
+      try {
+        const response = await authApiClient.get('/payment/plans');
+        if (response.data && response.data.plans) {
+          setPlans(response.data.plans);
+        }
+      } catch (err) {
+        console.error('Failed to fetch pricing plans:', err);
+        // Safe fallback just in case the backend is unreachable
+        setPlans([
+          {
+            id: 'annual',
+            name: 'Annual Plan',
+            price: '₦25,000',
+            description: 'Best value - save 30%',
+            planCode: 'PLN_alwct8bj4ybmjqf',
+            recommended: true,
+          },
+          {
+            id: 'monthly',
+            name: 'Monthly Plan',
+            price: '₦3,000',
+            description: 'Billed monthly',
+            planCode: 'PLN_sgry7evrd03iw15',
+          },
+        ]);
+      }
+    };
+
+    fetchPlans();
   }, []);
 
   useEffect(() => {
@@ -116,12 +129,12 @@ export function TrialExpiredModal() {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
 
       {/* Modal */}
-      <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 p-6 sm:p-8">
+      <div className="relative bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-6 sm:p-8">
         {/* Dismiss button */}
         <button
           onClick={() => setIsOpen(false)}
@@ -158,7 +171,7 @@ export function TrialExpiredModal() {
         )}
 
         {/* Plan options with Proceed to Payment buttons */}
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {plans.map((plan) => (
             <div
               key={plan.id}

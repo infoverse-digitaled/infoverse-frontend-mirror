@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Container, Button } from '@/components/ui';
@@ -16,13 +16,13 @@ interface Plan {
   features: string[];
 }
 
-const plans: Plan[] = [
+const DEFAULT_PLANS: Plan[] = [
   {
     id: 'monthly',
     name: 'Monthly',
     price: '₦3,000',
     description: 'Per month, billed monthly',
-    planCode: 'PLN_vnfkw3ejctr7fe4',
+    planCode: 'PLN_sgry7evrd03iw15', // Updated to match new backend
     features: [
       '100+ curriculum lessons',
       'AI-powered learning support',
@@ -34,7 +34,7 @@ const plans: Plan[] = [
     name: 'Annual',
     price: '₦25,000',
     description: 'Per year, save 30%',
-    planCode: 'PLN_t56h44wx8f2vcw7',
+    planCode: 'PLN_alwct8bj4ybmjqf', // Updated to match new backend
     features: [
       '100+ curriculum lessons',
       'AI-powered learning support',
@@ -68,11 +68,39 @@ const faqs = [
 ];
 
 export default function PricingPage() {
+  const [displayPlans, setDisplayPlans] = useState<Plan[]>(DEFAULT_PLANS);
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const { user, isTrialExpired } = useAuth();
   const router = useRouter();
+
+  useEffect(() => {
+    const fetchPlans = async () => {
+      try {
+        const response = await authApiClient.get('/payment/plans');
+        if (response.data && response.data.plans) {
+          const backendPlans = response.data.plans;
+          const mergedPlans = DEFAULT_PLANS.map(defaultPlan => {
+            const liveData = backendPlans.find((p: any) => p.id === defaultPlan.id);
+            if (liveData) {
+              return { 
+                ...defaultPlan, 
+                price: liveData.price, 
+                description: liveData.description, 
+                planCode: liveData.planCode 
+              };
+            }
+            return defaultPlan;
+          });
+          setDisplayPlans(mergedPlans);
+        }
+      } catch (err) {
+        console.error('Failed to fetch dynamic pricing plans:', err);
+      }
+    };
+    fetchPlans();
+  }, []);
 
   const handleSelectPlan = async (planCode: string) => {
     if (!user) {
@@ -171,7 +199,7 @@ export default function PricingPage() {
 
             {/* Pricing Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 max-w-3xl mx-auto">
-              {plans.map((plan) => (
+              {displayPlans.map((plan) => (
                 <div
                   key={plan.id}
                   className="bg-white border border-gray-200 rounded-2xl p-6 md:p-8 flex flex-col"
