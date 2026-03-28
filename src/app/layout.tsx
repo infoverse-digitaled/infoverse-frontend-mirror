@@ -6,6 +6,7 @@ import 'katex/dist/katex.min.css';
 import { LayoutWrapper } from '@/components/layout';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { GlobalChatbot } from '@/components/ai';
+import { PostHogProvider } from './providers';
 
 // Skip Navigation Component for accessibility
 function SkipNavigation() {
@@ -56,15 +57,17 @@ export default function RootLayout({
         className={`${inter.variable} ${fraunces.variable} antialiased flex flex-col min-h-screen bg-blue-50`}
         suppressHydrationWarning
       >
-        <AuthProvider>
-          <SkipNavigation />
-          <LayoutWrapper>
-            <main id="main-content" tabIndex={-1}>
-              {children}
-            </main>
-          </LayoutWrapper>
-          <GlobalChatbot />
-        </AuthProvider>
+        <PostHogProvider>
+          <AuthProvider>
+            <SkipNavigation />
+            <LayoutWrapper>
+              <main id="main-content" tabIndex={-1}>
+                {children}
+              </main>
+            </LayoutWrapper>
+            <GlobalChatbot />
+          </AuthProvider>
+        </PostHogProvider>
       </body>
     </html>
   );

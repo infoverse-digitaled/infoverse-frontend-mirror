@@ -23,7 +23,7 @@ const DEFAULT_PLANS: Plan[] = [
     name: 'Monthly',
     price: '₦3,000',
     description: 'Billed monthly',
-    planCode: 'PLN_sgry7evrd03iw15', // Updated to match new backend
+    planCode: 'PLN_sgry7evrd03iw15', 
     features: [
       '100+ curriculum lessons',
       'AI-powered learning support',
@@ -35,7 +35,7 @@ const DEFAULT_PLANS: Plan[] = [
     name: 'Annual',
     price: '₦25,000',
     description: 'Best value - save 30%',
-    planCode: 'PLN_alwct8bj4ybmjqf', // Updated to match new backend
+    planCode: 'PLN_alwct8bj4ybmjqf', 
     recommended: true,
     features: [
       '100+ curriculum lessons',
