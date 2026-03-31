@@ -9,6 +9,7 @@ import { BugReportButton } from '@/components/modals/BugReportButton';
 import { BugReportModal } from '@/components/modals/BugReportModal';
 import { useFeedbackTimer } from '@/lib/hooks/useFeedbackTimer';
 import { useAuth } from '@/contexts/AuthContext';
+import { CountdownBanner } from './CountdownBanner';
 
 export function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -39,6 +40,7 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
   return (
     <>
       <Header />
+      <CountdownBanner/>
       <main className="flex-grow">{children}</main>
       <Footer />
       <TrialExpiredModal />
