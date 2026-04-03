@@ -7,6 +7,7 @@ import { LayoutWrapper } from '@/components/layout';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { GlobalChatbot } from '@/components/ai';
 import { PostHogProvider } from './providers';
+import MetaPixel from '@/components/analytics/MetaPixel';
 
 // Skip Navigation Component for accessibility
 function SkipNavigation() {
@@ -58,6 +59,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <PostHogProvider>
+          <MetaPixel />
           <AuthProvider>
             <SkipNavigation />
             <LayoutWrapper>
