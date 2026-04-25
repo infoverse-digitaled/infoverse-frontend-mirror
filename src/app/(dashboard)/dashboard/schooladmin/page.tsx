@@ -78,8 +78,8 @@ export default function SchoolAdminDashboard() {
   }
 
   return (
-    <Container className="px-0 py-8">
-      <div className="flex flex-col gap-8">
+    <Container className="px-4 py-6 md:px-8 md:py-10">
+      <div className="flex flex-col gap-6 md:gap-8">
         {/* Header Section */}
         <div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">School Admin Dashboard</h1>
@@ -104,10 +104,10 @@ export default function SchoolAdminDashboard() {
               </p>
             </div>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-              <div className="px-6 py-3 bg-white border-2 border-primary border-dashed rounded-xl font-mono text-xl font-bold tracking-wider text-primary text-center">
+              <div className="px-4 sm:px-6 py-3 bg-white border-2 border-primary border-dashed rounded-xl font-mono text-lg sm:text-xl font-bold tracking-wider text-primary text-center break-all">
                 {schoolCode}
               </div>
-              <Button onClick={handleCopyCode} variant={copied ? "primary" : "outline"} className="h-[54px] px-8">
+              <Button onClick={handleCopyCode} variant={copied ? "primary" : "outline"} className="h-12 sm:h-[54px] px-8">
                 {copied ? 'Copied!' : 'Copy Code'}
               </Button>
             </div>
@@ -199,12 +199,12 @@ export default function SchoolAdminDashboard() {
         </div>
 
         {/* Students List */}
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-bold text-gray-900">Enrolled Students ({students.length})</h2>
+        <div className="block">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 mt-2">
+            <h2 className="text-xl md:text-2xl font-bold text-gray-900">Enrolled Students ({students.length})</h2>
           </div>
 
-          <Card className="overflow-hidden">
+          <Card className="overflow-hidden shadow-sm">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
