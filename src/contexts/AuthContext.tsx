@@ -23,6 +23,8 @@ interface User {
   name: string;
   role: string;
   keyStage?: number;
+  schoolCode?: string;
+  schoolName?: string;
   subscription?: Subscription;
   createdAt?: string;
 }
@@ -33,8 +35,9 @@ interface RegisterResult {
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<{ role: string }>;
   register: (name: string, email: string, password: string, licenseKey?: string) => Promise<RegisterResult>;
+  registerSchoolAdmin: (name: string, email: string, password: string, schoolName: string) => Promise<void>;
   logout: () => Promise<void>;
   setTokenAndFetchUser: (token: string) => Promise<void>;
   fetchUser: () => Promise<void>;
@@ -114,11 +117,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string): Promise<{ role: string }> => {
     const res = await authApiClient.post(API_ENDPOINTS.login, { email, password });
     const { token, user: userData } = res.data.data;
     localStorage.setItem('token', token);
     setUser(userData);
+    return { role: userData.role };
   };
 
   const register = async (name: string, email: string, password: string, licenseKey?: string): Promise<RegisterResult> => {
@@ -138,6 +142,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(userData);
 
     return { skipPayment: !!skipPayment };
+  };
+
+  const registerSchoolAdmin = async (name: string, email: string, password: string, schoolName: string) => {
+    const res = await authApiClient.post(API_ENDPOINTS.schoolRegister, {
+      name,
+      email,
+      password,
+      schoolName,
+    });
+    const { token, user: userData } = res.data.data;
+    localStorage.setItem('token', token);
+    setUser(userData);
   };
 
   const forgotPassword = async (email: string) => {
@@ -163,6 +179,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       login,
       register,
+      registerSchoolAdmin,
       logout,
       setTokenAndFetchUser,
       fetchUser,

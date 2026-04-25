@@ -45,25 +45,37 @@ export function CountdownBanner() {
   if (!isMounted || !isVisible) return null;
 
   return (
-    <div className="relative w-full bg-gradient-to-r from-blue-900 via-primary to-blue-900 text-white px-4 py-2 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 md:gap-6 shadow-md z-50">
-      <div className="flex items-center gap-2 text-sm sm:text-base font-medium tracking-wide text-center">
-        <span>🎓 GCSE 2026 Exams begin in:</span>
-        <div className="flex items-center space-x-1 font-bold font-mono">
-          <span className="bg-white/20 px-1.5 py-0.5 rounded">{String(timeLeft.days).padStart(2, '0')}d</span>
-          <span className="bg-white/20 px-1.5 py-0.5 rounded">{String(timeLeft.hours).padStart(2, '0')}h</span>
-          <span className="bg-white/20 px-1.5 py-0.5 rounded">{String(timeLeft.minutes).padStart(2, '0')}m</span>
-          <span className="bg-white/20 px-1.5 py-0.5 rounded">{String(timeLeft.seconds).padStart(2, '0')}s</span>
+    <div className="relative w-full bg-gradient-to-r from-blue-900 via-primary to-blue-900 text-white shadow-md z-50">
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-4 px-8 py-2">
+        {/* Label + timer on one line for mobile */}
+        <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs sm:text-sm font-medium tracking-wide text-center">
+          <span className="whitespace-nowrap">🎓 GCSE 2026 Exams begin in:</span>
+          <div className="flex items-center gap-1 font-bold font-mono">
+            <span className="bg-white/20 px-1.5 py-0.5 rounded text-xs sm:text-sm">
+              {String(timeLeft.days).padStart(2, '0')}d
+            </span>
+            <span className="bg-white/20 px-1.5 py-0.5 rounded text-xs sm:text-sm">
+              {String(timeLeft.hours).padStart(2, '0')}h
+            </span>
+            <span className="bg-white/20 px-1.5 py-0.5 rounded text-xs sm:text-sm">
+              {String(timeLeft.minutes).padStart(2, '0')}m
+            </span>
+            <span className="bg-white/20 px-1.5 py-0.5 rounded text-xs sm:text-sm">
+              {String(timeLeft.seconds).padStart(2, '0')}s
+            </span>
+          </div>
         </div>
-      </div>
-      
-      <Link 
-        href="/pricing" 
-        className="text-xs sm:text-sm bg-white text-primary px-3 py-1 rounded-full font-bold hover:bg-gray-100 transition-colors shadow-sm whitespace-nowrap"
-      >
-        Maximize Prep Now →
-      </Link>
 
-      <button 
+        <Link
+          href="/pricing"
+          className="text-xs bg-white text-primary px-3 py-1 rounded-full font-bold hover:bg-gray-100 transition-colors shadow-sm whitespace-nowrap"
+        >
+          Prep Now →
+        </Link>
+      </div>
+
+      {/* Close button — always top-right */}
+      <button
         onClick={() => setIsVisible(false)}
         className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-white/70 hover:text-white transition-colors"
         aria-label="Close banner"

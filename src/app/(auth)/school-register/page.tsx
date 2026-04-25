@@ -6,12 +6,14 @@ import Link from 'next/link';
 import { Input, Button, Card } from '@/components/ui';
 import { useAuth } from '@/contexts/AuthContext';
 
-export default function LoginPage() {
+export default function SchoolRegisterPage() {
   const router = useRouter();
-  const { login } = useAuth();
+  const { registerSchoolAdmin } = useAuth();
   const [formData, setFormData] = useState({
+    name: '',
     email: '',
     password: '',
+    schoolName: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -28,6 +30,10 @@ export default function LoginPage() {
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
+    if (!formData.name.trim()) {
+      newErrors.name = 'Full name is required';
+    }
+
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
@@ -36,6 +42,12 @@ export default function LoginPage() {
 
     if (!formData.password) {
       newErrors.password = 'Password is required';
+    } else if (formData.password.length < 8) {
+      newErrors.password = 'Password must be at least 8 characters';
+    }
+
+    if (!formData.schoolName.trim()) {
+      newErrors.schoolName = 'School name is required';
     }
 
     setErrors(newErrors);
@@ -51,16 +63,14 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const { role } = await login(formData.email, formData.password);
-      if (role === 'schooladmin') {
-        router.push('/dashboard/schooladmin');
-      } else {
-        router.push('/dashboard');
-      }
+      await registerSchoolAdmin(formData.name, formData.email, formData.password, formData.schoolName);
+
+      // Redirect to pricing page for schools to select a 1-month trial
+      router.push('/pricing/school');
     } catch (error: any) {
       setGeneralError(
         error.response?.data?.error?.message ||
-          'Login failed. Please check your credentials.'
+          'Registration failed. Please try again.'
       );
     } finally {
       setIsLoading(false);
@@ -71,8 +81,8 @@ export default function LoginPage() {
     <div className="flex justify-center items-center w-full">
       <Card className="w-full max-w-md shadow-xl bg-white p-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-primary mb-2">Welcome Back</h1>
-          <p className="text-gray-500">Please enter your details to sign in.</p>
+          <h1 className="text-3xl font-bold text-primary mb-2">Register Your School</h1>
+          <p className="text-gray-500">Create an admin account to manage your school's Infoverse access.</p>
         </div>
 
         {generalError && (
@@ -86,7 +96,18 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <Input
-            label="Email"
+            label="Admin Full Name"
+            name="name"
+            type="text"
+            placeholder="Enter your full name"
+            value={formData.name}
+            onChange={handleChange}
+            error={errors.name}
+            disabled={isLoading}
+          />
+
+          <Input
+            label="Admin Email"
             name="email"
             type="email"
             placeholder="Enter your email"
@@ -96,42 +117,54 @@ export default function LoginPage() {
             disabled={isLoading}
           />
 
-          <div className="space-y-2">
-            <Input
-              label="Password"
-              name="password"
-              type="password"
-              placeholder="Enter your password"
-              value={formData.password}
-              onChange={handleChange}
-              error={errors.password}
-              disabled={isLoading}
-            />
-            <div className="flex justify-end">
-              <Link
-                href="/forgot-password"
-                className="text-sm text-primary hover:text-primary-dark font-medium transition-colors"
-              >
-                Forgot password?
-              </Link>
-            </div>
-          </div>
+          <Input
+            label="School Name"
+            name="schoolName"
+            type="text"
+            placeholder="e.g., Springwood High School"
+            value={formData.schoolName}
+            onChange={handleChange}
+            error={errors.schoolName}
+            disabled={isLoading}
+          />
+
+          <Input
+            label="Password"
+            name="password"
+            type="password"
+            placeholder="Create a password"
+            value={formData.password}
+            onChange={handleChange}
+            error={errors.password}
+            disabled={isLoading}
+          />
 
           <Button type="submit" fullWidth isLoading={isLoading} size="lg">
-            Log In
+            Continue to Pricing
           </Button>
         </form>
 
         <div className="mt-8 text-center text-gray-500">
           <p>
-            Don&apos;t have an account?{' '}
+            Already registered your school?{' '}
             <Link
-              href="/register"
+              href="/login"
               className="font-semibold text-secondary hover:text-secondary-dark transition-colors"
             >
-              Sign up
+              Log in
             </Link>
           </p>
+          <div className="mt-4 pt-4 border-t border-gray-100">
+            <p className="text-sm">
+              Are you a student or individual?{' '}
+              <Link
+                href="/register"
+                className="font-semibold text-primary hover:underline transition-colors"
+              >
+                Sign up here
+              </Link>
+            </p>
+          </div>
         </div>
       </Card>
     </div>

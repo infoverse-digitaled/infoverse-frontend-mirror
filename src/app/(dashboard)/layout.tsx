@@ -50,6 +50,13 @@ export default function DashboardLayout({
     }
   }, [user, loading, router]);
 
+  // Redirect school admins from the generic /dashboard to their own dashboard
+  useEffect(() => {
+    if (!loading && user?.role === 'schooladmin' && pathname === '/dashboard') {
+      router.replace('/dashboard/schooladmin');
+    }
+  }, [user, loading, pathname, router]);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -66,7 +73,10 @@ export default function DashboardLayout({
   let userRole = 'Free';
   let roleColorClass = "bg-gray-100 text-gray-600";
 
-  if (user.subscription?.status === 'active') {
+  if (user.role === 'schooladmin') {
+    userRole = 'School Admin';
+    roleColorClass = "bg-purple-100 text-purple-600";
+  } else if (user.subscription?.status === 'active') {
     userRole = 'Premium';
     roleColorClass = "bg-primary/10 text-primary";
   } else if (!isTrialExpired && user.subscription?.status === 'trialing') {
@@ -130,26 +140,30 @@ export default function DashboardLayout({
 
         {/* Navigation Links */}
         <nav className="flex-1 py-6 space-y-1 overflow-y-auto">
-          <NavItem
-            href="/dashboard"
-            icon={
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-              </svg>
-            }
-            label="Dashboard"
-            isActive={pathname === '/dashboard'}
-          />
-          <NavItem
-            href="/browse"
-            icon={
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            }
-            label="Browse"
-            isActive={pathname?.startsWith('/browse')}
-          />
+          {user.role !== 'schooladmin' && (
+            <>
+              <NavItem
+                href="/dashboard"
+                icon={
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                  </svg>
+                }
+                label="Dashboard"
+                isActive={pathname === '/dashboard'}
+              />
+              <NavItem
+                href="/browse"
+                icon={
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                }
+                label="Browse"
+                isActive={pathname?.startsWith('/browse')}
+              />
+            </>
+          )}
           <NavItem
             href="/profile"
             icon={
@@ -160,6 +174,18 @@ export default function DashboardLayout({
             label="Profile"
             isActive={pathname === '/profile'}
           />
+          {user.role === 'schooladmin' && (
+            <NavItem
+              href="/dashboard/schooladmin"
+              icon={
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+              }
+              label="Manage Students"
+              isActive={pathname === '/dashboard/schooladmin'}
+            />
+          )}
         </nav>
 
         {/* User Profile Snippet */}

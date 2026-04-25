@@ -14,6 +14,25 @@ interface Plan {
   recommended?: boolean;
 }
 
+// Fallback individual plans if the backend is unreachable
+const FALLBACK_PLANS: Plan[] = [
+  {
+    id: 'annual',
+    name: 'Annual Plan',
+    price: '₦25,000',
+    description: 'Best value — save 30%',
+    planCode: 'PLN_alwct8bj4ybmjqf',
+    recommended: true,
+  },
+  {
+    id: 'monthly',
+    name: 'Monthly Plan',
+    price: '₦3,000',
+    description: 'Billed monthly',
+    planCode: 'PLN_sgry7evrd03iw15',
+  },
+];
+
 export function TrialExpiredModal() {
   const { user, isTrialExpired } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
@@ -22,34 +41,25 @@ export function TrialExpiredModal() {
   const [plans, setPlans] = useState<Plan[]>([]);
   const pathname = usePathname();
 
-  // Fetch plans dynamically from backend to ensure planCodes are always synced
+  // ─── Fetch only individual plans ──────────────────────────────────────────────────────────────
+  // School plans (school_tier*) must never appear here — this modal is for
+  // individual subscribers only. School admins handle their own billing.
+  const INDIVIDUAL_PLAN_IDS = ['monthly', 'annual'];
+
   useEffect(() => {
     const fetchPlans = async () => {
       try {
         const response = await authApiClient.get('/payment/plans');
         if (response.data && response.data.plans) {
-          setPlans(response.data.plans);
+          // Filter to individual plans only
+          const individualPlans = response.data.plans.filter((p: Plan) =>
+            INDIVIDUAL_PLAN_IDS.includes(p.id)
+          );
+          setPlans(individualPlans.length > 0 ? individualPlans : FALLBACK_PLANS);
         }
       } catch (err) {
         console.error('Failed to fetch pricing plans:', err);
-        // Safe fallback just in case the backend is unreachable
-        setPlans([
-          {
-            id: 'annual',
-            name: 'Annual Plan',
-            price: '₦25,000',
-            description: 'Best value - save 30%',
-            planCode: 'PLN_alwct8bj4ybmjqf',
-            recommended: true,
-          },
-          {
-            id: 'monthly',
-            name: 'Monthly Plan',
-            price: '₦3,000',
-            description: 'Billed monthly',
-            planCode: 'PLN_sgry7evrd03iw15',
-          },
-        ]);
+        setPlans(FALLBACK_PLANS);
       }
     };
 
@@ -57,8 +67,20 @@ export function TrialExpiredModal() {
   }, []);
 
   useEffect(() => {
-    // Show modal if user is logged in and trial is expired
+    // ─── Role guards ──────────────────────────────────────────────────────────────
+    // School admins manage their own billing from the school dashboard.
+    // School-enrolled students should contact their admin, not pay individually.
+    // Neither role should ever see this modal.
     if (!user || !isTrialExpired) {
+      setIsOpen(false);
+      return;
+    }
+    if (user.role === 'schooladmin') {
+      setIsOpen(false);
+      return;
+    }
+    const isSchoolStudent = !!(user as any).schoolCode;
+    if (isSchoolStudent) {
       setIsOpen(false);
       return;
     }

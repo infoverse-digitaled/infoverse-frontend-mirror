@@ -194,6 +194,17 @@ export default function RegisterPage() {
               Log in
             </Link>
           </p>
+          <div className="mt-4 pt-4 border-t border-gray-100">
+            <p className="text-sm">
+              Are you a school administrator?{' '}
+              <Link
+                href="/school-register"
+                className="font-semibold text-primary hover:underline transition-colors"
+              >
+                Register your school
+              </Link>
+            </p>
+          </div>
         </div>
       </Card>
     </div>

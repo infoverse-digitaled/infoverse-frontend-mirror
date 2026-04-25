@@ -34,6 +34,9 @@ export const API_ENDPOINTS = {
   resetPassword: '/auth/reset-password',
   // Bug Report / Feedback
   bugReport: '/public/bug-report',
+  // School Admin endpoints
+  schoolRegister: '/school/register',
+  schoolStudents: '/school/students',
 } as const;
 
 export const API_CONFIG = {

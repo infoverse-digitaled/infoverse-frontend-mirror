@@ -77,6 +77,21 @@ export default function PricingPage() {
   const { user, isTrialExpired } = useAuth();
   const router = useRouter();
 
+  // ─── Role Guard ──────────────────────────────────────────────────────────────
+  // School admins → their own pricing page.
+  // School-enrolled students (have schoolCode) → contact admin screen.
+  useEffect(() => {
+    if (!user) return;
+    if (user.role === 'schooladmin') {
+      router.replace('/pricing/school');
+      return;
+    }
+    const isSchoolStudent = !!(user as any).schoolCode;
+    if (isSchoolStudent) {
+      router.replace('/subscription-expired');
+    }
+  }, [user, router]);
+
   useEffect(() => {
     const fetchPlans = async () => {
       try {
