@@ -104,10 +104,10 @@ export default function SchoolAdminDashboard() {
               </p>
             </div>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-              <div className="px-4 sm:px-6 py-3 bg-white border-2 border-primary border-dashed rounded-xl font-mono text-lg sm:text-xl font-bold tracking-wider text-primary text-center break-all">
+              <div className="flex-1 min-w-0 px-4 sm:px-6 py-3 bg-white border-2 border-primary border-dashed rounded-xl font-mono text-lg sm:text-xl font-bold tracking-wider text-primary text-center break-all">
                 {schoolCode}
               </div>
-              <Button onClick={handleCopyCode} variant={copied ? "primary" : "outline"} className="h-12 sm:h-[54px] px-8">
+              <Button onClick={handleCopyCode} variant={copied ? "primary" : "outline"} className="h-12 sm:h-[54px] px-8 flex-shrink-0">
                 {copied ? 'Copied!' : 'Copy Code'}
               </Button>
             </div>
@@ -204,8 +204,8 @@ export default function SchoolAdminDashboard() {
             <h2 className="text-xl md:text-2xl font-bold text-gray-900">Enrolled Students ({students.length})</h2>
           </div>
 
-          <Card className="overflow-hidden shadow-sm">
-            <div className="overflow-x-auto">
+          <Card className="w-full overflow-hidden shadow-sm">
+            <div className="overflow-x-auto w-full">
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-gray-50 border-b border-gray-100 text-sm font-semibold text-gray-600 uppercase tracking-wide">

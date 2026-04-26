@@ -220,8 +220,8 @@ export default function DashboardLayout({
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 lg:ml-0 pt-16 lg:pt-0 min-h-screen">
-        <div className="p-6 md:p-8 max-w-7xl mx-auto">
+      <main className="flex-1 min-w-0 lg:ml-0 pt-16 lg:pt-0 min-h-screen">
+        <div className="p-4 sm:p-6 md:p-8 max-w-7xl mx-auto overflow-hidden">
           <TrialBanner />
           {children}
         </div>
