@@ -6,18 +6,20 @@ import Link from 'next/link';
 import clsx from 'clsx';
 
 // Which urgency tier the banner is in, based on days remaining
-type UrgencyTier = 'calm' | 'amber' | 'red';
+type UrgencyTier = 'calm' | 'amber' | 'red' | 'expired';
 
 const STORAGE_KEY = 'trial_banner_dismissed_tier';
 
-function getTier(daysRemaining: number): UrgencyTier {
+function getTier(daysRemaining: number | null, isTrialExpired: boolean): UrgencyTier | null {
+  if (isTrialExpired) return 'expired';
+  if (daysRemaining === null) return null;
   if (daysRemaining <= 1) return 'red';
   if (daysRemaining <= 3) return 'amber';
   return 'calm';
 }
 
 export function TrialBanner() {
-  const { user, loading, daysRemaining } = useAuth();
+  const { user, loading, daysRemaining, isTrialExpired } = useAuth();
   const [dismissedTier, setDismissedTier] = useState<UrgencyTier | null>(null);
   const [mounted, setMounted] = useState(false);
 
@@ -28,13 +30,15 @@ export function TrialBanner() {
   }, []);
 
   if (!mounted || loading || !user) return null;
-  if (user.subscription?.status !== 'trialing') return null;
-  if (daysRemaining === null || daysRemaining <= 0) return null;
+  
+  // We want to show banner if trialing or expired
+  if (user.subscription?.status !== 'trialing' && !isTrialExpired) return null;
 
-  const currentTier = getTier(daysRemaining);
+  const currentTier = getTier(daysRemaining, isTrialExpired);
+  if (!currentTier) return null;
 
   // Re-show if the current tier is MORE urgent than the one the user dismissed
-  const tierPriority: Record<UrgencyTier, number> = { calm: 0, amber: 1, red: 2 };
+  const tierPriority: Record<UrgencyTier, number> = { calm: 0, amber: 1, red: 2, expired: 3 };
   const isVisible = dismissedTier === null || tierPriority[currentTier] > tierPriority[dismissedTier];
 
   if (!isVisible) return null;
@@ -45,7 +49,9 @@ export function TrialBanner() {
   };
 
   const message =
-    daysRemaining === 1
+    currentTier === 'expired'
+      ? 'Your free trial has expired.'
+      : daysRemaining === 1
       ? 'Your free trial ends tomorrow!'
       : `${daysRemaining} days left in your free trial.`;
 
@@ -53,9 +59,10 @@ export function TrialBanner() {
     <div
       className={clsx(
         'flex items-start sm:items-center justify-between gap-3 sm:gap-4 px-4 sm:px-5 py-3 rounded-xl text-sm font-medium mb-6',
-        currentTier === 'red'   && 'bg-red-50 border border-red-200 text-red-800',
-        currentTier === 'amber' && 'bg-amber-50 border border-amber-200 text-amber-800',
-        currentTier === 'calm'  && 'bg-primary/5 border border-primary/20 text-primary'
+        currentTier === 'expired' && 'bg-red-100 border border-red-300 text-red-900',
+        currentTier === 'red'     && 'bg-red-50 border border-red-200 text-red-800',
+        currentTier === 'amber'   && 'bg-amber-50 border border-amber-200 text-amber-800',
+        currentTier === 'calm'    && 'bg-primary/5 border border-primary/20 text-primary'
       )}
     >
       <div className="flex items-start sm:items-center gap-2 sm:gap-3 flex-wrap flex-1 mt-0.5 sm:mt-0">
@@ -63,9 +70,10 @@ export function TrialBanner() {
         <span
           className={clsx(
             'w-2 h-2 rounded-full shrink-0 animate-pulse',
-            currentTier === 'red'   && 'bg-red-500',
-            currentTier === 'amber' && 'bg-amber-500',
-            currentTier === 'calm'  && 'bg-primary'
+            currentTier === 'expired' && 'bg-red-600',
+            currentTier === 'red'     && 'bg-red-500',
+            currentTier === 'amber'   && 'bg-amber-500',
+            currentTier === 'calm'    && 'bg-primary'
           )}
         />
         <span>{message}</span>
@@ -73,12 +81,13 @@ export function TrialBanner() {
           href="/pricing"
           className={clsx(
             'underline underline-offset-2 font-semibold whitespace-nowrap',
-            currentTier === 'red'   && 'text-red-700 hover:text-red-900',
-            currentTier === 'amber' && 'text-amber-700 hover:text-amber-900',
-            currentTier === 'calm'  && 'text-primary hover:text-primary-dark'
+            currentTier === 'expired' && 'text-red-700 hover:text-red-900',
+            currentTier === 'red'     && 'text-red-700 hover:text-red-900',
+            currentTier === 'amber'   && 'text-amber-700 hover:text-amber-900',
+            currentTier === 'calm'    && 'text-primary hover:text-primary-dark'
           )}
         >
-          Upgrade now →
+          {currentTier === 'expired' ? 'Subscribe now →' : 'Upgrade now →'}
         </Link>
       </div>
 
@@ -88,9 +97,10 @@ export function TrialBanner() {
         aria-label="Dismiss trial banner"
         className={clsx(
           'shrink-0 rounded-lg p-1 transition-colors',
-          currentTier === 'red'   && 'hover:bg-red-100 text-red-400 hover:text-red-600',
-          currentTier === 'amber' && 'hover:bg-amber-100 text-amber-400 hover:text-amber-600',
-          currentTier === 'calm'  && 'hover:bg-primary/10 text-primary/50 hover:text-primary'
+          currentTier === 'expired' && 'hover:bg-red-200 text-red-500 hover:text-red-700',
+          currentTier === 'red'     && 'hover:bg-red-100 text-red-400 hover:text-red-600',
+          currentTier === 'amber'   && 'hover:bg-amber-100 text-amber-400 hover:text-amber-600',
+          currentTier === 'calm'    && 'hover:bg-primary/10 text-primary/50 hover:text-primary'
         )}
       >
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

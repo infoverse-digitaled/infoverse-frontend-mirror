@@ -209,10 +209,15 @@ export default function SchoolPricingPage() {
       // Refresh user so subscription status is up-to-date
       await fetchUser();
       setTrialSuccess(`Your 30-day free trial for ${plan.tier} has started! Redirecting to your dashboard…`);
-      setTimeout(() => router.push('/dashboard/schooladmin'), 2000);
+      setTimeout(() => router.push('/dashboard/schooladmin'), 1500);
     } catch (err: unknown) {
       const serverMsg = (err as any)?.response?.data?.error;
-      setError(typeof serverMsg === 'string' ? serverMsg : 'Failed to start trial. Please try again.');
+      if (serverMsg === 'You already have an active trial' || serverMsg?.includes('active trial')) {
+        setTrialSuccess(`You already have an active trial! Redirecting to your dashboard…`);
+        setTimeout(() => router.push('/dashboard/schooladmin'), 1500);
+      } else {
+        setError(typeof serverMsg === 'string' ? serverMsg : 'Failed to start trial. Please try again.');
+      }
     } finally {
       setLoadingPlan(null);
     }
@@ -418,18 +423,21 @@ export default function SchoolPricingPage() {
                               </Button>
                             ) : (
                               <>
-                                {/* Free Trial button — disabled when trial active/expired or already subscribed */}
+                                {/* Free Trial / Dashboard button */}
                                 <Button
-                                  onClick={() => handleStartTrial(plan)}
+                                  onClick={() => {
+                                    if (isTrialing) {
+                                      router.push('/dashboard/schooladmin');
+                                    } else {
+                                      handleStartTrial(plan);
+                                    }
+                                  }}
                                   isLoading={isLoadingTrial}
-                                  disabled={authLoading || trialDisabled || (anyLoading && !isLoadingTrial)}
-                                  className={`rounded-xl text-sm whitespace-nowrap ${
-                                    trialDisabled ? 'opacity-50 cursor-not-allowed' : ''
-                                  }`}
+                                  disabled={authLoading || isActive || trialExpired || (anyLoading && !isLoadingTrial)}
+                                  className={`rounded-xl text-sm whitespace-nowrap`}
                                   fullWidth
-                                  title={isTrialing ? `Trial active: ${trialDaysLeft} day${trialDaysLeft !== 1 ? 's' : ''} left` : isActive ? 'Already subscribed' : trialExpired ? 'Trial expired — please purchase' : ''}
                                 >
-                                  {authLoading ? 'Loading…' : isTrialing ? `Trial (${trialDaysLeft}d left)` : trialExpired ? 'Trial Expired' : isActive ? 'Subscribed' : 'Free Trial'}
+                                  {authLoading ? 'Loading…' : isTrialing ? 'Go to Dashboard' : trialExpired ? 'Trial Expired' : isActive ? 'Subscribed' : 'Free Trial'}
                                 </Button>
                                 <Button
                                   onClick={() => handlePurchase(plan)}

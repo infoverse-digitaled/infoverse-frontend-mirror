@@ -167,6 +167,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = async () => {
     localStorage.removeItem('token');
     setUser(null);
+    window.location.href = '/login'; // Hard redirect to clear router cache and state completely
   };
 
   const setTokenAndFetchUser = async (token: string) => {
