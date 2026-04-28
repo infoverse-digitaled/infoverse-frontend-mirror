@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Input, Button, Card } from '@/components/ui';
@@ -8,7 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login } = useAuth();
+  const { login, user, loading } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -16,6 +16,17 @@ export default function LoginPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [generalError, setGeneralError] = useState('');
+
+  // Redirect if already logged in and not currently authenticating
+  useEffect(() => {
+    if (user && !loading && !isLoading) {
+      if (user.role === 'schooladmin') {
+        router.push('/dashboard/schooladmin');
+      } else {
+        router.push('/dashboard');
+      }
+    }
+  }, [user, loading, isLoading, router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -52,6 +63,9 @@ export default function LoginPage() {
 
     try {
       const { role } = await login(formData.email, formData.password);
+      // Note: we intentionally DO NOT set isLoading(false) here,
+      // because the component is about to unmount. Setting it to false
+      // would trigger the safety useEffect and redirect unexpectedly if we wanted to push elsewhere.
       if (role === 'schooladmin') {
         router.push('/dashboard/schooladmin');
       } else {
@@ -62,7 +76,6 @@ export default function LoginPage() {
         error.response?.data?.error?.message ||
           'Login failed. Please check your credentials.'
       );
-    } finally {
       setIsLoading(false);
     }
   };

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Input, Button, Card } from '@/components/ui';
@@ -8,7 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 
 export default function SchoolRegisterPage() {
   const router = useRouter();
-  const { registerSchoolAdmin } = useAuth();
+  const { registerSchoolAdmin, user, loading } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -18,6 +18,17 @@ export default function SchoolRegisterPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [generalError, setGeneralError] = useState('');
+
+  // Redirect if already logged in and not currently registering
+  useEffect(() => {
+    if (user && !loading && !isLoading) {
+      if (user.role === 'schooladmin') {
+        router.push('/dashboard/schooladmin');
+      } else {
+        router.push('/dashboard');
+      }
+    }
+  }, [user, loading, isLoading, router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -65,14 +76,16 @@ export default function SchoolRegisterPage() {
     try {
       await registerSchoolAdmin(formData.name, formData.email, formData.password, formData.schoolName);
 
-      // Redirect to pricing page for schools to select a 1-month trial
-      router.push('/pricing/school');
+      // Go to welcome page after successful registration
+      // Note: we intentionally DO NOT set isLoading(false) here,
+      // because the component is about to unmount. Setting it to false
+      // would trigger the safety useEffect and redirect to dashboard.
+      router.push('/welcome');
     } catch (error: any) {
       setGeneralError(
         error.response?.data?.error?.message ||
           'Registration failed. Please try again.'
       );
-    } finally {
       setIsLoading(false);
     }
   };
@@ -140,7 +153,7 @@ export default function SchoolRegisterPage() {
           />
 
           <Button type="submit" fullWidth isLoading={isLoading} size="lg">
-            Continue to Pricing
+            Register Your School
           </Button>
         </form>
 

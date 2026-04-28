@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Input, Button, Card } from '@/components/ui';
@@ -10,7 +10,7 @@ type RegistrationMode = 'standard' | 'school';
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { register } = useAuth();
+  const { register, user, loading } = useAuth();
   const [mode, setMode] = useState<RegistrationMode>('standard');
   const [formData, setFormData] = useState({
     name: '',
@@ -21,6 +21,17 @@ export default function RegisterPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [generalError, setGeneralError] = useState('');
+
+  // Redirect if already logged in and not currently registering
+  useEffect(() => {
+    if (user && !loading && !isLoading) {
+      if (user.role === 'schooladmin') {
+        router.push('/dashboard/schooladmin');
+      } else {
+        router.push('/dashboard');
+      }
+    }
+  }, [user, loading, isLoading, router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -69,15 +80,17 @@ export default function RegisterPage() {
       const licenseKey = mode === 'school' ? formData.licenseCode : undefined;
       await register(formData.name, formData.email, formData.password, licenseKey);
 
-      // Go directly to dashboard after successful registration
+      // Go to welcome page after successful registration
       // User is automatically logged in via AuthContext
-      router.push('/dashboard');
+      // Note: we intentionally DO NOT set isLoading(false) here,
+      // because the component is about to unmount. Setting it to false
+      // would trigger the safety useEffect and redirect to dashboard.
+      router.push('/welcome');
     } catch (error: any) {
       setGeneralError(
         error.response?.data?.error?.message ||
           'Registration failed. Please try again.'
       );
-    } finally {
       setIsLoading(false);
     }
   };

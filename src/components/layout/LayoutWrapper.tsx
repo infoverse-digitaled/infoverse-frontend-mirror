@@ -18,15 +18,8 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const { shouldShowFeedback, dismissFeedback } = useFeedbackTimer();
 
   // Don't show Header/Footer on auth pages
-  const authPaths = ['/login', '/register', '/onboarding', '/forgot-password', '/reset-password', '/auth/callback'];
+  const authPaths = ['/login', '/register', '/onboarding', '/forgot-password', '/reset-password', '/auth/callback', '/welcome'];
   const isAuthPage = authPaths.some(path => pathname === path || pathname?.startsWith(path + '/'));
-
-  // Redirect logged-in users away from auth pages
-  useEffect(() => {
-    if (!loading && user && isAuthPage) {
-      router.replace('/dashboard');
-    }
-  }, [user, loading, isAuthPage, router]);
 
   if (isAuthPage) {
     return (
