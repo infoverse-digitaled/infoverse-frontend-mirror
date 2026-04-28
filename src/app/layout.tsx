@@ -5,7 +5,7 @@ import './globals.css';
 import 'katex/dist/katex.min.css';
 import { LayoutWrapper } from '@/components/layout';
 import { AuthProvider } from '@/contexts/AuthContext';
-// import { GlobalChatbot } from '@/components/ai';
+import { GlobalChatbot } from '@/components/ai';
 import { PostHogProvider } from './providers';
 import MetaPixel from '@/components/analytics/MetaPixel';
 
@@ -67,7 +67,7 @@ export default function RootLayout({
                 {children}
               </main>
             </LayoutWrapper>
-            {/* <GlobalChatbot /> */}
+            <GlobalChatbot />
           </AuthProvider>
         </PostHogProvider>
       </body>
