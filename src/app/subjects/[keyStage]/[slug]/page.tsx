@@ -90,9 +90,11 @@ export default function SubjectPage() {
   }, [units, isKs4TieredSubject, isKs4Science, selectedExamSubject]);
 
   // Check if user is already enrolled in this subject
-  const isEnrolled = useMemo(() => {
-    return myProgress?.some(p => p.subjectSlug === slug && p.keyStage === keyStage) || false;
+  const enrollment = useMemo(() => {
+    return myProgress?.find(p => p.subjectSlug === slug && p.keyStage === keyStage);
   }, [myProgress, slug, keyStage]);
+
+  const isEnrolled = !!enrollment;
 
   // Filter units by selected tier and exam subject for KS4
   const filteredUnits = useMemo(() => {
@@ -211,26 +213,52 @@ export default function SubjectPage() {
                 <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
                   {subject.title}
                 </h1>
-                <p className="text-sm text-gray-500 mt-1">Key Stage: {subject.keyStageTitle}</p>
+                <div className="flex items-center gap-3 mt-1">
+                  <p className="text-sm text-gray-500">Key Stage: {subject.keyStageTitle}</p>
+                  {isEnrolled && enrollment?.progress && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-300">•</span>
+                      <div className="flex items-center gap-2">
+                        <div className="w-24 h-2 bg-gray-100 rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-primary transition-all duration-500" 
+                            style={{ width: `${enrollment.progress.progressPercent}%` }}
+                          />
+                        </div>
+                        <span className="text-sm font-bold text-primary">{enrollment.progress.progressPercent}%</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
           <div className="flex items-center gap-3">
             {user && (
               isEnrolled ? (
-                <div className="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-700 rounded-lg border border-green-200">
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="font-medium">Enrolled</span>
+                <div className="flex flex-col sm:flex-row items-center gap-3">
+                  <div className="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-700 rounded-lg border border-green-200 shadow-sm">
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span className="font-medium">Enrolled</span>
+                  </div>
+                  {filteredUnits.length > 0 && (
+                    <Button 
+                      variant="primary" 
+                      onClick={() => router.push(`/units/${filteredUnits[0].slug}`)}
+                    >
+                      Continue Learning
+                    </Button>
+                  )}
                 </div>
               ) : (
                 <Button
                   variant="primary"
                   onClick={handleEnroll}
-                  disabled={isEnrolling}
+                  isLoading={isEnrolling}
                 >
-                  {isEnrolling ? 'Enrolling...' : 'Enroll in Course'}
+                  Enroll in Course
                 </Button>
               )
             )}

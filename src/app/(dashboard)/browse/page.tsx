@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { SubjectCard } from '@/components/lessons/SubjectCard';
 import { KeyStageSelector } from '@/components/lessons';
-import { useSubjects } from '@/lib/hooks/useOakData';
+import { useSubjects, useMyProgress } from '@/lib/hooks/useOakData';
 import { Loading } from '@/components/ui';
 
 export default function BrowsePage() {
@@ -37,6 +37,8 @@ export default function BrowsePage() {
     error,
     isLoading,
   } = useSubjects({ keyStageSlug: `ks${selectedKeyStage}` });
+  
+  const { data: myProgress } = useMyProgress();
 
   return (
     <div className="space-y-4 sm:space-y-6 lg:space-y-8">
@@ -75,6 +77,7 @@ export default function BrowsePage() {
                 key={subject.slug}
                 subject={subject}
                 keyStage={selectedKeyStage}
+                isEnrolled={myProgress?.some(p => p.subjectSlug === subject.slug && p.keyStage === `ks${selectedKeyStage}`)}
               />
             ))}
         </div>

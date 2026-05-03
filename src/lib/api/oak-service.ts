@@ -41,6 +41,28 @@ export interface EnrollmentProgress {
 export interface EnrollRequest {
   subjectSlug: string;
   keyStage: string;
+  unitSlug?: string;
+  lessonSlug?: string;
+}
+
+export interface ProgressUpdateRequest {
+  unitSlug?: string;
+  lessonSlug?: string;
+}
+
+export interface QuizSubmitRequest {
+  unitSlug: string;
+  lessonSlug: string;
+  answers: Array<{
+    questionId?: string;
+    answer: string | number;
+  }>;
+}
+
+export interface QuizSubmitResponse {
+  score: number;
+  passed: boolean;
+  status: string;
 }
 
 /**
@@ -286,6 +308,24 @@ export const oakService = {
    */
   async enrollInSubject(data: EnrollRequest): Promise<EnrollmentProgress> {
     const response = await authApiClient.post<BackendResponse<EnrollmentProgress>>(API_ENDPOINTS.enroll, data);
+    return response.data.data;
+  },
+
+  /**
+   * Update progress for an enrollment
+   */
+  async updateProgress(enrollmentId: string, data: ProgressUpdateRequest): Promise<void> {
+    await authApiClient.put(API_ENDPOINTS.updateProgress(enrollmentId), data);
+  },
+
+  /**
+   * Submit quiz answers
+   */
+  async submitQuiz(enrollmentId: string, data: QuizSubmitRequest): Promise<QuizSubmitResponse> {
+    const response = await authApiClient.post<BackendResponse<QuizSubmitResponse>>(
+      API_ENDPOINTS.submitQuiz(enrollmentId),
+      data
+    );
     return response.data.data;
   },
 };

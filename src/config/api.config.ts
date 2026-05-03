@@ -19,6 +19,8 @@ export const API_ENDPOINTS = {
   // Progress & Enrollment endpoints
   myProgress: '/progress/my-progress',
   enroll: '/progress/enroll',
+  updateProgress: (enrollmentId: string) => `/progress/enrollments/${enrollmentId}/progress`,
+  submitQuiz: (enrollmentId: string) => `/progress/enrollments/${enrollmentId}/quiz`,
   // AI Tutor endpoints
   aiTutor: '/ai/tutor',
   aiSummary: '/ai/summary',

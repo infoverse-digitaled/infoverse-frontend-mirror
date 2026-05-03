@@ -1,6 +1,13 @@
 import useSWR, { mutate } from 'swr';
 import { useState, useCallback } from 'react';
-import { oakService, EnrollmentProgress, EnrollRequest } from '@/lib/api/oak-service';
+import { 
+  oakService, 
+  EnrollmentProgress, 
+  EnrollRequest, 
+  ProgressUpdateRequest, 
+  QuizSubmitRequest, 
+  QuizSubmitResponse 
+} from '@/lib/api/oak-service';
 import type {
   KeyStage,
   Subject,
@@ -158,6 +165,56 @@ export function useEnroll() {
   }, []);
 
   return { enroll, isEnrolling, error };
+}
+
+/**
+ * Hook to update course progress
+ */
+export function useUpdateProgress() {
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const updateProgress = useCallback(async (enrollmentId: string, data: ProgressUpdateRequest): Promise<void> => {
+    setIsUpdating(true);
+    setError(null);
+    try {
+      await oakService.updateProgress(enrollmentId, data);
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } }; message?: string };
+      setError(error.response?.data?.message || error.message || 'Failed to update progress');
+    } finally {
+      setIsUpdating(false);
+    }
+  }, []);
+
+  return { updateProgress, isUpdating, error };
+}
+
+/**
+ * Hook to submit quiz results
+ */
+export function useSubmitQuiz() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const submitQuiz = useCallback(async (enrollmentId: string, data: QuizSubmitRequest): Promise<QuizSubmitResponse | null> => {
+    setIsSubmitting(true);
+    setError(null);
+    try {
+      const result = await oakService.submitQuiz(enrollmentId, data);
+      // Revalidate the progress data after quiz submission
+      mutate('my-progress');
+      return result;
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } }; message?: string };
+      setError(error.response?.data?.message || error.message || 'Failed to submit quiz');
+      return null;
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, []);
+
+  return { submitQuiz, isSubmitting, error };
 }
 
 /**

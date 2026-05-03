@@ -21,6 +21,8 @@ import {
   useLessonQuiz,
   useLessonAssets,
   useLessonTranscript,
+  useMyProgress,
+  useUpdateProgress,
 } from '@/lib/hooks/useOakData';
 
 export default function LessonPage() {
@@ -33,6 +35,10 @@ export default function LessonPage() {
   const { data: quizData, isLoading: quizLoading } = useLessonQuiz(slug);
   const { data: assetsData, isLoading: assetsLoading } = useLessonAssets(slug);
   const { data: transcriptData } = useLessonTranscript(slug);
+  
+  // Progress tracking
+  const { data: myProgress } = useMyProgress();
+  const { updateProgress } = useUpdateProgress();
 
   // Build context for AI helper
   const buildLessonContext = () => {
@@ -62,6 +68,22 @@ export default function LessonPage() {
       if (timer) clearTimeout(timer);
     };
   }, [isLoading, error, lesson, router]);
+
+  // Track progress when lesson is loaded
+  useEffect(() => {
+    if (lesson && myProgress && user) {
+      const enrollment = myProgress.find(
+        (p) => p.subjectSlug === lesson.subjectSlug && p.keyStage === lesson.keyStageSlug
+      );
+
+      if (enrollment) {
+        updateProgress(enrollment._id, {
+          unitSlug: lesson.unitSlug,
+          lessonSlug: lesson.slug,
+        });
+      }
+    }
+  }, [lesson, myProgress, user, updateProgress]);
 
   // Redirect expired users away from actual lesson content immediately
   useEffect(() => {

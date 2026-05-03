@@ -13,6 +13,7 @@ interface SubjectCardProps {
     lessonCount?: number;
   };
   keyStage: number;
+  isEnrolled?: boolean;
 }
 
 // Subject icon component with gradient
@@ -56,7 +57,7 @@ const SubjectIcon = ({ title }: { title: string }) => {
 // Paid subjects list
 const PAID_SUBJECTS = ['german', 'french', 'spanish', 'latin'];
 
-export function SubjectCard({ subject, keyStage }: SubjectCardProps) {
+export function SubjectCard({ subject, keyStage, isEnrolled }: SubjectCardProps) {
   const { user } = useAuth();
   
   // Determine if content is locked
@@ -96,9 +97,19 @@ export function SubjectCard({ subject, keyStage }: SubjectCardProps) {
                 <h3 className="font-serif font-bold text-xl md:text-2xl leading-tight text-gray-900 group-hover:text-primary transition-colors duration-300">
                     {subject.title}
                 </h3>
-                <span className="text-xs font-semibold text-gray-500 bg-gray-100 px-2 py-1 rounded-md">
-                    KS{keyStage}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold text-gray-500 bg-gray-100 px-2 py-1 rounded-md">
+                      KS{keyStage}
+                  </span>
+                  {isEnrolled && (
+                    <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-green-600 bg-green-50 px-2 py-1 rounded-md border border-green-100">
+                      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                      </svg>
+                      Enrolled
+                    </span>
+                  )}
+                </div>
             </div>
 
             {/* Description */}
@@ -109,7 +120,7 @@ export function SubjectCard({ subject, keyStage }: SubjectCardProps) {
             {/* Footer / CTA */}
             <div className="flex items-center justify-between mt-auto">
                 <div className="inline-flex items-center gap-2 font-medium text-gray-900 group-hover:text-primary transition-colors duration-300">
-                {isLocked ? 'Upgrade to view' : 'View units'}
+                {isLocked ? 'Upgrade to view' : isEnrolled ? 'Continue learning' : 'View units'}
                 <svg className="w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
