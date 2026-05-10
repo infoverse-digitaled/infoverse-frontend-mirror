@@ -8,6 +8,7 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { GlobalChatbot } from '@/components/ai';
 import { PostHogProvider } from './providers';
 import MetaPixel from '@/components/analytics/MetaPixel';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 // Skip Navigation Component for accessibility
 function SkipNavigation() {
@@ -60,15 +61,17 @@ export default function RootLayout({
       >
         <PostHogProvider>
           <MetaPixel />
-          <AuthProvider>
-            <SkipNavigation />
-            <LayoutWrapper>
-              <main id="main-content" tabIndex={-1}>
-                {children}
-              </main>
-            </LayoutWrapper>
-            <GlobalChatbot />
-          </AuthProvider>
+          <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ''}>
+            <AuthProvider>
+              <SkipNavigation />
+              <LayoutWrapper>
+                <main id="main-content" tabIndex={-1}>
+                  {children}
+                </main>
+              </LayoutWrapper>
+              <GlobalChatbot />
+            </AuthProvider>
+          </GoogleOAuthProvider>
         </PostHogProvider>
       </body>
     </html>

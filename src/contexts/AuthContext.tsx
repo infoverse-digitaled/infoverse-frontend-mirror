@@ -36,6 +36,7 @@ interface RegisterResult {
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<{ role: string }>;
+  loginWithGoogle: (credential: string) => Promise<{ role: string }>;
   register: (name: string, email: string, password: string, licenseKey?: string) => Promise<RegisterResult>;
   registerSchoolAdmin: (name: string, email: string, password: string, schoolName: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -125,6 +126,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { role: userData.role };
   };
 
+  const loginWithGoogle = async (credential: string): Promise<{ role: string }> => {
+    const res = await authApiClient.post('/auth/google', { credential });
+    const { token, user: userData } = res.data.data;
+    localStorage.setItem('token', token);
+    setUser(userData);
+    return { role: userData.role };
+  };
+
   const register = async (name: string, email: string, password: string, licenseKey?: string): Promise<RegisterResult> => {
     const payload: { name: string; email: string; password: string; licenseKey?: string } = {
       name,
@@ -179,6 +188,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <AuthContext.Provider value={{
       user,
       login,
+      loginWithGoogle,
       register,
       registerSchoolAdmin,
       logout,

@@ -5,12 +5,13 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Input, Button, Card } from '@/components/ui';
 import { useAuth } from '@/contexts/AuthContext';
+import { GoogleLogin } from '@react-oauth/google';
 
 type RegistrationMode = 'standard' | 'school';
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { register, user, loading } = useAuth();
+  const { register, loginWithGoogle, user, loading } = useAuth();
   const [mode, setMode] = useState<RegistrationMode>('standard');
   const [formData, setFormData] = useState({
     name: '',
@@ -95,6 +96,27 @@ export default function RegisterPage() {
     }
   };
 
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+    setIsLoading(true);
+    setGeneralError('');
+    try {
+      if (credentialResponse.credential) {
+        const { role } = await loginWithGoogle(credentialResponse.credential);
+        if (role === 'schooladmin') {
+          router.push('/dashboard/schooladmin');
+        } else {
+          router.push('/welcome');
+        }
+      }
+    } catch (error: any) {
+      setGeneralError(
+        error.response?.data?.error?.message ||
+          'Google signup failed. Please try again.'
+      );
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="flex justify-center items-center w-full">
       <Card className="w-full max-w-md shadow-xl bg-white p-8">
@@ -144,6 +166,8 @@ export default function RegisterPage() {
             <span>{generalError}</span>
           </div>
         )}
+
+
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <Input
@@ -196,6 +220,33 @@ export default function RegisterPage() {
             {mode === 'school' ? 'Register with School Code' : 'Sign Up'}
           </Button>
         </form>
+
+        {mode === 'standard' && (
+          <>
+            <div className="relative mt-6 mb-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">Or continue with Google</span>
+              </div>
+            </div>
+
+            <div className="mb-6 flex justify-center">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={() => {
+                  setGeneralError('Google Signup failed.');
+                }}
+                useOneTap
+                shape="rectangular"
+                theme="outline"
+                text="continue_with"
+                size="large"
+              />
+            </div>
+          </>
+        )}
 
         <div className="mt-8 text-center text-gray-500">
           <p>

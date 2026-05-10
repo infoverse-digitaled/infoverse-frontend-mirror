@@ -5,10 +5,12 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Input, Button, Card } from '@/components/ui';
 import { useAuth } from '@/contexts/AuthContext';
+import { GoogleLogin } from '@react-oauth/google';
 
 export default function LoginPage() {
+  
   const router = useRouter();
-  const { login, user, loading } = useAuth();
+  const { login, loginWithGoogle, user, loading } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -74,79 +76,125 @@ export default function LoginPage() {
     } catch (error: any) {
       setGeneralError(
         error.response?.data?.error?.message ||
-          'Login failed. Please check your credentials.'
+        'Login failed. Please check your credentials.'
       );
       setIsLoading(false);
     }
   };
 
-  return (
-    <div className="flex justify-center items-center w-full">
-      <Card className="w-full max-w-md shadow-xl bg-white p-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-primary mb-2">Welcome Back</h1>
-          <p className="text-gray-500">Please enter your details to sign in.</p>
-        </div>
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+      setIsLoading(true);
+      setGeneralError('');
+      try {
+        if (credentialResponse.credential) {
+          const { role } = await loginWithGoogle(credentialResponse.credential);
+          if (role === 'schooladmin') {
+            router.push('/dashboard/schooladmin');
+          } else {
+            router.push('/dashboard');
+          }
+        }
+      } catch (error: any) {
+        setGeneralError(
+          error.response?.data?.error?.message ||
+          'Google login failed. Please try again.'
+        );
+        setIsLoading(false);
+      }
+    };
 
-        {generalError && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-xl text-red-600 text-sm flex items-start gap-2">
-            <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span>{generalError}</span>
+    return (
+      <div className="flex justify-center items-center w-full">
+        <Card className="w-full max-w-md shadow-xl bg-white p-8">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-primary mb-2">Welcome Back</h1>
+            <p className="text-gray-500">Please enter your details to sign in.</p>
           </div>
-        )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <Input
-            label="Email"
-            name="email"
-            type="email"
-            placeholder="Enter your email"
-            value={formData.email}
-            onChange={handleChange}
-            error={errors.email}
-            disabled={isLoading}
-          />
+          {generalError && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-xl text-red-600 text-sm flex items-start gap-2">
+              <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>{generalError}</span>
+            </div>
+          )}
 
-          <div className="space-y-2">
+
+
+          <form onSubmit={handleSubmit} className="space-y-6">
             <Input
-              label="Password"
-              name="password"
-              type="password"
-              placeholder="Enter your password"
-              value={formData.password}
+              label="Email"
+              name="email"
+              type="email"
+              placeholder="Enter your email"
+              value={formData.email}
               onChange={handleChange}
-              error={errors.password}
+              error={errors.email}
               disabled={isLoading}
             />
-            <div className="flex justify-end">
-              <Link
-                href="/forgot-password"
-                className="text-sm text-primary hover:text-primary-dark font-medium transition-colors"
-              >
-                Forgot password?
-              </Link>
+
+            <div className="space-y-2">
+              <Input
+                label="Password"
+                name="password"
+                type="password"
+                placeholder="Enter your password"
+                value={formData.password}
+                onChange={handleChange}
+                error={errors.password}
+                disabled={isLoading}
+              />
+              <div className="flex justify-end">
+                <Link
+                  href="/forgot-password"
+                  className="text-sm text-primary hover:text-primary-dark font-medium transition-colors"
+                >
+                  Forgot password?
+                </Link>
+              </div>
+            </div>
+
+            <Button type="submit" fullWidth isLoading={isLoading} size="lg">
+              Log In
+            </Button>
+          </form>
+
+          <div className="relative mt-6 mb-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-white text-gray-500">Or continue with Google</span>
             </div>
           </div>
 
-          <Button type="submit" fullWidth isLoading={isLoading} size="lg">
-            Log In
-          </Button>
-        </form>
+          <div className="mb-6 flex justify-center">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => {
+                setGeneralError('Google Login failed.');
+              }}
+              useOneTap
+              shape="rectangular"
+              theme="outline"
+              text="continue_with"
+              size="large"
+            />
+          </div>
 
-        <div className="mt-8 text-center text-gray-500">
-          <p>
-            Don&apos;t have an account?{' '}
-            <Link
-              href="/register"
-              className="font-semibold text-secondary hover:text-secondary-dark transition-colors"
-            >
-              Sign up
-            </Link>
-          </p>
-        </div>
-      </Card>
-    </div>
+          <div className="mt-8 text-center text-gray-500">
+            <p>
+              Don&apos;t have an account?{' '}
+              <Link
+                href="/register"
+                className="font-semibold text-secondary hover:text-secondary-dark transition-colors"
+              >
+                Sign up
+              </Link>
+            </p>
+          </div>
+        </Card>
+      </div>
   );
 }
