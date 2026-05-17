@@ -79,6 +79,8 @@ export default function DashboardPage() {
               <CourseProgressCard
                 key={enrollment._id}
                 subjectName={formatSubjectName(enrollment.subjectSlug)}
+                subjectSlug={enrollment.subjectSlug}
+                keyStage={enrollment.keyStage}
                 progress={enrollment.progress.progressPercent}
                 onClick={() =>
                   router.push(`/subjects/${enrollment.keyStage}/${enrollment.subjectSlug}`)
