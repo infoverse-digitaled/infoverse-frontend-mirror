@@ -6,6 +6,7 @@ import {
   CourseProgressCard,
   SuggestedCourseCard,
   ProgressTracker,
+  SubscriptionCard,
 } from '@/components/dashboard';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMyProgress } from '@/lib/hooks/useOakData';
@@ -58,6 +59,9 @@ export default function DashboardPage() {
           <ProfileCard />
         </div>
       </div>
+
+      {/* Subscription Card */}
+      <SubscriptionCard />
 
       {/* Progress Tracker */}
       <ProgressTracker />

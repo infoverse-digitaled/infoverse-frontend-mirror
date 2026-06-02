@@ -197,29 +197,44 @@ export default function Home() {
                   className="rounded-2xl px-10 py-4 text-lg shadow-2xl shadow-primary/40 hover:shadow-3xl hover:shadow-primary/50 hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group"
                 >
                   <span className="relative z-10">
-                    {!user 
-                      ? 'Start free trial' 
-                      : user.subscription?.status === 'active' 
-                        ? 'Go to dashboard' 
-                        : isTrialExpired 
-                          ? 'Upgrade to premium' 
+                    {!user
+                      ? 'Start free trial'
+                      : user.subscription?.status === 'active'
+                        ? 'Go to dashboard'
+                        : isTrialExpired
+                          ? 'Upgrade to premium'
                           : 'Continue learning'}
                   </span>
                   <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
                 </Button>
               </Link>
-              <Link href="/key-stages">
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="rounded-2xl px-10 py-4 text-lg border-white/30 text-white hover:bg-white hover:text-gray-900 transition-all duration-300 backdrop-blur-sm"
-                >
-                  Browse lessons
-                  <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </Button>
-              </Link>
+              {user?.subscription?.status === 'active' ? (
+                <Link href="/pricing">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="rounded-2xl px-10 py-4 text-lg border-white/30 text-white hover:bg-white hover:text-gray-900 transition-all duration-300 backdrop-blur-sm"
+                  >
+                    View / Change Plan
+                    <svg className="w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                    </svg>
+                  </Button>
+                </Link>
+              ) : (
+                <Link href="/key-stages">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="rounded-2xl px-10 py-4 text-lg border-white/30 text-white hover:bg-white hover:text-gray-900 transition-all duration-300 backdrop-blur-sm"
+                  >
+                    Browse lessons
+                    <svg className="w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </Button>
+                </Link>
+              )}
             </div>
 
             {/* Trust indicators */}
@@ -611,26 +626,25 @@ export default function Home() {
                     size="lg"
                     className="rounded-2xl px-10 py-4 text-lg shadow-2xl hover:shadow-3xl hover:-translate-y-1 transition-all duration-300"
                   >
-                    {!user 
-                      ? 'Get Started Free' 
-                      : user.subscription?.status === 'active' 
-                        ? 'Go to Dashboard' 
-                        : isTrialExpired 
-                          ? 'Proceed to Payment' 
+                    {!user
+                      ? 'Get Started Free'
+                      : user.subscription?.status === 'active'
+                        ? 'Go to Dashboard'
+                        : isTrialExpired
+                          ? 'Proceed to Payment'
                           : 'Continue Learning'}
                   </Button>
                 </Link>
-                {(!user || isTrialExpired) && (
-                  <Link href="/pricing">
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      className="rounded-2xl px-10 py-4 text-lg border-white/30 text-white hover:bg-white hover:text-gray-900 transition-all duration-300"
-                    >
-                      View Pricing
-                    </Button>
-                  </Link>
-                )}
+                {/* Always show View Pricing — subscribers can see & change their plan too */}
+                <Link href="/pricing">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="rounded-2xl px-10 py-4 text-lg border-white/30 text-white hover:bg-white hover:text-gray-900 transition-all duration-300"
+                  >
+                    {user?.subscription?.status === 'active' ? 'View / Change Plan' : 'View Pricing'}
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>

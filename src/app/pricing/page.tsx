@@ -19,9 +19,33 @@ interface Plan {
 
 const DEFAULT_PLANS: Plan[] = [
   {
+    id: 'daily',
+    name: 'Daily',
+    price: '₦100',
+    description: 'Billed daily',
+    planCode: 'PLN_fq49l19jvokxoy1',
+    features: [
+      '100+ curriculum lessons',
+      'AI-powered learning support',
+      'Progress tracking dashboard',
+    ],
+  },
+  {
+    id: 'weekly',
+    name: 'Weekly',
+    price: '₦600',
+    description: 'Billed weekly',
+    planCode: 'PLN_81o2g4ew9okwjms',
+    features: [
+      '100+ curriculum lessons',
+      'AI-powered learning support',
+      'Progress tracking dashboard',
+    ],
+  },
+  {
     id: 'monthly',
     name: 'Monthly',
-    price: '₦3,000',
+    price: '₦2,000',
     description: 'Billed monthly',
     planCode: 'PLN_sgry7evrd03iw15', 
     features: [
@@ -33,7 +57,7 @@ const DEFAULT_PLANS: Plan[] = [
   {
     id: 'annual',
     name: 'Annual',
-    price: '₦25,000',
+    price: '₦20,000',
     description: 'Best value - save 30%',
     planCode: 'PLN_alwct8bj4ybmjqf', 
     recommended: true,
@@ -68,6 +92,9 @@ const faqs = [
     answer: 'Completely free. No credit card required to start. You get 7 days of unrestricted access to everything. Cancel anytime before the trial ends.',
   },
 ];
+
+// Plans that never have a free trial — always go straight to payment
+const NO_TRIAL_PLAN_IDS = ['daily', 'weekly'];
 
 export default function PricingPage() {
   const [displayPlans, setDisplayPlans] = useState<Plan[]>(DEFAULT_PLANS);
@@ -119,20 +146,21 @@ export default function PricingPage() {
     fetchPlans();
   }, []);
 
-  const handleSelectPlan = async (planCode: string) => {
+  const handleSelectPlan = async (planCode: string, planId: string) => {
     if (!user) {
       sessionStorage.setItem('selectedPlan', planCode);
       router.push('/register');
       return;
     }
 
+    const skipTrial = NO_TRIAL_PLAN_IDS.includes(planId);
+
     try {
       setLoadingPlan(planCode);
       setError(null);
 
-      // Check if user's trial has expired or they belong to a cancelled/past-due tier
-      if (isTrialExpired) {
-        // Trial expired - initiate payment
+      // Daily/weekly plans, expired trials, or active subscriptions always go straight to payment
+      if (isTrialExpired || skipTrial || user?.subscription?.status === 'active') {
         const response = await authApiClient.post<{ authorization_url: string }>(
           '/payment/initialize',
           { planCode }
@@ -142,7 +170,7 @@ export default function PricingPage() {
           window.location.href = response.data.authorization_url;
         }
       } else {
-        // Start free trial
+        // Start free trial (monthly / annual only)
         const response = await authApiClient.post<{ message: string; trialEndsAt: string; redirectUrl: string }>(
           '/payment/start-trial',
           { planCode }
@@ -259,24 +287,24 @@ export default function PricingPage() {
 
                   {/* CTA Button */}
                   <Button
-                    onClick={() => handleSelectPlan(plan.planCode)}
+                    onClick={() => handleSelectPlan(plan.planCode, plan.id)}
                     isLoading={loadingPlan === plan.planCode}
                     disabled={!!loadingPlan && loadingPlan !== plan.planCode}
                     fullWidth
                     className="rounded-xl mb-4"
                   >
-                    {isTrialExpired || user?.subscription?.status === 'active'
+                    {isTrialExpired || user?.subscription?.status === 'active' || NO_TRIAL_PLAN_IDS.includes(plan.id)
                       ? 'Subscribe Now'
                       : 'Start 7-day free trial'}
                   </Button>
-                  
-                  {!isTrialExpired && user?.subscription?.status !== 'active' && (
+
+                  {!isTrialExpired && user?.subscription?.status !== 'active' && !NO_TRIAL_PLAN_IDS.includes(plan.id) && (
                     <p className="text-center text-sm text-gray-500 mb-8">
                       No credit card required
                     </p>
                   )}
-                  
-                  {(isTrialExpired || user?.subscription?.status === 'active') && (
+
+                  {(isTrialExpired || user?.subscription?.status === 'active' || NO_TRIAL_PLAN_IDS.includes(plan.id)) && (
                     <p className="text-center text-sm text-gray-400 mb-8 italic">
                       Secure payment via Paystack
                     </p>
