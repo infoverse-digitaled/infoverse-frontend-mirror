@@ -2,7 +2,7 @@
 
 import React, { useState,useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Container, Button } from '@/components/ui';
+import { Container, Button, PaymentRedirectOverlay } from '@/components/ui';
 import { useAuth } from '@/contexts/AuthContext';
 import authApiClient from '@/lib/api/auth-client';
 
@@ -123,6 +123,7 @@ export default function SchoolPricingPage() {
   const [error, setError] = useState<string | null>(null);
   const [trialSuccess, setTrialSuccess] = useState<string | null>(null);
   const [displayPlans, setDisplayPlans] = useState<SchoolPlan[]>(SCHOOL_PLANS);
+  const [isRedirecting, setIsRedirecting] = useState(false);
   const { user, loading: authLoading, fetchUser } = useAuth();
   const router = useRouter();
 
@@ -244,6 +245,7 @@ export default function SchoolPricingPage() {
       );
 
       if (response.data?.authorization_url) {
+        setIsRedirecting(true);
         window.location.href = response.data.authorization_url;
       } else {
         throw new Error('Invalid payment response');
@@ -258,6 +260,7 @@ export default function SchoolPricingPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
+      {isRedirecting && <PaymentRedirectOverlay />}
       <section className="px-4 md:px-12 py-14 md:py-24">
         <Container size="xl" className="px-0">
           <div className="flex flex-col gap-10 md:gap-16">

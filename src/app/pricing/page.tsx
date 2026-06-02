@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Container, Button } from '@/components/ui';
+import { Container, Button, PaymentRedirectOverlay } from '@/components/ui';
 import { useAuth } from '@/contexts/AuthContext';
 import authApiClient from '@/lib/api/auth-client';
 
@@ -101,6 +101,7 @@ export default function PricingPage() {
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const [isRedirecting, setIsRedirecting] = useState(false);
   const { user, isTrialExpired } = useAuth();
   const router = useRouter();
 
@@ -167,6 +168,7 @@ export default function PricingPage() {
         );
 
         if (response.data.authorization_url) {
+          setIsRedirecting(true);
           window.location.href = response.data.authorization_url;
         }
       } else {
@@ -194,6 +196,7 @@ export default function PricingPage() {
 
   return (
     <div className="flex flex-col min-h-screen">
+      {isRedirecting && <PaymentRedirectOverlay />}
       {/* Hero Header Section */}
       <section className="px-5 md:px-16 py-16 md:py-28">
         <Container size="xl" className="px-0">
