@@ -17,9 +17,9 @@ interface SubjectCardProps {
 }
 
 // Subject icon component with gradient
-const SubjectIcon = ({ title }: { title: string }) => {
-  const getIconAndColor = (title: string) => {
-    const lowerTitle = title.toLowerCase();
+const SubjectIcon = ({ title }: { title?: string }) => {
+  const getIconAndColor = (title?: string) => {
+    const lowerTitle = (title || '').toLowerCase();
     if (lowerTitle.includes('math')) {
       return { icon: '∑', gradient: 'from-blue-500 to-indigo-600' };
     } else if (lowerTitle.includes('english') || lowerTitle.includes('literacy')) {
@@ -95,7 +95,7 @@ export function SubjectCard({ subject, keyStage, isEnrolled }: SubjectCardProps)
             {/* Subject Title */}
             <div className="flex items-center gap-3 mb-3">
                 <h3 className="font-serif font-bold text-xl md:text-2xl leading-tight text-gray-900 group-hover:text-primary transition-colors duration-300">
-                    {subject.title}
+                    {subject.title || subject.slug}
                 </h3>
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-semibold text-gray-500 bg-gray-100 px-2 py-1 rounded-md">
@@ -114,7 +114,7 @@ export function SubjectCard({ subject, keyStage, isEnrolled }: SubjectCardProps)
 
             {/* Description */}
             <p className="text-base text-gray-600 leading-relaxed mb-6 flex-grow">
-                {subject.description || `Explore units and lessons for ${subject.title}`}
+                {subject.description || `Explore units and lessons for ${subject.title || subject.slug}`}
             </p>
 
             {/* Footer / CTA */}

@@ -104,6 +104,7 @@ export default function PricingPage() {
   const [isRedirecting, setIsRedirecting] = useState(false);
   const { user, isTrialExpired } = useAuth();
   const router = useRouter();
+  const userPlanName = user?.subscription?.status === 'active' ? user.subscription.plan : null;
 
   // ─── Role Guard ──────────────────────────────────────────────────────────────
   // School admins → their own pricing page.
@@ -202,18 +203,20 @@ export default function PricingPage() {
         <Container size="xl" className="px-0">
           <div className="max-w-3xl mx-auto text-center">
             <p className="font-semibold text-base text-gray-900 mb-4">
-              Plans
+              {userPlanName ? 'Switch Plan' : 'Plans'}
             </p>
             <h1 className="font-serif font-bold text-4xl md:text-7xl lg:text-[84px] leading-[1.1] tracking-tight text-gray-900 mb-6">
-              Flexible pricing for every learner
+              {userPlanName ? 'Change Your Plan' : 'Flexible pricing for every learner'}
             </h1>
             <p className="text-base md:text-xl text-gray-600 leading-relaxed mb-8">
-              Choose a plan that fits your needs. All plans include full access to 100+ UK-curriculum lessons, quizzes, and exams.
+              {userPlanName 
+                ? 'Select a new plan below to switch your subscription. Changes take effect immediately.' 
+                : 'Choose a plan that fits your needs. All plans include full access to 100+ UK-curriculum lessons, quizzes, and exams.'}
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <Link href="#pricing">
                 <Button size="lg" className="rounded-xl">
-                  Explore
+                  {userPlanName ? 'View Plans' : 'Explore'}
                 </Button>
               </Link>
             </div>
@@ -228,13 +231,15 @@ export default function PricingPage() {
             {/* Section Header */}
             <div className="max-w-3xl mx-auto text-center">
               <p className="font-semibold text-base text-gray-900 mb-4">
-                Plans
+                {userPlanName ? 'Switch Plan' : 'Plans'}
               </p>
               <h2 className="font-serif font-bold text-3xl md:text-5xl lg:text-[60px] leading-[1.2] tracking-tight text-gray-900 mb-6">
-                Simple pricing
+                {userPlanName ? 'Available Plans' : 'Simple pricing'}
               </h2>
               <p className="text-base md:text-xl text-gray-600 leading-relaxed">
-                All plans unlock access to 100+ curriculum-aligned lessons and expert-designed content.
+                {userPlanName 
+                  ? 'Your current plan is highlighted below.' 
+                  : 'All plans unlock access to 100+ curriculum-aligned lessons and expert-designed content.'}
               </p>
             </div>
 
@@ -247,17 +252,29 @@ export default function PricingPage() {
 
             {/* Pricing Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 max-w-3xl mx-auto">
-              {displayPlans.map((plan) => (
+              {displayPlans.map((plan) => {
+                const isCurrentPlan = userPlanName ? userPlanName.endsWith(plan.id.toLowerCase()) : false;
+
+                
+                return (
                 <div
                   key={plan.id}
-                  className={`bg-white border-2 rounded-2xl p-6 md:p-8 flex flex-col relative transition-all duration-300 ${
-                    plan.recommended
-                      ? 'border-primary shadow-2xl md:scale-105 z-10'
-                      : 'border-gray-100 shadow-md'
+                  className={`border-2 rounded-2xl p-6 md:p-8 flex flex-col relative transition-all duration-300 ${
+                    isCurrentPlan
+                      ? 'bg-gray-50 border-gray-300 shadow-inner opacity-90'
+                      : plan.recommended
+                        ? 'bg-white border-primary shadow-2xl md:scale-105 z-10'
+                        : 'bg-white border-gray-100 shadow-md'
                   }`}
                 >
-                  {plan.recommended && (
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-primary text-white px-4 py-1 rounded-full text-sm font-bold tracking-wide shadow-md">
+                  {isCurrentPlan && (
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gray-600 text-white px-4 py-1 rounded-full text-sm font-bold tracking-wide shadow-md z-20">
+                      Current Plan
+                    </div>
+                  )}
+                  
+                  {plan.recommended && !isCurrentPlan && (
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-primary text-white px-4 py-1 rounded-full text-sm font-bold tracking-wide shadow-md z-20">
                       Most Popular
                     </div>
                   )}
@@ -292,13 +309,18 @@ export default function PricingPage() {
                   <Button
                     onClick={() => handleSelectPlan(plan.planCode, plan.id)}
                     isLoading={loadingPlan === plan.planCode}
-                    disabled={!!loadingPlan && loadingPlan !== plan.planCode}
+                    disabled={isCurrentPlan || (!!loadingPlan && loadingPlan !== plan.planCode)}
                     fullWidth
+                    variant={isCurrentPlan ? 'outline' : 'primary'}
                     className="rounded-xl mb-4"
                   >
-                    {isTrialExpired || user?.subscription?.status === 'active' || NO_TRIAL_PLAN_IDS.includes(plan.id)
-                      ? 'Subscribe Now'
-                      : 'Start 7-day free trial'}
+                    {isCurrentPlan 
+                      ? 'Current Plan'
+                      : userPlanName
+                        ? `Switch to ${plan.name}`
+                        : isTrialExpired || NO_TRIAL_PLAN_IDS.includes(plan.id)
+                          ? 'Subscribe Now'
+                          : 'Start 7-day free trial'}
                   </Button>
 
                   {!isTrialExpired && user?.subscription?.status !== 'active' && !NO_TRIAL_PLAN_IDS.includes(plan.id) && (
@@ -338,7 +360,8 @@ export default function PricingPage() {
                     ))}
                   </ul>
                 </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </Container>

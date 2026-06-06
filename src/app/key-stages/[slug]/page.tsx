@@ -9,9 +9,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { SignupPromptModal } from '@/components/modals/SignupPromptModal';
 
 // Subject icon component with gradient
-const SubjectIcon = ({ title }: { title: string }) => {
-  const getIconAndColor = (title: string) => {
-    const lowerTitle = title.toLowerCase();
+const SubjectIcon = ({ title }: { title?: string }) => {
+  const getIconAndColor = (title?: string) => {
+    const lowerTitle = (title || '').toLowerCase();
     if (lowerTitle.includes('math')) {
       return { icon: '∑', gradient: 'from-blue-500 to-indigo-600' };
     } else if (lowerTitle.includes('english') || lowerTitle.includes('literacy')) {
@@ -276,12 +276,12 @@ export default function KeyStagePage() {
 
                         {/* Subject Title */}
                         <h3 className="font-serif font-bold text-xl md:text-2xl leading-tight mb-3 text-gray-900 group-hover:text-primary transition-colors duration-300">
-                          {subject.title}
+                          {subject.title || subject.slug}
                         </h3>
 
                         {/* Description */}
                         <p className="text-base text-gray-600 leading-relaxed mb-6 flex-grow">
-                          Explore units and lessons for {subject.title}
+                          Explore units and lessons for {subject.title || subject.slug}
                         </p>
 
                         {/* Footer */}

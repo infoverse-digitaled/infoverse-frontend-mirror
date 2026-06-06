@@ -15,6 +15,7 @@ interface Subscription {
   status: 'free' | 'active' | 'inactive' | 'cancelled' | 'trialing' | 'past_due';
   expiresAt?: string;
   trialEndsAt?: string;
+  planCode?: string;
 }
 
 interface User {
