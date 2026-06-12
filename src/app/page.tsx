@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Button, Container } from '@/components/ui';
 import { useAuth } from '@/contexts/AuthContext';
+import CyclingHeadline from './CyclingHeadline';
 
 export default function Home() {
   const { user, isTrialExpired } = useAuth();
@@ -174,19 +175,11 @@ export default function Home() {
             </div>
 
             {/* Main Headline */}
-            <h1 className="font-serif font-bold text-5xl md:text-7xl lg:text-[90px] leading-[1.05] tracking-tight text-white mb-8 animate-slide-up delay-100">
-              Improve your grades with{' '}
-              <span className="relative inline-block">
-                <span className="relative z-10 text-gradient">UK-standard</span>
-                <span className="absolute -bottom-2 left-0 right-0 h-3 bg-gradient-to-r from-primary/50 to-secondary/50 blur-xl" />
-              </span>{' '}
-              lessons
-            </h1>
+            <CyclingHeadline />
 
             {/* Subheadline */}
             <p className="text-xl md:text-2xl text-white/80 leading-relaxed mb-12 max-w-3xl mx-auto animate-slide-up delay-200">
-              Over 100+ curriculum-aligned lessons, expertly designed to boost academic performance.
-              Access the same quality content trusted by UK schools.
+              From homework struggles to exam success, Infoverse DigitalED helps learners aged 6–16 build confidence, master concepts, and achieve better results.
             </p>
 
             {/* CTA Buttons */}
