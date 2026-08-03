@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useAI } from '@/lib/hooks/useAI';
 import { useAuth } from '@/contexts/AuthContext';
+import { useAIContext } from '@/contexts/AIContext';
 
 interface Message {
   id: string;
@@ -22,8 +23,17 @@ export function GlobalChatbot() {
   const [inputValue, setInputValue] = useState('');
   const { askTutor, isLoading, error, clearError } = useAI();
   const { user } = useAuth();
+  const { lessonContext, lessonTitle } = useAIContext();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const isLessonMode = !!lessonContext;
+
+  // Clear chat history when switching between general and lesson mode
+  useEffect(() => {
+    setMessages([]);
+    setInputValue('');
+  }, [isLessonMode, lessonTitle]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -54,8 +64,11 @@ export function GlobalChatbot() {
     setInputValue('');
     clearError();
 
+    // Use lesson context if available, otherwise fall back to general context
+    const activeContext = isLessonMode ? lessonContext! : GENERAL_CONTEXT;
+
     try {
-      const answer = await askTutor(GENERAL_CONTEXT, userMessage.content);
+      const answer = await askTutor(activeContext, userMessage.content);
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: 'ai',
@@ -73,7 +86,7 @@ export function GlobalChatbot() {
 
   return (
     <div className="fixed bottom-6 right-6 z-50">
-      {/* Chat Container - Expands from the pill */}
+      {/* Chat Container */}
       <div
         className={`flex flex-col bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden transition-all duration-300 ease-in-out ${
           isOpen
@@ -84,24 +97,43 @@ export function GlobalChatbot() {
         {/* Header / Collapsed Pill */}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className={`flex items-center gap-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white transition-all duration-300 ${
+          className={`flex items-center gap-3 text-white transition-all duration-300 ${
+            isLessonMode
+              ? 'bg-gradient-to-r from-emerald-500 to-blue-600'
+              : 'bg-gradient-to-r from-blue-600 to-purple-600'
+          } ${
             isOpen
               ? 'p-4 justify-between cursor-default'
-              : 'px-5 py-3 hover:from-blue-700 hover:to-purple-700 hover:shadow-lg'
+              : 'px-5 py-3 hover:opacity-90 hover:shadow-lg'
           }`}
-          aria-label={isOpen ? 'Close AI Study Helper' : 'Open AI Study Helper'}
+          aria-label={isOpen ? 'Close AI Assistant' : 'Open AI Assistant'}
         >
           <div className="flex items-center gap-3">
-            {/* Light bulb icon */}
+            {/* Icon */}
             <div className={`flex items-center justify-center ${isOpen ? 'w-10 h-10 rounded-full bg-white/20' : ''}`}>
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-              </svg>
+              {isLessonMode ? (
+                // Book icon for lesson mode
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+              ) : (
+                // Light bulb icon for general mode
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
+              )}
             </div>
-            <div className={isOpen ? '' : ''}>
-              <span className="font-semibold text-base">AI Study Helper</span>
+
+            <div>
+              <span className="font-semibold text-base">
+                {isLessonMode ? 'Lesson Assistant' : 'AI Study Helper'}
+              </span>
               {isOpen && (
-                <p className="text-xs text-white/80">Ask me anything about your studies</p>
+                <p className="text-xs text-white/80 truncate max-w-[200px]">
+                  {isLessonMode && lessonTitle
+                    ? `Studying:${lessonTitle}`
+                    : 'Ask me about any subject!'}
+                </p>
               )}
             </div>
           </div>
@@ -131,20 +163,43 @@ export function GlobalChatbot() {
           )}
         </button>
 
-        {/* Chat Content - Only visible when open */}
+        {/* Lesson context badge — visible below header when in lesson mode */}
+        {isOpen && isLessonMode && lessonTitle && (
+          <div className="px-4 py-2 bg-emerald-50 border-b border-emerald-100">
+            <p className="text-xs text-emerald-700 font-medium truncate">
+              📖 {lessonTitle}
+            </p>
+          </div>
+        )}
+
+        {/* Chat Content */}
         {isOpen && (
           <>
             {/* Messages */}
             <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-white">
               {messages.length === 0 && (
                 <div className="text-center text-gray-500 py-8">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
-                    <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                    </svg>
+                  <div className={`w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center ${
+                    isLessonMode
+                      ? 'bg-gradient-to-br from-emerald-100 to-blue-100'
+                      : 'bg-gradient-to-br from-blue-100 to-purple-100'
+                  }`}>
+                    {isLessonMode ? (
+                      <svg className="w-8 h-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                      </svg>
+                    ) : (
+                      <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                      </svg>
+                    )}
                   </div>
                   <p className="font-semibold text-gray-700 mb-1">Hi {user?.name?.split(' ')[0]}!</p>
-                  <p className="text-sm text-gray-500">Ask me about any subject - Math, English, and more!</p>
+                  <p className="text-sm text-gray-500">
+                    {isLessonMode
+                      ? "Ask me anything about this lesson — I'll use the lesson content to help you!"
+                      : 'Ask me about any subject — Math, English, Science, and more!'}
+                  </p>
                 </div>
               )}
 
@@ -156,7 +211,9 @@ export function GlobalChatbot() {
                   <div
                     className={`max-w-[85%] rounded-2xl px-4 py-2 ${
                       message.type === 'user'
-                        ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-br-md'
+                        ? isLessonMode
+                          ? 'bg-gradient-to-r from-emerald-500 to-blue-600 text-white rounded-br-md'
+                          : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-br-md'
                         : 'bg-gray-100 text-gray-800 rounded-bl-md'
                     }`}
                   >
@@ -170,9 +227,9 @@ export function GlobalChatbot() {
                   <div className="bg-gray-100 rounded-2xl rounded-bl-md px-4 py-3">
                     <div className="flex items-center gap-2">
                       <div className="flex gap-1">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                        <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                        <div className={`w-2 h-2 rounded-full animate-bounce ${isLessonMode ? 'bg-emerald-500' : 'bg-blue-500'}`} style={{ animationDelay: '0ms' }} />
+                        <div className={`w-2 h-2 rounded-full animate-bounce ${isLessonMode ? 'bg-blue-500' : 'bg-purple-500'}`} style={{ animationDelay: '150ms' }} />
+                        <div className={`w-2 h-2 rounded-full animate-bounce ${isLessonMode ? 'bg-emerald-500' : 'bg-blue-500'}`} style={{ animationDelay: '300ms' }} />
                       </div>
                       <span className="text-xs text-gray-500">Thinking...</span>
                     </div>
@@ -199,7 +256,7 @@ export function GlobalChatbot() {
                   type="text"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
-                  placeholder="Ask a question..."
+                  placeholder={isLessonMode ? 'Ask about this lesson...' : 'Ask a question...'}
                   aria-label="Type your question here"
                   className="flex-1 px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
                   disabled={isLoading}
@@ -208,7 +265,11 @@ export function GlobalChatbot() {
                   type="submit"
                   disabled={isLoading || !inputValue.trim()}
                   aria-label={isLoading ? 'Sending message' : 'Send message'}
-                  className="px-4 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg"
+                  className={`px-4 py-2.5 text-white rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg ${
+                    isLessonMode
+                      ? 'bg-gradient-to-r from-emerald-500 to-blue-600 hover:from-emerald-600 hover:to-blue-700'
+                      : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700'
+                  }`}
                 >
                   {isLoading ? (
                     <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">

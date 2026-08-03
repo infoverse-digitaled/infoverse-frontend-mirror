@@ -14,7 +14,7 @@ import {
 } from '@/components/ui';
 import { QuizSection } from '@/components/quiz';
 import { VideoPlayer, AssetDownloads } from '@/components/lessons';
-import { AiHelperButton } from '@/components/ai';
+import { useAIContext } from '@/contexts/AIContext';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   useLesson,
@@ -40,6 +40,9 @@ export default function LessonPage() {
   const { data: myProgress } = useMyProgress();
   const { updateProgress } = useUpdateProgress();
 
+  // Register lesson context into the unified GlobalChatbot
+  const { setLessonContext, clearLessonContext } = useAIContext();
+
   // Build context for AI helper
   const buildLessonContext = () => {
     if (!lesson) return '';
@@ -56,6 +59,17 @@ export default function LessonPage() {
     }
     return context;
   };
+
+  // Register / clear the lesson context in the global chatbot as the user enters/leaves
+  useEffect(() => {
+    if (lesson) {
+      setLessonContext(buildLessonContext(), lesson.title);
+    }
+    return () => {
+      clearLessonContext();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lesson?.slug, transcriptData]);
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -230,13 +244,7 @@ export default function LessonPage() {
         </div>
       </Container>
 
-      {/* AI Helper Button - Only show for authenticated users */}
-      {user && lesson && (
-        <AiHelperButton
-          lessonContext={buildLessonContext()}
-          lessonTitle={lesson.title}
-        />
-      )}
+      {/* AI Assistant is handled globally by GlobalChatbot via AIContext */}
     </div>
   );
 }
