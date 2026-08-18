@@ -156,13 +156,15 @@ export default function PricingPage() {
     }
 
     const skipTrial = NO_TRIAL_PLAN_IDS.includes(planId);
+    const isCurrentlyTrialing = user?.subscription?.status === 'trialing';
 
     try {
       setLoadingPlan(planCode);
       setError(null);
 
-      // Daily/weekly plans, expired trials, or active subscriptions always go straight to payment
-      if (isTrialExpired || skipTrial || user?.subscription?.status === 'active') {
+      // Daily/weekly plans, expired trials, active trialing users, or active subscriptions
+      // always go straight to payment so they can upgrade at any time.
+      if (isTrialExpired || skipTrial || isCurrentlyTrialing || user?.subscription?.status === 'active') {
         const response = await authApiClient.post<{ authorization_url: string }>(
           '/payment/initialize',
           { planCode }
@@ -318,18 +320,18 @@ export default function PricingPage() {
                       ? 'Current Plan'
                       : userPlanName
                         ? `Switch to ${plan.name}`
-                        : isTrialExpired || NO_TRIAL_PLAN_IDS.includes(plan.id)
+                        : isTrialExpired || user?.subscription?.status === 'trialing' || NO_TRIAL_PLAN_IDS.includes(plan.id)
                           ? 'Subscribe Now'
                           : 'Start 7-day free trial'}
                   </Button>
 
-                  {!isTrialExpired && user?.subscription?.status !== 'active' && !NO_TRIAL_PLAN_IDS.includes(plan.id) && (
+                  {!isTrialExpired && user?.subscription?.status !== 'active' && user?.subscription?.status !== 'trialing' && !NO_TRIAL_PLAN_IDS.includes(plan.id) && (
                     <p className="text-center text-sm text-gray-500 mb-8">
                       No credit card required
                     </p>
                   )}
 
-                  {(isTrialExpired || user?.subscription?.status === 'active' || NO_TRIAL_PLAN_IDS.includes(plan.id)) && (
+                  {(isTrialExpired || user?.subscription?.status === 'active' || user?.subscription?.status === 'trialing' || NO_TRIAL_PLAN_IDS.includes(plan.id)) && (
                     <p className="text-center text-sm text-gray-400 mb-8 italic">
                       Secure payment via Paystack
                     </p>
