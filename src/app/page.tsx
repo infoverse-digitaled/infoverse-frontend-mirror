@@ -199,7 +199,7 @@ export default function Home() {
                           ? 'Upgrade to premium'
                           : 'Continue learning'}
                   </span>
-                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                  <span className="pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
                 </Button>
               </Link>
               {user?.subscription?.status === 'active' ? (
