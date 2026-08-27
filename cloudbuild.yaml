@@ -1,4 +1,13 @@
 steps:
+  # Step 0: Install deps and gate the deploy on lint (no test script exists yet)
+  - name: 'node:22'
+    entrypoint: npm
+    args: ['ci']
+
+  - name: 'node:22'
+    entrypoint: npm
+    args: ['run', 'lint']
+
   # Build the Docker image
   - name: 'gcr.io/cloud-builders/docker'
     args:
