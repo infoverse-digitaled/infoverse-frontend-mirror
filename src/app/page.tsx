@@ -261,7 +261,7 @@ export default function Home() {
           <div className="flex flex-col lg:flex-row gap-16 lg:gap-20 items-center">
             {/* Left Content */}
             <div className="flex-1 max-w-xl">
-              <p className="font-semibold text-base text-primary mb-4 animate-slide-in-left">
+              <p className="font-semibold text-base text-primary-text mb-4 animate-slide-in-left">
                 Expert-Led Learning
               </p>
               <h2 className="font-serif font-bold text-4xl md:text-6xl leading-[1.15] tracking-tight text-gray-900 mb-6">
@@ -390,7 +390,7 @@ export default function Home() {
           <div className="flex flex-col gap-16 md:gap-20">
             {/* Section Header */}
             <div className="max-w-3xl mx-auto text-center">
-              <p className="font-semibold text-base text-primary mb-4">
+              <p className="font-semibold text-base text-primary-text mb-4">
                 Why Choose Us
               </p>
               <h2 className="font-serif font-bold text-4xl md:text-6xl leading-[1.15] tracking-tight text-gray-900 mb-6">
@@ -419,7 +419,7 @@ export default function Home() {
                     </div>
 
                     {/* Content */}
-                    <p className="font-semibold text-sm text-primary mb-2 uppercase tracking-wider">
+                    <p className="font-semibold text-sm text-primary-text mb-2 uppercase tracking-wider">
                       {feature.tagline}
                     </p>
                     <h3 className="font-serif font-bold text-2xl md:text-3xl leading-tight text-gray-900 mb-4">
@@ -456,7 +456,7 @@ export default function Home() {
           <div className="flex flex-col gap-16 md:gap-20">
             {/* Section Header */}
             <div className="max-w-3xl mx-auto text-center">
-              <p className="font-semibold text-base text-primary mb-4">
+              <p className="font-semibold text-base text-primary-text mb-4">
                 Testimonials
               </p>
               <h2 className="font-serif font-bold text-4xl md:text-6xl leading-[1.15] tracking-tight text-gray-900 mb-6">
@@ -520,7 +520,7 @@ export default function Home() {
           <div className="flex flex-col gap-16 md:gap-20">
             {/* Section Header */}
             <div className="max-w-3xl mx-auto text-center">
-              <p className="font-semibold text-base text-primary mb-4">
+              <p className="font-semibold text-base text-primary-text mb-4">
                 Words of Wisdom
               </p>
               <h2 className="font-serif font-bold text-4xl md:text-6xl leading-[1.15] tracking-tight text-gray-900 mb-6">

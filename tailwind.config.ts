@@ -10,14 +10,18 @@ const config: Config = {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#33A1CD', // Teal-Blue
+          DEFAULT: '#33A1CD', // Teal-Blue - decorative surfaces/large elements only, fails WCAG AA as text/button-fill
           light: '#6BB3D4',
           dark: '#2A85A8', // Slightly darker for hover states
+          text: '#1D6E8C', // WCAG AA (5.7:1 on white) - use for small text and button fills with white text
+          textHover: '#17586F', // Darker hover state for the `text` shade above
         },
         secondary: {
-          DEFAULT: '#E87B5C', // Coral/Orange
+          DEFAULT: '#E87B5C', // Coral/Orange - decorative surfaces/large elements only, fails WCAG AA as text/button-fill
           light: '#F29580',
           dark: '#D66B4D',
+          text: '#B14E33', // WCAG AA (5.2:1 on white) - use for small text and button fills with white text
+          textHover: '#8F3E29', // Darker hover state for the `text` shade above
         },
         accent: {
           coral: '#D4856D', // Icon backgrounds

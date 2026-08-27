@@ -141,7 +141,7 @@ export default function KeyStagesPage() {
                   className="rounded-2xl px-10 py-4 text-lg shadow-2xl shadow-primary/40 hover:shadow-primary/50 hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group"
                 >
                   <span className="relative z-10">Browse stages</span>
-                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                  <span className="pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
                 </Button>
               </Link>
               <Link href="/about">
