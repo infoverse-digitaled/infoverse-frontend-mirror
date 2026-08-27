@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Input, Button, Card, LoadingPage } from '@/components/ui';
 import { useAuth } from '@/contexts/AuthContext';
+import { getApiErrorMessage } from '@/lib/api/errors';
 
 function ResetPasswordForm() {
   const router = useRouter();
@@ -63,11 +64,8 @@ function ResetPasswordForm() {
       setTimeout(() => {
         router.push('/login');
       }, 5000);
-    } catch (error: any) {
-      setGeneralError(
-        error.response?.data?.error?.message ||
-          'Failed to reset password. The link may have expired.'
-      );
+    } catch (error) {
+      setGeneralError(getApiErrorMessage(error, 'Failed to reset password. The link may have expired.'));
     } finally {
       setIsLoading(false);
     }

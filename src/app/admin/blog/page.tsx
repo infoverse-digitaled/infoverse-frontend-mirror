@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import authApiClient from '@/lib/api/auth-client';
+import { getApiErrorMessage } from '@/lib/api/errors';
 import { Button } from '@/components/ui';
 
 interface BlogPost {
@@ -52,8 +53,8 @@ export default function AdminBlogPage() {
       try {
         const response = await authApiClient.get('/content/posts?limit=100');
         setPosts(response.data.data?.posts || []);
-      } catch (err: any) {
-        setError(err.response?.data?.error || 'Failed to load posts');
+      } catch (err) {
+        setError(getApiErrorMessage(err, 'Failed to load posts'));
       } finally {
         setLoading(false);
       }
@@ -113,8 +114,8 @@ export default function AdminBlogPage() {
       });
       setIsCreating(false);
       setEditingPost(null);
-    } catch (err: any) {
-      setFormError(err.response?.data?.error || 'Failed to save post');
+    } catch (err) {
+      setFormError(getApiErrorMessage(err, 'Failed to save post'));
     } finally {
       setSaving(false);
     }
@@ -140,8 +141,8 @@ export default function AdminBlogPage() {
     try {
       await authApiClient.delete(`/admin/content/${postId}`);
       setPosts(prev => prev.filter(p => p._id !== postId));
-    } catch (err: any) {
-      alert(err.response?.data?.error || 'Failed to delete post');
+    } catch (err) {
+      alert(getApiErrorMessage(err, 'Failed to delete post'));
     }
   };
 

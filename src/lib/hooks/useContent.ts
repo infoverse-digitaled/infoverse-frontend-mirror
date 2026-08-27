@@ -28,10 +28,6 @@ interface PostsResponse {
   };
 }
 
-interface PostResponse {
-  data: BlogPost;
-}
-
 const fetcher = async (url: string) => {
   const res = await apiClient.get(url);
   return res.data.data;
@@ -82,4 +78,5 @@ export function usePost(slug: string | null) {
   };
 }
 
-export default { usePosts, usePost };
+const contentHooks = { usePosts, usePost };
+export default contentHooks;

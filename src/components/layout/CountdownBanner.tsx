@@ -23,6 +23,9 @@ export function CountdownBanner() {
     pathname?.startsWith('/profile');
 
   useEffect(() => {
+    // Hydration guard: must start false on the server and flip true only
+    // after client mount, so a lazy initializer isn't an option here.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsMounted(true);
     // Target date: May 4, 2026 at 9:00 AM (local time)
     // Adjust the year as necessary

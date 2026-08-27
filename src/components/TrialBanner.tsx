@@ -24,6 +24,9 @@ export function TrialBanner() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // Hydration guard + localStorage read: both are only available client-side
+    // after mount, so a lazy initializer isn't an option here.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     const stored = localStorage.getItem(STORAGE_KEY) as UrgencyTier | null;
     setDismissedTier(stored);

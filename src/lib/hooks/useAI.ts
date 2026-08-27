@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import authApiClient from '@/lib/api/auth-client';
+import { getApiErrorMessage } from '@/lib/api/errors';
 
 interface AskTutorResponse {
   answer: string;
@@ -34,8 +35,8 @@ export function useAI(): UseAIReturn {
       });
 
       return response.data.data.answer;
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.error?.message || 'Failed to get AI response. Please try again.';
+    } catch (err) {
+      const errorMessage = getApiErrorMessage(err, 'Failed to get AI response. Please try again.');
       setError(errorMessage);
       throw new Error(errorMessage);
     } finally {

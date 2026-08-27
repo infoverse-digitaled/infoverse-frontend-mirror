@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Container, Button } from '@/components/ui';
 import { apiClient } from '@/lib/api/client';
+import { getApiErrorMessage } from '@/lib/api/errors';
 
 export const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
@@ -23,9 +24,8 @@ export const Footer: React.FC = () => {
       await apiClient.post('/public/subscribe', { email });
       setSubscribeMessage({ type: 'success', text: 'Successfully subscribed!' });
       setEmail('');
-    } catch (error: any) {
-      const errorMsg = error.response?.data?.error || 'Failed to subscribe. Please try again.';
-      setSubscribeMessage({ type: 'error', text: errorMsg });
+    } catch (error) {
+      setSubscribeMessage({ type: 'error', text: getApiErrorMessage(error, 'Failed to subscribe. Please try again.') });
     } finally {
       setIsSubscribing(false);
     }

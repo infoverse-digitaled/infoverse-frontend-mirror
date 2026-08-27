@@ -39,7 +39,7 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, logout, loading, isTrialExpired, daysRemaining } = useAuth();
+  const { user, logout, loading, isTrialExpired } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

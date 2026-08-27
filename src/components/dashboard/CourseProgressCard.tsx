@@ -259,7 +259,7 @@ export default function CourseProgressCard({
           <p className="text-[10px] text-white/60">Not started yet — dive in!</p>
         )}
         {progress > 0 && progress < 100 && (
-          <p className="text-[10px] text-white/60">Keep going, you're doing great!</p>
+          <p className="text-[10px] text-white/60">Keep going, you&apos;re doing great!</p>
         )}
         {progress === 100 && (
           <p className="text-[10px] text-white/80 font-semibold">🎉 Completed!</p>

@@ -12,6 +12,9 @@ export default function WelcomePage() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // Hydration guard: must start false on the server and flip true only
+    // after client mount, so a lazy initializer isn't an option here.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
@@ -44,7 +47,7 @@ export default function WelcomePage() {
         </h1>
         
         <p className="text-gray-500 mb-8 leading-relaxed">
-          Hi {user.name.split(' ')[0]}, your account has been successfully created. We're excited to have you on board! Get ready to explore personalized learning, track your progress, and excel in your studies.
+          Hi {user.name.split(' ')[0]}, your account has been successfully created. We&apos;re excited to have you on board! Get ready to explore personalized learning, track your progress, and excel in your studies.
         </p>
 
         <div className="space-y-4">

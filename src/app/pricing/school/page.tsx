@@ -2,6 +2,7 @@
 
 import React, { useState,useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { AxiosError } from 'axios';
 import { Container, Button, PaymentRedirectOverlay } from '@/components/ui';
 import { useAuth } from '@/contexts/AuthContext';
 import authApiClient from '@/lib/api/auth-client';
@@ -9,6 +10,14 @@ import authApiClient from '@/lib/api/auth-client';
 // Returns true when the visitor is authenticated (user object OR token in localStorage)
 const isAuthenticated = (user: unknown) =>
   !!user || (typeof window !== 'undefined' && !!localStorage.getItem('token'));
+
+// Raw server error string, if any (distinct from getApiErrorMessage: callers here
+// need to pattern-match on the raw message, not just get a display fallback).
+const getServerErrorString = (err: unknown): string | undefined => {
+  if (!(err instanceof AxiosError)) return undefined;
+  const data = err.response?.data as { error?: string } | undefined;
+  return typeof data?.error === 'string' ? data.error : undefined;
+};
 
 type BillingCycle = 'term' | 'year';
 
@@ -135,7 +144,7 @@ export default function SchoolPricingPage() {
     if (authLoading) return; // wait for auth to resolve
     if (!user) return; // unauthenticated — let the page's own unauth handling deal with it
     if (user.role !== 'schooladmin') {
-      const isSchoolStudent = !!(user as any).schoolCode;
+      const isSchoolStudent = !!user.schoolCode;
       router.replace(isSchoolStudent ? '/subscription-expired' : '/pricing');
     }
   }, [user, authLoading, router]);
@@ -156,8 +165,8 @@ export default function SchoolPricingPage() {
             const termId = `school_tier${tierNum}_term`;
             const yearId = `school_tier${tierNum}_year`;
 
-            const termMatch = backendPlans.find((p: any) => p.id === termId);
-            const yearMatch = backendPlans.find((p: any) => p.id === yearId);
+            const termMatch = backendPlans.find((p: { id: string }) => p.id === termId);
+            const yearMatch = backendPlans.find((p: { id: string }) => p.id === yearId);
 
             return {
               ...localPlan,
@@ -187,8 +196,6 @@ export default function SchoolPricingPage() {
   const isTrialing = subStatus === 'trialing' && trialEndsAt && trialEndsAt > new Date();
   const trialExpired = subStatus === 'trialing' && trialEndsAt && trialEndsAt <= new Date();
   const isActive = subStatus === 'active';
-  // Grey out Free Trial if already trialing (active trial) OR already a paid subscriber
-  const trialDisabled = !!(isTrialing || isActive || trialExpired);
   // Days remaining in trial
   const trialDaysLeft = trialEndsAt && trialEndsAt > new Date()
     ? Math.ceil((trialEndsAt.getTime() - Date.now()) / 86_400_000)
@@ -212,7 +219,7 @@ export default function SchoolPricingPage() {
       setTrialSuccess(`Your 30-day free trial for ${plan.tier} has started! Redirecting to your dashboard…`);
       setTimeout(() => router.push('/dashboard/schooladmin'), 1500);
     } catch (err: unknown) {
-      const serverMsg = (err as any)?.response?.data?.error;
+      const serverMsg = getServerErrorString(err);
       if (serverMsg === 'You already have an active trial' || serverMsg?.includes('active trial')) {
         setTrialSuccess(`You already have an active trial! Redirecting to your dashboard…`);
         setTimeout(() => router.push('/dashboard/schooladmin'), 1500);
@@ -251,8 +258,8 @@ export default function SchoolPricingPage() {
         throw new Error('Invalid payment response');
       }
     } catch (err: unknown) {
-      const msg = (err as any)?.response?.data?.error;
-      setError(typeof msg === 'string' ? msg : 'Failed to initiate payment. Please try again.');
+      const msg = getServerErrorString(err);
+      setError(msg ?? 'Failed to initiate payment. Please try again.');
     } finally {
       setLoadingPlan(null);
     }
@@ -344,6 +351,12 @@ export default function SchoolPricingPage() {
             {trialSuccess && (
               <div className="max-w-2xl mx-auto p-4 bg-green-50 border border-green-200 rounded-xl text-sm text-green-800 text-center">
                 {trialSuccess}
+              </div>
+            )}
+
+            {error && (
+              <div className="max-w-2xl mx-auto p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-800 text-center">
+                {error}
               </div>
             )}
 

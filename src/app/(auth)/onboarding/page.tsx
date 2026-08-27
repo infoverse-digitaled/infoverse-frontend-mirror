@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button, Card, Container } from '@/components/ui';
 import { useAuth } from '@/contexts/AuthContext';
 import authApiClient from '@/lib/api/auth-client';
+import { getApiErrorMessage } from '@/lib/api/errors';
 
 export default function OnboardingPage() {
   const { user, loading } = useAuth();
@@ -34,9 +35,9 @@ export default function OnboardingPage() {
       });
 
       router.push('/dashboard');
-    } catch (err: any) {
+    } catch (err) {
       console.error('Failed to save onboarding data:', err);
-      setError(err.response?.data?.message || 'Failed to save preferences. Please try again.');
+      setError(getApiErrorMessage(err, 'Failed to save preferences. Please try again.'));
     } finally {
       setIsSaving(false);
     }

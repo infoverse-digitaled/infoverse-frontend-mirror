@@ -288,7 +288,7 @@ export default function SubjectPage() {
         <div className="bg-white rounded-2xl border border-gray-100 shadow-soft overflow-hidden">
           <div className="px-6 md:px-8 py-5 border-b border-gray-100">
             <h2 className="text-lg md:text-xl font-bold text-gray-900">Choose Your Science Course</h2>
-            <p className="text-sm text-gray-500 mt-1">Select the science course you're studying</p>
+            <p className="text-sm text-gray-500 mt-1">Select the science course you&apos;re studying</p>
           </div>
           <div className="p-4 sm:p-6 md:p-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">

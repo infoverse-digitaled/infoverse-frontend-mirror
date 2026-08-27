@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Input, Button, Card } from '@/components/ui';
 import { useAuth } from '@/contexts/AuthContext';
+import { getApiErrorMessage } from '@/lib/api/errors';
 
 export default function SchoolRegisterPage() {
   const router = useRouter();
@@ -81,11 +82,8 @@ export default function SchoolRegisterPage() {
       // because the component is about to unmount. Setting it to false
       // would trigger the safety useEffect and redirect to dashboard.
       router.push('/welcome');
-    } catch (error: any) {
-      setGeneralError(
-        error.response?.data?.error?.message ||
-          'Registration failed. Please try again.'
-      );
+    } catch (error) {
+      setGeneralError(getApiErrorMessage(error, 'Registration failed. Please try again.'));
       setIsLoading(false);
     }
   };
@@ -95,7 +93,7 @@ export default function SchoolRegisterPage() {
       <Card className="w-full max-w-md shadow-xl bg-white p-8">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-primary mb-2">Register Your School</h1>
-          <p className="text-gray-500">Create an admin account to manage your school's Infoverse access.</p>
+          <p className="text-gray-500">Create an admin account to manage your school&apos;s Infoverse access.</p>
         </div>
 
         {generalError && (

@@ -22,7 +22,9 @@ export default function BrowsePage() {
     router.replace(`/browse?ks=${ks}`, { scroll: false });
   };
 
-  // Sync state with URL params when they change (e.g., back navigation)
+  // Sync state with URL params when they change (e.g., back navigation).
+  // selectedKeyStage is read but deliberately excluded from deps: it's only
+  // used to skip a redundant set, not something this effect should re-run for.
   useEffect(() => {
     if (ksParam) {
       const ks = parseInt(ksParam, 10);
@@ -30,6 +32,7 @@ export default function BrowsePage() {
         setSelectedKeyStage(ks);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ksParam]);
 
   const {
@@ -72,7 +75,7 @@ export default function BrowsePage() {
         </div>
       ) : subjects && subjects.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {subjects.map((subject: any) => (
+            {subjects.map((subject) => (
               <SubjectCard
                 key={subject.slug}
                 subject={subject}

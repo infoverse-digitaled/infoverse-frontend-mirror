@@ -4,6 +4,12 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import Script from 'next/script';
 import { useEffect, Suspense } from 'react';
 
+declare global {
+  interface Window {
+    fbq?: (...args: unknown[]) => void;
+  }
+}
+
 // MetaPixelInner component to handle the tracking logic with useSearchParams (which requires Suspense)
 function MetaPixelInner() {
   const pathname = usePathname();
@@ -11,8 +17,8 @@ function MetaPixelInner() {
 
   useEffect(() => {
     // Only run if fbq is defined (it's initialized by the script)
-    if (typeof window !== 'undefined' && (window as any).fbq) {
-      (window as any).fbq('track', 'PageView');
+    if (typeof window !== 'undefined' && window.fbq) {
+      window.fbq('track', 'PageView');
     }
   }, [pathname, searchParams]);
 

@@ -31,7 +31,7 @@ export function ProgressTracker() {
     const recordActivity = async () => {
       try {
         await authApiClient.post('/progress/activity');
-      } catch (error) {
+      } catch {
         // Silent fail - activity recording is not critical
         console.debug('Activity recording skipped');
       }

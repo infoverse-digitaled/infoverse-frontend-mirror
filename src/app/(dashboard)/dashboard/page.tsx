@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation';
 import {
   ProfileCard,
   CourseProgressCard,
-  SuggestedCourseCard,
   ProgressTracker,
   SubscriptionCard,
 } from '@/components/dashboard';
@@ -25,25 +24,6 @@ export default function DashboardPage() {
 
   // Use SWR hook for progress data - auto-revalidates when enrollments change
   const { data: enrollments, isLoading: loading } = useMyProgress();
-
-  // Suggested courses based on what user hasn't enrolled in
-  const suggestedCourses = [
-    {
-      id: 1,
-      name: 'History',
-      description: 'Learn about historical events',
-    },
-    {
-      id: 2,
-      name: 'Geography',
-      description: 'Explore the world',
-    },
-    {
-      id: 3,
-      name: 'Art',
-      description: 'Express your creativity',
-    },
-  ];
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">
@@ -110,28 +90,6 @@ export default function DashboardPage() {
           </div>
         )}
       </section>
-
-      {/* Suggested Courses Section - COMMENTED OUT FOR NOW
-      <section>
-        <div className="mb-4 sm:mb-6">
-          <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-black mb-1 sm:mb-2">
-            Suggested New Courses
-          </h2>
-          <p className="text-sm sm:text-base lg:text-lg text-gray-600">Explore new subjects to expand your knowledge</p>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          {suggestedCourses.map((course) => (
-            <SuggestedCourseCard
-              key={course.id}
-              courseName={course.name}
-              description={course.description}
-              onClick={() => router.push('/browse')}
-            />
-          ))}
-        </div>
-      </section>
-      */}
     </div>
   );
 }

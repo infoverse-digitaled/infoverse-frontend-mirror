@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import authApiClient from '@/lib/api/auth-client';
+import { getApiErrorMessage } from '@/lib/api/errors';
 
 interface Plan {
   id: string;
@@ -13,6 +14,10 @@ interface Plan {
   planCode: string;
   recommended?: boolean;
 }
+
+// School plans (school_tier*) must never appear here — this modal is for
+// individual subscribers only. School admins handle their own billing.
+const INDIVIDUAL_PLAN_IDS = ['monthly', 'annual'];
 
 // Fallback individual plans if the backend is unreachable
 const FALLBACK_PLANS: Plan[] = [
@@ -40,11 +45,6 @@ export function TrialExpiredModal() {
   const [error, setError] = useState<string | null>(null);
   const [plans, setPlans] = useState<Plan[]>([]);
   const pathname = usePathname();
-
-  // ─── Fetch only individual plans ──────────────────────────────────────────────────────────────
-  // School plans (school_tier*) must never appear here — this modal is for
-  // individual subscribers only. School admins handle their own billing.
-  const INDIVIDUAL_PLAN_IDS = ['monthly', 'annual'];
 
   useEffect(() => {
     const fetchPlans = async () => {
@@ -79,7 +79,7 @@ export function TrialExpiredModal() {
       setIsOpen(false);
       return;
     }
-    const isSchoolStudent = !!(user as any).schoolCode;
+    const isSchoolStudent = !!user.schoolCode;
     if (isSchoolStudent) {
       setIsOpen(false);
       return;
@@ -140,9 +140,9 @@ export function TrialExpiredModal() {
       } else {
         setError('Failed to get payment URL. Please try again.');
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error('Failed to initialize payment:', err);
-      setError(err.response?.data?.error || 'Failed to initialize payment. Please try again.');
+      setError(getApiErrorMessage(err, 'Failed to initialize payment. Please try again.'));
     } finally {
       setLoading(null);
     }

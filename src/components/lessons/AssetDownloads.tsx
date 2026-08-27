@@ -11,10 +11,11 @@ interface AssetDownloadsProps {
 export function AssetDownloads({ assets }: AssetDownloadsProps) {
   const [authToken, setAuthToken] = useState<string | null>(null);
 
-  // Get auth token from localStorage on mount
+  // Get auth token from localStorage on mount (client-only; not available during SSR)
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('token');
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setAuthToken(token);
     }
   }, []);

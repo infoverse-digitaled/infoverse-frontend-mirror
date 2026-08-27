@@ -29,8 +29,11 @@ export function GlobalChatbot() {
 
   const isLessonMode = !!lessonContext;
 
-  // Clear chat history when switching between general and lesson mode
+  // Clear chat history when switching between general and lesson mode.
+  // This resets state in response to a prop change, not just on mount, so a
+  // lazy initializer can't replace it.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMessages([]);
     setInputValue('');
   }, [isLessonMode, lessonTitle]);

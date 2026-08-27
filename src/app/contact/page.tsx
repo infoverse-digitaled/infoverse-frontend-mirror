@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Container, Button } from '@/components/ui';
 import { apiClient } from '@/lib/api/client';
+import { getApiErrorMessage } from '@/lib/api/errors';
 
 interface FormData {
   firstName: string;
@@ -83,9 +84,8 @@ export default function ContactPage() {
         message: `User type: ${formData.userType}\nPhone: ${formData.phone || 'Not provided'}\n\n${formData.message}`,
       });
       setSubmitted(true);
-    } catch (err: any) {
-      const errorMsg = err.response?.data?.error || 'Failed to send message. Please try again.';
-      setError(errorMsg);
+    } catch (err) {
+      setError(getApiErrorMessage(err, 'Failed to send message. Please try again.'));
     } finally {
       setIsSubmitting(false);
     }

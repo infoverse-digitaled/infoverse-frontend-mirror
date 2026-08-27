@@ -2,15 +2,15 @@
 
 import { useState, useEffect } from 'react';
 
-export default function CyclingHeadline() {
-  const endings = [
-    "We're changing that.",
-    "The future shouldn't depend on location.",
-    "World-class learning to every child.",
-    "Every potential deserves opportunity.",
-    "Brighter futures through better learning.",
-  ];
+const endings = [
+  "We're changing that.",
+  "The future shouldn't depend on location.",
+  "World-class learning to every child.",
+  "Every potential deserves opportunity.",
+  "Brighter futures through better learning.",
+];
 
+export default function CyclingHeadline() {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {

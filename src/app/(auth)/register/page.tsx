@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Input, Button, Card } from '@/components/ui';
 import { useAuth } from '@/contexts/AuthContext';
-import { GoogleLogin } from '@react-oauth/google';
+import { GoogleLogin, CredentialResponse } from '@react-oauth/google';
+import { getApiErrorMessage } from '@/lib/api/errors';
 
 type RegistrationMode = 'standard' | 'school';
 
@@ -87,16 +88,13 @@ export default function RegisterPage() {
       // because the component is about to unmount. Setting it to false
       // would trigger the safety useEffect and redirect to dashboard.
       router.push('/welcome');
-    } catch (error: any) {
-      setGeneralError(
-        error.response?.data?.error?.message ||
-          'Registration failed. Please try again.'
-      );
+    } catch (error) {
+      setGeneralError(getApiErrorMessage(error, 'Registration failed. Please try again.'));
       setIsLoading(false);
     }
   };
 
-  const handleGoogleSuccess = async (credentialResponse: any) => {
+  const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
     setIsLoading(true);
     setGeneralError('');
     try {
@@ -108,11 +106,8 @@ export default function RegisterPage() {
           router.push('/welcome');
         }
       }
-    } catch (error: any) {
-      setGeneralError(
-        error.response?.data?.error?.message ||
-          'Google signup failed. Please try again.'
-      );
+    } catch (error) {
+      setGeneralError(getApiErrorMessage(error, 'Google signup failed. Please try again.'));
       setIsLoading(false);
     }
   };
