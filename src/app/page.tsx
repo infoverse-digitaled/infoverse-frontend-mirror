@@ -156,6 +156,7 @@ export default function Home() {
                   src="/Transparent logo.png"
                   alt="Infoverse Logo"
                   fill
+                  sizes="(max-width: 768px) 64px, 80px"
                   className="object-cover"
                   priority
                 />
@@ -310,6 +311,7 @@ export default function Home() {
                           src="/Transparent logo.png"
                           alt="Infoverse Logo"
                           fill
+                          sizes="96px"
                           className="object-cover"
                         />
                       </div>
@@ -600,6 +602,7 @@ export default function Home() {
                     src="/Transparent logo.png"
                     alt="Infoverse Logo"
                     fill
+                    sizes="(max-width: 768px) 56px, 64px"
                     className="object-cover"
                   />
                 </div>
