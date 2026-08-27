@@ -54,8 +54,14 @@ export default function DashboardPage() {
         </div>
 
         {loading ? (
-          <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+          <div
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
+            aria-busy="true"
+            aria-label="Loading your courses"
+          >
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="h-48 rounded-2xl bg-gray-100 animate-pulse" />
+            ))}
           </div>
         ) : enrollments && enrollments.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
