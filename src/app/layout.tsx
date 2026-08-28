@@ -9,6 +9,7 @@ import { AIProvider } from '@/contexts/AIContext';
 import { GlobalChatbot } from '@/components/ai';
 import { PostHogProvider } from './providers';
 import MetaPixel from '@/components/analytics/MetaPixel';
+import GoogleAdsense from '@/components/analytics/GoogleAdsense';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { CookieConsentBanner } from '@/components/consent/CookieConsentBanner';
 
@@ -63,6 +64,7 @@ export default function RootLayout({
       >
         <PostHogProvider>
           <MetaPixel />
+          <GoogleAdsense />
           {/*
             Google Identity Services (Sign in with Google) is treated as
             strictly necessary and left ungated by cookie consent: it's a
