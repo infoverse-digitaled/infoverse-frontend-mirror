@@ -25,6 +25,39 @@ import {
   useUpdateProgress,
 } from '@/lib/hooks/useOakData';
 
+// Sized to match the header + description card + video shape so the page
+// doesn't reflow when lesson data arrives - same approach as /key-stages.
+function LessonSkeleton() {
+  return (
+    <div className="bg-background-light min-h-screen py-16" aria-busy="true">
+      <Container>
+        <div className="mb-10">
+          <div className="mb-6">
+            <div className="h-10 w-24 rounded-lg bg-gray-200 animate-pulse" />
+          </div>
+          <div className="flex items-start md:items-center gap-3 md:gap-4 mb-4">
+            <div className="w-12 h-12 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-gray-200 animate-pulse shrink-0" />
+            <div className="flex-1">
+              <div className="h-8 w-2/3 rounded bg-gray-200 animate-pulse mb-2" />
+              <div className="h-4 w-1/2 rounded bg-gray-100 animate-pulse" />
+            </div>
+          </div>
+        </div>
+
+        <Card className="mb-8">
+          <CardContent className="py-6">
+            <div className="h-4 w-full rounded bg-gray-100 animate-pulse mb-2" />
+            <div className="h-4 w-5/6 rounded bg-gray-100 animate-pulse mb-2" />
+            <div className="h-4 w-3/4 rounded bg-gray-100 animate-pulse" />
+          </CardContent>
+        </Card>
+
+        <div className="aspect-video w-full rounded-xl bg-gray-200 animate-pulse mb-8" />
+      </Container>
+    </div>
+  );
+}
+
 export default function LessonPage() {
   const params = useParams();
   const slug = params.slug as string;
@@ -111,11 +144,7 @@ export default function LessonPage() {
   }, [isTrialExpired, router, lesson?.unitSlug, isLoading]);
 
   if (isLoading) {
-    return (
-      <div className="min-h-[60vh] flex items-center justify-center">
-        <Loading size="lg" />
-      </div>
-    );
+    return <LessonSkeleton />;
   }
 
   if (error || !lesson) {

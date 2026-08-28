@@ -3,11 +3,49 @@
 import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { Card, CardTitle, Loading, Button } from '@/components/ui';
+import { Card, CardTitle, Button } from '@/components/ui';
 import { useSubjects, useUnits, useMyProgress, useEnroll } from '@/lib/hooks/useOakData';
 import { useAuth } from '@/contexts/AuthContext';
 
 const UNITS_PER_PAGE = 5;
+
+// Sized to match the header card + units list shape so the page doesn't
+// reflow when subject/units data arrives - same approach as /key-stages.
+function SubjectDetailSkeleton() {
+  return (
+    <div className="space-y-6" aria-busy="true">
+      <Card className="p-6 md:p-8 shadow-soft">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 md:gap-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <div className="h-10 w-24 rounded-lg bg-gray-200 animate-pulse" />
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-gray-200 animate-pulse" />
+              <div>
+                <div className="h-4 w-28 rounded bg-gray-100 animate-pulse mb-2" />
+                <div className="h-8 w-48 rounded bg-gray-200 animate-pulse" />
+              </div>
+            </div>
+          </div>
+          <div className="h-10 w-36 rounded-lg bg-gray-200 animate-pulse" />
+        </div>
+      </Card>
+
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-soft overflow-hidden">
+        <div className="px-6 md:px-8 py-5 border-b border-gray-100">
+          <div className="h-6 w-40 rounded bg-gray-200 animate-pulse" />
+        </div>
+        <div className="p-4 sm:p-6 md:p-8 flex flex-col gap-3">
+          {Array.from({ length: UNITS_PER_PAGE }).map((_, i) => (
+            <div
+              key={i}
+              className="h-[76px] rounded-xl border border-gray-100 bg-gray-50/60 animate-pulse"
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function SubjectPage() {
   const params = useParams();
@@ -174,11 +212,7 @@ export default function SubjectPage() {
   );
 
   if (isLoading) {
-    return (
-      <div className="min-h-[60vh] flex items-center justify-center">
-        <Loading size="lg" />
-      </div>
-    );
+    return <SubjectDetailSkeleton />;
   }
 
   if (error || !subject) {
