@@ -23,7 +23,7 @@ interface User {
   email: string;
   name: string;
   role: string;
-  keyStage?: number;
+  keyStage?: 'ks1' | 'ks2' | 'ks3' | 'ks4';
   schoolCode?: string;
   schoolName?: string;
   subscription?: Subscription;

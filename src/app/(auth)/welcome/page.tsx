@@ -51,13 +51,13 @@ export default function WelcomePage() {
         </p>
 
         <div className="space-y-4">
-          <Button 
-            onClick={() => router.push('/dashboard')} 
-            fullWidth 
+          <Button
+            onClick={() => router.push('/onboarding')}
+            fullWidth
             size="lg"
             className="text-lg font-semibold shadow-md hover:shadow-lg transition-all"
           >
-            Continue to Dashboard
+            Continue
           </Button>
         </div>
       </Card>

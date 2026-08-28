@@ -37,6 +37,13 @@ const featuresData = [
   },
 ];
 
+const stageYearRanges: Record<string, string> = {
+  ks1: 'Years 1-2 (Ages 5-7)',
+  ks2: 'Years 3-6 (Ages 7-11)',
+  ks3: 'Years 7-9 (Ages 11-14)',
+  ks4: 'Years 10-11 (Ages 14-16)',
+};
+
 const stageColors = [
   { bg: 'from-blue-500 to-cyan-500', light: 'bg-blue-50', text: 'text-blue-600' },
   { bg: 'from-green-500 to-emerald-500', light: 'bg-green-50', text: 'text-green-600' },
@@ -211,9 +218,16 @@ export default function KeyStagesPage() {
                       </div>
 
                       {/* Stage Title */}
-                      <h3 className="font-serif font-bold text-2xl md:text-3xl leading-tight text-gray-900 mb-3">
+                      <h3 className="font-serif font-bold text-2xl md:text-3xl leading-tight text-gray-900 mb-1">
                         {stage.title}
                       </h3>
+
+                      {/* Year range */}
+                      {stageYearRanges[stage.slug] && (
+                        <p className={`text-sm font-semibold ${color.text} mb-3`}>
+                          {stageYearRanges[stage.slug]}
+                        </p>
+                      )}
 
                       {/* Description */}
                       <p className="text-base text-gray-600 leading-relaxed mb-6 flex-grow">

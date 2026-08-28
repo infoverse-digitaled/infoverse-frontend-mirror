@@ -29,6 +29,14 @@ const KEY_STAGE_COLORS = [
   },
 ];
 
+// Official UK curriculum year/age ranges per key stage
+const KEY_STAGE_YEAR_RANGES = [
+  'Years 1-2 (Ages 5-7)',
+  'Years 3-6 (Ages 7-11)',
+  'Years 7-9 (Ages 11-14)',
+  'Years 10-11 (Ages 14-16)',
+];
+
 export function KeyStageSelector({
   selectedKeyStage,
   onSelect,
@@ -45,11 +53,14 @@ export function KeyStageSelector({
             key={ks}
             onClick={() => onSelect(ks)}
             className={clsx(
-              'px-6 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 shadow-sm',
+              'px-6 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 shadow-sm flex flex-col items-center leading-tight',
               isActive ? `${colors.active} shadow-md` : colors.inactive
             )}
           >
-            Key Stage {ks}
+            <span>Key Stage {ks}</span>
+            <span className={clsx('text-[11px] font-normal', isActive ? 'text-white/80' : 'opacity-70')}>
+              {KEY_STAGE_YEAR_RANGES[ks - 1]}
+            </span>
           </button>
         );
       })}
