@@ -4,9 +4,41 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 
 import { useParams, useRouter } from 'next/navigation';
-import { Card, Loading, Button } from '@/components/ui';
+import { Card, Button } from '@/components/ui';
 import { useUnit, useLessons } from '@/lib/hooks/useOakData';
 import { useAuth } from '@/contexts/AuthContext';
+
+// Sized to match the header card + lessons list shape so the page doesn't
+// reflow when unit/lesson data arrives - same approach as /key-stages.
+function UnitSkeleton() {
+  return (
+    <div className="space-y-8" aria-busy="true">
+      <Card className="p-6 md:p-8 shadow-soft">
+        <div className="flex flex-col md:flex-row items-start gap-4 md:gap-6">
+          <div className="h-10 w-32 rounded-lg bg-gray-200 animate-pulse shrink-0" />
+          <div className="flex-1 mt-2 md:mt-0">
+            <div className="h-8 w-2/3 rounded bg-gray-200 animate-pulse mb-2" />
+            <div className="h-4 w-1/3 rounded bg-gray-100 animate-pulse" />
+          </div>
+        </div>
+      </Card>
+
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-soft overflow-hidden">
+        <div className="px-6 md:px-8 py-5 border-b border-gray-100">
+          <div className="h-6 w-48 rounded bg-gray-200 animate-pulse" />
+        </div>
+        <div className="p-4 sm:p-6 md:p-8 flex flex-col gap-3">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div
+              key={i}
+              className="h-[68px] rounded-xl border border-gray-100 bg-gray-50/60 animate-pulse"
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function UnitPage() {
   const params = useParams();
@@ -33,11 +65,7 @@ export default function UnitPage() {
   }, [isLoading, error, unit, router]);
 
   if (isLoading) {
-    return (
-      <div className="min-h-[60vh] flex items-center justify-center">
-        <Loading size="lg" />
-      </div>
-    );
+    return <UnitSkeleton />;
   }
 
   if (error || !unit) {
