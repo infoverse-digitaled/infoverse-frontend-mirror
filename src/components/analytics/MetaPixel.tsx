@@ -3,6 +3,7 @@
 import { usePathname, useSearchParams } from 'next/navigation';
 import Script from 'next/script';
 import { useEffect, Suspense } from 'react';
+import { useConsent } from '@/lib/hooks/useConsent';
 
 declare global {
   interface Window {
@@ -56,6 +57,19 @@ function MetaPixelInner() {
 }
 
 const MetaPixel = () => {
+  // Cookie consent gate: the pixel script (and the cookies/local storage it
+  // sets) must not load until the visitor has actively opted into
+  // "Marketing" via the cookie banner. See src/lib/consent.ts.
+  //
+  // Note: if consent is later withdrawn after being granted, this stops
+  // further PageView tracking (MetaPixelInner unmounts), but the
+  // fbevents.js script and any cookies it already set before withdrawal
+  // are outside our control to remove - Meta doesn't expose a JS API for
+  // that. The fix is not loading it until consent is given in the first
+  // place, which this does.
+  const marketingConsent = useConsent('marketing');
+  if (!marketingConsent) return null;
+
   return (
     <Suspense fallback={null}>
       <MetaPixelInner />
