@@ -130,8 +130,10 @@ export function CookieConsentBanner() {
 
   if (!visible) {
     if (!hasDecision) return null;
-    // Small, unobtrusive re-open control - bottom-left so it never collides
-    // with the AI chatbot launcher (bottom-right, see GlobalChatbot.tsx).
+    // Small, unobtrusive re-open control - bottom-left, below the bug-report
+    // FAB (which stacks above it at bottom-24, see BugReportButton.tsx) so
+    // they don't overlap, and clear of the AI chatbot launcher (bottom-right,
+    // see GlobalChatbot.tsx).
     return (
       <button
         type="button"

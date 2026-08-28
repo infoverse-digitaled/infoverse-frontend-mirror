@@ -8,10 +8,12 @@ export function BugReportButton() {
 
   return (
     <>
-      {/* Floating Action Button - bottom-left */}
+      {/* Floating Action Button - bottom-left, stacked above the cookie
+          settings pill (bottom-6, see CookieConsentBanner.tsx) so they
+          don't overlap */}
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 left-6 z-40 w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110 active:scale-95 group"
+        className="fixed bottom-24 left-6 z-40 w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110 active:scale-95 group"
         style={{
           background: 'linear-gradient(135deg, #f97316 0%, #ef4444 100%)',
         }}
