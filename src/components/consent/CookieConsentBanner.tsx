@@ -160,8 +160,8 @@ export function CookieConsentBanner() {
           <div className="flex-1">
             <p className="font-semibold text-gray-900 mb-1">We use cookies</p>
             <p className="text-sm text-gray-600 leading-relaxed">
-              We use essential cookies to run Infoverse Digital-Ed, and - only with your permission -
-              analytics and marketing cookies to help us improve the platform. See our{' '}
+              We use essential cookies to run Infoverse Digital-Ed. And only with your permission,
+              for analytics and marketing cookies to help us improve the platform. See our{' '}
               <Link href="/cookies" className="text-primary-text hover:underline font-medium">
                 Cookie Policy
               </Link>{' '}
