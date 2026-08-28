@@ -10,6 +10,7 @@ import { GlobalChatbot } from '@/components/ai';
 import { PostHogProvider } from './providers';
 import MetaPixel from '@/components/analytics/MetaPixel';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import { CookieConsentBanner } from '@/components/consent/CookieConsentBanner';
 
 // Skip Navigation Component for accessibility
 function SkipNavigation() {
@@ -62,6 +63,13 @@ export default function RootLayout({
       >
         <PostHogProvider>
           <MetaPixel />
+          {/*
+            Google Identity Services (Sign in with Google) is treated as
+            strictly necessary and left ungated by cookie consent: it's a
+            login mechanism the user explicitly invokes on /login and
+            /register, not passive tracking, and gating it could break
+            authentication for those users. See src/lib/consent.ts.
+          */}
           <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ''}>
             <AuthProvider>
               <AIProvider>
@@ -76,6 +84,7 @@ export default function RootLayout({
             </AuthProvider>
           </GoogleOAuthProvider>
         </PostHogProvider>
+        <CookieConsentBanner />
       </body>
     </html>
   );
