@@ -13,6 +13,7 @@
   --accent-coral: #D4856D;
   --accent-purple: #8B5CF6;
   --accent-blue: #3B82F6;
+  --accent-blue-gray: #BDD0D2;
 
   --background-dark: #2C5F75;
   --background-light: #F5F5F5;
@@ -21,6 +22,13 @@
   --text-light: #666666;
 
   --white: #FFFFFF;
+
+  /* WCAG AA text/button-fill shades (5.7:1 / 5.2:1 on white) — ported from the
+     formerly-dead tailwind.config.ts theme.extend.colors.{primary,secondary}.{text,textHover} */
+  --primary-text: #1D6E8C;
+  --primary-text-hover: #17586F;
+  --secondary-text: #B14E33;
+  --secondary-text-hover: #8F3E29;
 }
 
 @theme inline {
@@ -38,6 +46,7 @@
   --color-accent-coral: var(--accent-coral);
   --color-accent-purple: var(--accent-purple);
   --color-accent-blue: var(--accent-blue);
+  --color-accent-blueGray: var(--accent-blue-gray);
 
   /* Background Colors */
   --color-background-dark: var(--background-dark);
@@ -47,6 +56,14 @@
   --color-text-dark: var(--text-dark);
   --color-text-light: var(--text-light);
 
+  /* Primary/Secondary "-text" shades (WCAG AA button-fill/text colors).
+     Utility-class suffix casing (textHover) must match the CSS variable
+     suffix verbatim — Tailwind v4 does not case-fold theme keys. */
+  --color-primary-text: var(--primary-text);
+  --color-primary-textHover: var(--primary-text-hover);
+  --color-secondary-text: var(--secondary-text);
+  --color-secondary-textHover: var(--secondary-text-hover);
+
   /* Border Radius */
   --radius-card: 12px;
   --radius-button: 8px;
@@ -54,9 +71,11 @@
   /* Box Shadows */
   --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.1);
   --shadow-card-hover: 0 4px 16px rgba(0, 0, 0, 0.15);
+  --shadow-soft: 0 4px 20px -2px rgba(51, 161, 205, 0.1);
 
   /* Typography */
-  --font-sans: var(--font-geist-sans, 'Inter', system-ui, sans-serif);
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-serif: var(--font-fraunces), Georgia, serif;
 }
 
 body {
