@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import authApiClient from '@/lib/api/auth-client';
+import { getApiErrorMessage } from '@/lib/api/errors';
 
 export default function ProfilePage() {
   const { user } = useAuth();
@@ -40,8 +41,8 @@ export default function ProfilePage() {
       setIsEditingName(false);
       // Refresh the page to update the context
       window.location.reload();
-    } catch (err: any) {
-      setNameError(err.response?.data?.error?.message || err.response?.data?.message || 'Failed to update name.');
+    } catch (err) {
+      setNameError(getApiErrorMessage(err, 'Failed to update name.'));
     } finally {
       setNameLoading(false);
     }
@@ -79,9 +80,8 @@ export default function ProfilePage() {
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
-    } catch (err: any) {
-      const errorMsg = err.response?.data?.error?.message || err.response?.data?.message || 'Failed to change password.';
-      setPasswordError(errorMsg);
+    } catch (err) {
+      setPasswordError(getApiErrorMessage(err, 'Failed to change password.'));
     } finally {
       setPasswordLoading(false);
     }

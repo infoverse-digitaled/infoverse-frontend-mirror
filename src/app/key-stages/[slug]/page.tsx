@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { Container, Button, Loading } from '@/components/ui';
+import { Container, Button } from '@/components/ui';
 import { useSubjects } from '@/lib/hooks/useOakData';
 import { useAuth } from '@/contexts/AuthContext';
 import { SignupPromptModal } from '@/components/modals/SignupPromptModal';
@@ -78,25 +78,6 @@ export default function KeyStagePage() {
   };
 
   const stageGradient = getStageGradient();
-
-  if (isLoading) {
-    return (
-      <div className="flex flex-col min-h-screen">
-        {/* Animated loading state */}
-        <div className="relative min-h-[60vh] flex items-center justify-center overflow-hidden">
-          {/* Background effects */}
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-white to-secondary/5" />
-          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/10 rounded-full blur-3xl animate-blob" />
-          <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-secondary/10 rounded-full blur-3xl animate-blob delay-1000" />
-
-          <div className="relative z-10 text-center">
-            <Loading size="lg" />
-            <p className="mt-4 text-gray-600 animate-pulse">Loading subjects...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   if (error) {
     return (
@@ -257,7 +238,27 @@ export default function KeyStagePage() {
             </div>
 
             {/* Subjects Grid */}
-            {subjects && subjects.length > 0 ? (
+            {isLoading ? (
+              <div
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
+                aria-busy="true"
+              >
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="bg-white border border-gray-200 rounded-2xl p-8 h-full flex flex-col"
+                  >
+                    <div className="w-14 h-14 rounded-2xl bg-gray-200 animate-pulse mb-5" />
+                    <div className="h-6 w-2/3 rounded-lg bg-gray-200 animate-pulse mb-3" />
+                    <div className="flex-grow flex flex-col gap-2 mb-6">
+                      <div className="h-4 w-full rounded bg-gray-100 animate-pulse" />
+                      <div className="h-4 w-4/5 rounded bg-gray-100 animate-pulse" />
+                    </div>
+                    <div className="h-5 w-24 rounded bg-gray-200 animate-pulse" />
+                  </div>
+                ))}
+              </div>
+            ) : subjects && subjects.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                 {subjects.map((subject, index) => {
                   const cardContent = (

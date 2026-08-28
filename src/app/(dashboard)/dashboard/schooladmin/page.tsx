@@ -50,7 +50,7 @@ export default function SchoolAdminDashboard() {
         setStudents(backendData.students || []);
         setSchoolCode(backendData.schoolCode || '---');
         setSchoolName(backendData.schoolName || 'Your School');
-      } catch (err: any) {
+      } catch (err) {
         console.error('Failed to fetch students:', err);
         setError('Failed to load student data. Please try again later.');
       } finally {
@@ -100,7 +100,7 @@ export default function SchoolAdminDashboard() {
             <div>
               <h2 className="text-xl font-bold text-gray-900 mb-2">Your Unique School Code</h2>
               <p className="text-gray-600 mb-4">
-                Share this code with your students. They will use it when registering on Infoverse to automatically link to your school's account.
+                Share this code with your students. They will use it when registering on Infoverse to automatically link to your school&apos;s account.
               </p>
             </div>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">

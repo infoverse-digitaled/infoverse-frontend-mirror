@@ -115,7 +115,7 @@ export default function PricingPage() {
       router.replace('/pricing/school');
       return;
     }
-    const isSchoolStudent = !!(user as any).schoolCode;
+    const isSchoolStudent = !!user.schoolCode;
     if (isSchoolStudent) {
       router.replace('/subscription-expired');
     }
@@ -128,7 +128,7 @@ export default function PricingPage() {
         if (response.data && response.data.plans) {
           const backendPlans = response.data.plans;
           const mergedPlans = DEFAULT_PLANS.map(defaultPlan => {
-            const liveData = backendPlans.find((p: any) => p.id === defaultPlan.id);
+            const liveData = backendPlans.find((p: { id: string }) => p.id === defaultPlan.id);
             if (liveData) {
               return { 
                 ...defaultPlan, 

@@ -48,10 +48,10 @@ export default function SubscriptionExpiredPage() {
         </p>
 
         {/* School info if available */}
-        {(user as any)?.schoolName && (
+        {user?.schoolName && (
           <div className="bg-white border border-gray-200 rounded-xl px-5 py-4 mb-8 text-left">
             <p className="text-sm text-gray-500 mb-1">Registered school</p>
-            <p className="font-semibold text-gray-900">{(user as any).schoolName}</p>
+            <p className="font-semibold text-gray-900">{user.schoolName}</p>
           </div>
         )}
 

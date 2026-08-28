@@ -171,7 +171,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const resetPassword = async (password: string, token: string) => {
-    await authApiClient.post(API_ENDPOINTS.resetPassword, { password, token });
+    
+    await authApiClient.patch(API_ENDPOINTS.resetPassword(token), { password });
   };
 
   const logout = async () => {

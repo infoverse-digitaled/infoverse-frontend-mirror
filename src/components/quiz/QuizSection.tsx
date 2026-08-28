@@ -132,7 +132,8 @@ export function QuizSection({
     setMatchSelections((prev) => {
       const updated = { ...prev };
       if (updated[qIndex]) {
-        const { [leftIndex]: _, ...rest } = updated[qIndex];
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars -- destructured only to omit this key
+        const { [leftIndex]: _omit, ...rest } = updated[qIndex];
         updated[qIndex] = rest;
       }
       return updated;

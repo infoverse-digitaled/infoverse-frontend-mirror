@@ -1,5 +1,6 @@
 import { Container } from '@/components/ui';
 import Link from 'next/link';
+import { ManageCookiePreferencesButton } from '@/components/consent/ManageCookiePreferencesButton';
 
 export const metadata = {
   title: 'Cookie Policy | Infoverse Digital-Ed',
@@ -18,7 +19,7 @@ export default function CookiesPage() {
               Cookie Policy
             </h1>
             <p className="text-lg md:text-xl text-gray-600 leading-relaxed">
-              Last updated: December 2024
+              Last updated: August 2026
             </p>
           </div>
         </Container>
@@ -56,7 +57,7 @@ export default function CookiesPage() {
 
             <h3>Analytics Cookies</h3>
             <p>
-              We use analytics cookies to understand how visitors interact with our website. This helps us improve our Service and content. These cookies collect information such as:
+              We use analytics cookies (via PostHog) to understand how visitors interact with our website. This helps us improve our Service and content. These cookies collect information such as:
             </p>
             <ul>
               <li>Pages visited and time spent on each page</li>
@@ -64,10 +65,21 @@ export default function CookiesPage() {
               <li>Which features you use most often</li>
               <li>Error messages you encounter</li>
             </ul>
+            <p>
+              Analytics cookies are <strong>off by default</strong> and only load after you accept them in the cookie banner or your saved preferences.
+            </p>
 
             <h3>Marketing Cookies</h3>
             <p>
-              These cookies may be set by our advertising partners to build a profile of your interests and show you relevant advertisements on other websites. If you do not allow these cookies, you will experience less targeted advertising.
+              These cookies (via the Meta Pixel) may be set by our advertising partners to build a profile of your interests and show you relevant advertisements on other websites. If you do not allow these cookies, you will experience less targeted advertising.
+            </p>
+            <p>
+              Marketing cookies are <strong>off by default</strong> and only load after you accept them in the cookie banner or your saved preferences.
+            </p>
+
+            <h3>Sign-In Cookies</h3>
+            <p>
+              When you sign in with Google, Google Identity Services sets cookies needed to complete that login. These are treated as essential/functional, since they are only set when you actively choose to sign in with Google, and are required for that feature to work.
             </p>
 
             <h2>3. Types of Cookies We Use</h2>
@@ -109,6 +121,14 @@ export default function CookiesPage() {
             <p>
               You can control and manage cookies in various ways. Please note that removing or blocking cookies may impact your user experience.
             </p>
+
+            <h3>On This Site</h3>
+            <p>
+              You can accept, reject, or change your Analytics and Marketing cookie preferences at any time using the cookie banner, or the button below. Essential cookies cannot be turned off, as they are required for the site to function.
+            </p>
+            <div className="not-prose mb-8">
+              <ManageCookiePreferencesButton size="sm" variant="outline" />
+            </div>
 
             <h3>Browser Settings</h3>
             <p>
@@ -165,7 +185,10 @@ export default function CookiesPage() {
 
             <div className="not-prose mt-12 pt-8 border-t border-gray-200">
               <p className="text-gray-500 text-sm">
-                By continuing to use Infoverse Digital-Ed, you consent to our use of cookies as described in this Cookie Policy.
+                Essential cookies are used automatically to run Infoverse Digital-Ed. Analytics and Marketing cookies are only
+                set once you actively choose to accept them via the cookie banner - you can change your choice at any time
+                using the &quot;Manage cookie preferences&quot; button above or the &quot;Cookie settings&quot; control shown
+                at the bottom of the screen.
               </p>
             </div>
           </div>

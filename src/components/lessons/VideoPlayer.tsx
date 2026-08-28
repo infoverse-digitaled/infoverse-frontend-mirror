@@ -16,10 +16,11 @@ export function VideoPlayer({ assets, transcript, isLoading }: VideoPlayerProps)
   const [tokenChecked, setTokenChecked] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Get auth token from localStorage on mount
+  // Get auth token from localStorage on mount (client-only; not available during SSR)
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('token');
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setAuthToken(token);
       setTokenChecked(true);
     }

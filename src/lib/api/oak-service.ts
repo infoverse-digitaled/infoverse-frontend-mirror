@@ -73,13 +73,13 @@ interface BackendResponse<T> {
   success: boolean;
   data: T;
   message: string;
-  meta?: any;
+  meta?: Record<string, unknown>;
 }
 
 /**
  * Check if mock data should be used
  */
-const useMockData = () => {
+const shouldUseMockData = () => {
   return process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true';
 };
 
@@ -93,7 +93,7 @@ export const oakService = {
    * Fetch all key stages (KS1-4)
    */
   async getKeyStages(): Promise<KeyStage[]> {
-    if (useMockData()) {
+    if (shouldUseMockData()) {
       // Return mock data
       return Promise.resolve(mockKeyStages);
     }
@@ -107,7 +107,7 @@ export const oakService = {
    * Fetch subjects for a specific key stage
    */
   async getSubjects(filters?: SubjectFilters): Promise<Subject[]> {
-    if (useMockData()) {
+    if (shouldUseMockData()) {
       // Return mock data
       if (filters?.keyStageSlug) {
         return Promise.resolve(mockSubjects[filters.keyStageSlug] || []);
@@ -130,7 +130,7 @@ export const oakService = {
    * Fetch units for a specific subject
    */
   async getUnits(filters?: UnitFilters): Promise<Unit[]> {
-    if (useMockData()) {
+    if (shouldUseMockData()) {
       // Return mock data
       if (filters?.subjectSlug) {
         return Promise.resolve(mockUnits[filters.subjectSlug] || []);
@@ -152,7 +152,7 @@ export const oakService = {
    * Fetch lessons for a specific unit
    */
   async getLessons(filters?: LessonFilters): Promise<Lesson[]> {
-    if (useMockData()) {
+    if (shouldUseMockData()) {
       // Return mock data
       if (filters?.unitSlug) {
         return Promise.resolve(mockLessons[filters.unitSlug] || []);
@@ -175,7 +175,7 @@ export const oakService = {
    * NOTE: This is a premium endpoint that requires authentication
    */
   async getLesson(slug: string): Promise<Lesson> {
-    if (useMockData()) {
+    if (shouldUseMockData()) {
       // Return mock data - find lesson by slug
       const allLessons = Object.values(mockLessons).flat();
       const lesson = allLessons.find((l) => l.slug === slug);
@@ -197,7 +197,7 @@ export const oakService = {
    * You need to add: GET /oak/years to your backend
    */
   async getYears(): Promise<Year[]> {
-    if (useMockData()) {
+    if (shouldUseMockData()) {
       // Return empty array for mock data (not implemented)
       return Promise.resolve([]);
     }
@@ -213,7 +213,7 @@ export const oakService = {
    * You need to add: GET /oak/subjects/:slug to your backend
    */
   async getSubject(slug: string): Promise<Subject> {
-    if (useMockData()) {
+    if (shouldUseMockData()) {
       // Return mock data - find subject by slug
       const allSubjects = Object.values(mockSubjects).flat();
       const subject = allSubjects.find((s) => s.slug === slug);
@@ -231,7 +231,7 @@ export const oakService = {
    * Fetch unit by slug
    */
   async getUnit(slug: string): Promise<Unit> {
-    if (useMockData()) {
+    if (shouldUseMockData()) {
       // Return mock data - find unit by slug
       const allUnits = Object.values(mockUnits).flat();
       const unit = allUnits.find((u) => u.slug === slug);
@@ -252,7 +252,7 @@ export const oakService = {
    * NOTE: This is a premium endpoint that requires authentication
    */
   async getLessonQuiz(lessonSlug: string): Promise<LessonQuiz> {
-    if (useMockData()) {
+    if (shouldUseMockData()) {
       // Return empty quiz for mock data
       return Promise.resolve({ starterQuiz: [], exitQuiz: [] });
     }
@@ -268,7 +268,7 @@ export const oakService = {
    * NOTE: This is a premium endpoint that requires authentication
    */
   async getLessonAssets(lessonSlug: string): Promise<LessonAssets> {
-    if (useMockData()) {
+    if (shouldUseMockData()) {
       // Return empty assets for mock data
       return Promise.resolve({ assets: [] });
     }
@@ -284,7 +284,7 @@ export const oakService = {
    * NOTE: This is a premium endpoint that requires authentication
    */
   async getLessonTranscript(lessonSlug: string): Promise<LessonTranscript> {
-    if (useMockData()) {
+    if (shouldUseMockData()) {
       // Return empty transcript for mock data
       return Promise.resolve({ sentences: [] });
     }

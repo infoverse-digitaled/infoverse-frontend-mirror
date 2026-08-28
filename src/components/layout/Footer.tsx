@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Container, Button } from '@/components/ui';
 import { apiClient } from '@/lib/api/client';
+import { getApiErrorMessage } from '@/lib/api/errors';
 
 export const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
@@ -23,9 +24,8 @@ export const Footer: React.FC = () => {
       await apiClient.post('/public/subscribe', { email });
       setSubscribeMessage({ type: 'success', text: 'Successfully subscribed!' });
       setEmail('');
-    } catch (error: any) {
-      const errorMsg = error.response?.data?.error || 'Failed to subscribe. Please try again.';
-      setSubscribeMessage({ type: 'error', text: errorMsg });
+    } catch (error) {
+      setSubscribeMessage({ type: 'error', text: getApiErrorMessage(error, 'Failed to subscribe. Please try again.') });
     } finally {
       setIsSubscribing(false);
     }
@@ -99,13 +99,13 @@ export const Footer: React.FC = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter your email"
-                    className="flex-1 px-5 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder:text-white/50 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+                    className="flex-1 min-h-[44px] px-5 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder:text-white/50 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                     required
                   />
                   <Button
                     type="submit"
                     isLoading={isSubscribing}
-                    className="rounded-xl px-8 shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 hover:-translate-y-0.5 transition-all whitespace-nowrap"
+                    className="rounded-xl px-8 min-h-[44px] shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 hover:-translate-y-0.5 transition-all whitespace-nowrap"
                   >
                     Subscribe
                   </Button>
@@ -170,7 +170,7 @@ export const Footer: React.FC = () => {
                     <li key={link.href}>
                       <Link
                         href={link.href}
-                        className="text-white/60 hover:text-white transition-colors duration-200 inline-flex items-center gap-1 group"
+                        className="inline-flex items-center gap-1 py-1.5 text-white/60 hover:text-white transition-colors duration-200 group"
                       >
                         <span>{link.label}</span>
                         <svg
@@ -197,7 +197,7 @@ export const Footer: React.FC = () => {
                     <li key={link.href}>
                       <Link
                         href={link.href}
-                        className="text-white/60 hover:text-white transition-colors duration-200 inline-flex items-center gap-1 group"
+                        className="inline-flex items-center gap-1 py-1.5 text-white/60 hover:text-white transition-colors duration-200 group"
                       >
                         <span>{link.label}</span>
                         <svg
@@ -224,7 +224,7 @@ export const Footer: React.FC = () => {
                     <li key={link.href}>
                       <Link
                         href={link.href}
-                        className="text-white/60 hover:text-white transition-colors duration-200"
+                        className="inline-block py-1.5 text-white/60 hover:text-white transition-colors duration-200"
                       >
                         {link.label}
                       </Link>

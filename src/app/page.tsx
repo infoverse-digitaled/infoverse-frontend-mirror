@@ -156,6 +156,7 @@ export default function Home() {
                   src="/Transparent logo.png"
                   alt="Infoverse Logo"
                   fill
+                  sizes="(max-width: 768px) 64px, 80px"
                   className="object-cover"
                   priority
                 />
@@ -198,7 +199,7 @@ export default function Home() {
                           ? 'Upgrade to premium'
                           : 'Continue learning'}
                   </span>
-                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                  <span className="pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
                 </Button>
               </Link>
               {user?.subscription?.status === 'active' ? (
@@ -260,7 +261,7 @@ export default function Home() {
           <div className="flex flex-col lg:flex-row gap-16 lg:gap-20 items-center">
             {/* Left Content */}
             <div className="flex-1 max-w-xl">
-              <p className="font-semibold text-base text-primary mb-4 animate-slide-in-left">
+              <p className="font-semibold text-base text-primary-text mb-4 animate-slide-in-left">
                 Expert-Led Learning
               </p>
               <h2 className="font-serif font-bold text-4xl md:text-6xl leading-[1.15] tracking-tight text-gray-900 mb-6">
@@ -310,6 +311,7 @@ export default function Home() {
                           src="/Transparent logo.png"
                           alt="Infoverse Logo"
                           fill
+                          sizes="96px"
                           className="object-cover"
                         />
                       </div>
@@ -388,7 +390,7 @@ export default function Home() {
           <div className="flex flex-col gap-16 md:gap-20">
             {/* Section Header */}
             <div className="max-w-3xl mx-auto text-center">
-              <p className="font-semibold text-base text-primary mb-4">
+              <p className="font-semibold text-base text-primary-text mb-4">
                 Why Choose Us
               </p>
               <h2 className="font-serif font-bold text-4xl md:text-6xl leading-[1.15] tracking-tight text-gray-900 mb-6">
@@ -402,7 +404,7 @@ export default function Home() {
 
             {/* Features Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 stagger-grid">
-              {features.map((feature, index) => (
+              {features.map((feature) => (
                 <div
                   key={feature.title}
                   className="group relative bg-white rounded-3xl overflow-hidden hover-lift border border-gray-100"
@@ -417,7 +419,7 @@ export default function Home() {
                     </div>
 
                     {/* Content */}
-                    <p className="font-semibold text-sm text-primary mb-2 uppercase tracking-wider">
+                    <p className="font-semibold text-sm text-primary-text mb-2 uppercase tracking-wider">
                       {feature.tagline}
                     </p>
                     <h3 className="font-serif font-bold text-2xl md:text-3xl leading-tight text-gray-900 mb-4">
@@ -454,7 +456,7 @@ export default function Home() {
           <div className="flex flex-col gap-16 md:gap-20">
             {/* Section Header */}
             <div className="max-w-3xl mx-auto text-center">
-              <p className="font-semibold text-base text-primary mb-4">
+              <p className="font-semibold text-base text-primary-text mb-4">
                 Testimonials
               </p>
               <h2 className="font-serif font-bold text-4xl md:text-6xl leading-[1.15] tracking-tight text-gray-900 mb-6">
@@ -518,7 +520,7 @@ export default function Home() {
           <div className="flex flex-col gap-16 md:gap-20">
             {/* Section Header */}
             <div className="max-w-3xl mx-auto text-center">
-              <p className="font-semibold text-base text-primary mb-4">
+              <p className="font-semibold text-base text-primary-text mb-4">
                 Words of Wisdom
               </p>
               <h2 className="font-serif font-bold text-4xl md:text-6xl leading-[1.15] tracking-tight text-gray-900 mb-6">
@@ -600,6 +602,7 @@ export default function Home() {
                     src="/Transparent logo.png"
                     alt="Infoverse Logo"
                     fill
+                    sizes="(max-width: 768px) 56px, 64px"
                     className="object-cover"
                   />
                 </div>

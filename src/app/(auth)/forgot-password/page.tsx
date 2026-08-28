@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Input, Button, Card } from '@/components/ui';
 import { useAuth } from '@/contexts/AuthContext';
+import { getApiErrorMessage } from '@/lib/api/errors';
 
 export default function ForgotPasswordPage() {
   const { forgotPassword } = useAuth();
@@ -37,11 +38,8 @@ export default function ForgotPasswordPage() {
     try {
       await forgotPassword(email);
       setIsSubmitted(true);
-    } catch (error: any) {
-      setGeneralError(
-        error.response?.data?.error?.message ||
-          'Failed to send reset email. Please try again.'
-      );
+    } catch (error) {
+      setGeneralError(getApiErrorMessage(error, 'Failed to send reset email. Please try again.'));
     } finally {
       setIsLoading(false);
     }

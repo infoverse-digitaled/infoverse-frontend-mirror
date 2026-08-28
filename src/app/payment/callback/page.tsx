@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Container } from '@/components/ui';
 import authApiClient from '@/lib/api/auth-client';
 import { useAuth } from '@/contexts/AuthContext';
+import { getApiErrorMessage } from '@/lib/api/errors';
 
 function PaymentCallbackContent() {
   const router = useRouter();
@@ -45,17 +46,20 @@ function PaymentCallbackContent() {
         } else {
           throw new Error('Verification failed');
         }
-      } catch (error: any) {
+      } catch (error) {
         console.error('Payment verification failed:', error);
         setStatus('failed');
         setMessage(
-          error.response?.data?.error ||
-          'Payment verification failed. Please contact support if payment was deducted.'
+          getApiErrorMessage(error, 'Payment verification failed. Please contact support if payment was deducted.')
         );
       }
     };
 
     verifyPayment();
+    // fetchUser is intentionally omitted: it's unmemoized in AuthContext, and
+    // this verification call must run exactly once per callback, not re-fire
+    // whenever AuthProvider re-renders and hands us a new fetchUser reference.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams, router]);
 
   return (

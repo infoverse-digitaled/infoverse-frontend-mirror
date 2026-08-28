@@ -31,7 +31,7 @@ export default function PrivacyPage() {
             {/* Quote */}
             <div className="not-prose mb-12 p-8 bg-gray-50 rounded-2xl border border-gray-100">
               <blockquote className="font-serif text-xl md:text-2xl text-gray-700 italic mb-4">
-                &ldquo;Privacy is not something that I'm merely entitled to, it's an absolute prerequisite.&rdquo;
+                &ldquo;Privacy is not something that I&apos;m merely entitled to, it&apos;s an absolute prerequisite.&rdquo;
               </blockquote>
               <p className="text-gray-500 font-medium">— Marlon Brando</p>
             </div>

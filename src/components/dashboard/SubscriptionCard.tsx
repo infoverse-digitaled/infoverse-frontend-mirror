@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import authApiClient from '@/lib/api/auth-client';
+import { getApiErrorMessage } from '@/lib/api/errors';
 
 // Map internal plan keys to friendly display info
 const PLAN_DISPLAY: Record<string, { label: string; price: string; billing: string; color: string }> = {
@@ -90,10 +91,8 @@ export default function SubscriptionCard() {
       // Refresh user in context so the UI reflects the downgrade immediately
       await fetchUser();
       setConfirmingCancel(false);
-    } catch (err: any) {
-      setCancelError(
-        err?.response?.data?.error || 'Failed to cancel subscription. Please try again.'
-      );
+    } catch (err) {
+      setCancelError(getApiErrorMessage(err, 'Failed to cancel subscription. Please try again.'));
     } finally {
       setCancelling(false);
     }

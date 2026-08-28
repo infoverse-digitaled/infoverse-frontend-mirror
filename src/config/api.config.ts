@@ -33,7 +33,7 @@ export const API_ENDPOINTS = {
   register: '/auth/register',
   me: '/auth/me',
   forgotPassword: '/auth/forgot-password',
-  resetPassword: '/auth/reset-password',
+  resetPassword: (token: string) => `/auth/reset-password/${token}`,
   // Bug Report / Feedback
   bugReport: '/public/bug-report',
   // School Admin endpoints

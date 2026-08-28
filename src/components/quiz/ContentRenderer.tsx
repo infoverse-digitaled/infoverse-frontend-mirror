@@ -14,9 +14,9 @@ interface ContentRendererProps {
   content: string | ImageObject | null | undefined;
 }
 
-function isImageObject(content: any): content is ImageObject {
+function isImageObject(content: unknown): content is ImageObject {
   return (
-    content &&
+    !!content &&
     typeof content === 'object' &&
     'url' in content &&
     'width' in content &&

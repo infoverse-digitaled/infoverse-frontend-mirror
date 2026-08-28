@@ -1,4 +1,13 @@
 steps:
+  # Step 0: Install deps and gate the deploy on lint (no test script exists yet)
+  - name: 'node:22'
+    entrypoint: npm
+    args: ['ci']
+
+  - name: 'node:22'
+    entrypoint: npm
+    args: ['run', 'lint']
+
   # Build the Docker image
   - name: 'gcr.io/cloud-builders/docker'
     args:
@@ -34,10 +43,10 @@ steps:
       - '--allow-unauthenticated'
 
 substitutions:
-  _NEXT_PUBLIC_API_URL: 'http://localhost:5001/api/v1'
-  _NEXT_PUBLIC_POSTHOG_KEY: ''
+  _NEXT_PUBLIC_API_URL: 'https://infoverse-backend-84498540486.europe-west1.run.app/api/v1'
+  _NEXT_PUBLIC_POSTHOG_KEY: 'phc_KuzbUNhO7RbVc1kkegikc6gROTB1Dm1az3FqI2bbiox'
   _NEXT_PUBLIC_POSTHOG_HOST: 'https://us.i.posthog.com'
-  _NEXT_PUBLIC_GOOGLE_CLIENT_ID: ''
+  _NEXT_PUBLIC_GOOGLE_CLIENT_ID: '84498540486-5v3sppmrbca9s3phpngkvd8ir9s0fj9o.apps.googleusercontent.com'
 options:
   logging: CLOUD_LOGGING_ONLY
 

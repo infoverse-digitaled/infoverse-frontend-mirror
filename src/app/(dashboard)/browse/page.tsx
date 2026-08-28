@@ -5,7 +5,6 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { SubjectCard } from '@/components/lessons/SubjectCard';
 import { KeyStageSelector } from '@/components/lessons';
 import { useSubjects, useMyProgress } from '@/lib/hooks/useOakData';
-import { Loading } from '@/components/ui';
 
 export default function BrowsePage() {
   const searchParams = useSearchParams();
@@ -22,7 +21,9 @@ export default function BrowsePage() {
     router.replace(`/browse?ks=${ks}`, { scroll: false });
   };
 
-  // Sync state with URL params when they change (e.g., back navigation)
+  // Sync state with URL params when they change (e.g., back navigation).
+  // selectedKeyStage is read but deliberately excluded from deps: it's only
+  // used to skip a redundant set, not something this effect should re-run for.
   useEffect(() => {
     if (ksParam) {
       const ks = parseInt(ksParam, 10);
@@ -30,6 +31,7 @@ export default function BrowsePage() {
         setSelectedKeyStage(ks);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ksParam]);
 
   const {
@@ -60,8 +62,14 @@ export default function BrowsePage() {
 
       {/* Subjects Grid */}
       {isLoading ? (
-        <div className="flex justify-center items-center py-12 sm:py-20">
-          <Loading size="lg" />
+        <div
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
+          aria-busy="true"
+          aria-label="Loading subjects"
+        >
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="h-56 rounded-xl bg-gray-100 animate-pulse" />
+          ))}
         </div>
       ) : error ? (
         <div className="text-center py-12 sm:py-20 px-4 bg-white rounded-xl shadow-soft border border-red-100">
@@ -72,7 +80,7 @@ export default function BrowsePage() {
         </div>
       ) : subjects && subjects.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {subjects.map((subject: any) => (
+            {subjects.map((subject) => (
               <SubjectCard
                 key={subject.slug}
                 subject={subject}

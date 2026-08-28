@@ -3,8 +3,34 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Container, Card, CardHeader, CardTitle, CardContent, Loading, Button } from '@/components/ui';
+import { Container, Card, CardHeader, CardTitle, CardContent, Button } from '@/components/ui';
 import { useSubjects } from '@/lib/hooks/useOakData';
+
+// Sized to match the real subject-group layout (heading + 3-card row) so the
+// page doesn't reflow when data arrives - same approach as /key-stages.
+function SubjectsSkeleton() {
+  return (
+    <div aria-busy="true">
+      {Array.from({ length: 2 }).map((_, groupIndex) => (
+        <div key={groupIndex} className="mb-12">
+          <div className="h-8 w-48 rounded-lg bg-gray-200 animate-pulse mb-6" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.from({ length: 3 }).map((_, cardIndex) => (
+              <Card key={cardIndex}>
+                <CardHeader>
+                  <div className="h-6 w-3/4 rounded bg-gray-200 animate-pulse" />
+                </CardHeader>
+                <CardContent>
+                  <div className="h-4 w-1/2 rounded bg-gray-100 animate-pulse" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default function SubjectsPage() {
   const router = useRouter();
@@ -21,14 +47,6 @@ export default function SubjectsPage() {
       if (timer) clearTimeout(timer);
     };
   }, [isLoading, error, router]);
-
-  if (isLoading) {
-    return (
-      <div className="min-h-[60vh] flex items-center justify-center">
-        <Loading size="lg" />
-      </div>
-    );
-  }
 
   if (error) {
     return (
@@ -76,29 +94,33 @@ export default function SubjectsPage() {
           </p>
         </div>
 
-        {subjectsByKeyStage && Object.entries(subjectsByKeyStage).map(([keyStage, subjects]) => (
-          <div key={keyStage} className="mb-12">
-            <h2 className="text-2xl font-bold text-text-dark mb-6">
-              {keyStage}
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {subjects.map((subject) => (
-                <Link key={subject.slug} href={`/subjects/${subject.keyStageSlug}/${subject.slug}`}>
-                  <Card hover>
-                    <CardHeader>
-                      <CardTitle>{subject.title}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-primary font-semibold">
-                        {subject.keyStageTitle}
-                      </p>
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))}
+        {isLoading ? (
+          <SubjectsSkeleton />
+        ) : (
+          subjectsByKeyStage && Object.entries(subjectsByKeyStage).map(([keyStage, subjects]) => (
+            <div key={keyStage} className="mb-12">
+              <h2 className="text-2xl font-bold text-text-dark mb-6">
+                {keyStage}
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {subjects.map((subject) => (
+                  <Link key={subject.slug} href={`/subjects/${subject.keyStageSlug}/${subject.slug}`}>
+                    <Card hover>
+                      <CardHeader>
+                        <CardTitle>{subject.title}</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm text-primary font-semibold">
+                          {subject.keyStageTitle}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </Container>
     </div>
   );

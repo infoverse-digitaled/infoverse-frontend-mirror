@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Input, Button, Card } from '@/components/ui';
 import { useAuth } from '@/contexts/AuthContext';
-import { GoogleLogin } from '@react-oauth/google';
+import { GoogleLogin, CredentialResponse } from '@react-oauth/google';
+import { getApiErrorMessage } from '@/lib/api/errors';
 
 export default function LoginPage() {
   
@@ -73,16 +74,13 @@ export default function LoginPage() {
       } else {
         router.push('/dashboard');
       }
-    } catch (error: any) {
-      setGeneralError(
-        error.response?.data?.error?.message ||
-        'Login failed. Please check your credentials.'
-      );
+    } catch (error) {
+      setGeneralError(getApiErrorMessage(error, 'Login failed. Please check your credentials.'));
       setIsLoading(false);
     }
   };
 
-  const handleGoogleSuccess = async (credentialResponse: any) => {
+  const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
       setIsLoading(true);
       setGeneralError('');
       try {
@@ -94,11 +92,8 @@ export default function LoginPage() {
             router.push('/dashboard');
           }
         }
-      } catch (error: any) {
-        setGeneralError(
-          error.response?.data?.error?.message ||
-          'Google login failed. Please try again.'
-        );
+      } catch (error) {
+        setGeneralError(getApiErrorMessage(error, 'Google login failed. Please try again.'));
         setIsLoading(false);
       }
     };

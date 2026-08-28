@@ -227,7 +227,7 @@ export const Header: React.FC = () => {
                   size="sm"
                   className={cn(
                     'rounded-full hover:shadow-lg hover:shadow-primary/10 transition-all duration-300',
-                    scrolled ? 'px-4 py-1 text-xs' : 'px-5 py-1.5'
+                    scrolled ? 'px-4 py-1.5 text-xs' : 'px-5 py-2'
                   )}
                 >
                   Login
@@ -239,11 +239,11 @@ export const Header: React.FC = () => {
                   size="sm"
                   className={cn(
                     'rounded-full shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 transition-all duration-300 relative overflow-hidden group',
-                    scrolled ? 'px-4 py-1 text-xs' : 'px-6 py-1.5'
+                    scrolled ? 'px-4 py-1.5 text-xs' : 'px-6 py-2'
                   )}
                 >
                   <span className="relative z-10">Get Started</span>
-                  <span className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                  <span className="pointer-events-none absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
                 </Button>
               </Link>
             </div>

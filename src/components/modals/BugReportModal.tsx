@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { apiClient } from '@/lib/api/client';
 import { API_ENDPOINTS } from '@/config/api.config';
+import { getApiErrorMessage } from '@/lib/api/errors';
 
 interface BugReportModalProps {
   isOpen: boolean;
@@ -67,9 +68,8 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
 
       setSubmitted(true);
       setTimeout(handleClose, 3000);
-    } catch (err: any) {
-      const msg = err.response?.data?.error || 'Failed to submit. Please try again.';
-      setError(msg);
+    } catch (err) {
+      setError(getApiErrorMessage(err, 'Failed to submit. Please try again.'));
     } finally {
       setIsSubmitting(false);
     }

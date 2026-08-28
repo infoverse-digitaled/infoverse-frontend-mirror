@@ -19,6 +19,7 @@ export function useFeedbackTimer() {
 
     const elapsed = Date.now() - parseInt(lastPrompt, 10);
     if (elapsed >= PROMPT_INTERVAL_MS) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- reads localStorage, unavailable during SSR
       setShouldShowFeedback(true);
     }
   }, []);
