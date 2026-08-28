@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Container, Button, Loading } from '@/components/ui';
+import { Container, Button } from '@/components/ui';
 import { useKeyStages } from '@/lib/hooks/useOakData';
 
 const featuresData = [
@@ -46,16 +46,6 @@ const stageColors = [
 
 export default function KeyStagesPage() {
   const { data: keyStages, error, isLoading } = useKeyStages();
-
-  if (isLoading) {
-    return (
-      <div className="flex flex-col min-h-screen">
-        <div className="min-h-[60vh] flex items-center justify-center">
-          <Loading size="lg" />
-        </div>
-      </div>
-    );
-  }
 
   if (error) {
     return (
@@ -188,7 +178,25 @@ export default function KeyStagesPage() {
             </div>
 
             {/* Key Stages Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+            <div
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8"
+              aria-busy={isLoading}
+            >
+              {isLoading &&
+                Array.from({ length: 4 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="bg-white rounded-3xl p-8 border border-gray-100 h-full flex flex-col"
+                  >
+                    <div className="w-20 h-20 rounded-2xl bg-gray-200 animate-pulse mb-6" />
+                    <div className="h-7 w-3/4 rounded-lg bg-gray-200 animate-pulse mb-3" />
+                    <div className="flex-grow flex flex-col gap-2 mb-6">
+                      <div className="h-4 w-full rounded bg-gray-100 animate-pulse" />
+                      <div className="h-4 w-5/6 rounded bg-gray-100 animate-pulse" />
+                    </div>
+                    <div className="h-5 w-28 rounded bg-gray-200 animate-pulse" />
+                  </div>
+                ))}
               {keyStages?.map((stage, index) => {
                 const color = stageColors[index % stageColors.length];
                 return (
