@@ -185,7 +185,7 @@ export function MillionaireView() {
     return (
       <div className="relative rounded-2xl overflow-hidden bg-[var(--background-dark)]">
         <GameBackdrop />
-        <div className="relative z-10 px-4 sm:px-6 pt-4 sm:pt-6">
+        <div className="relative z-10 px-4 sm:px-6 pt-3 sm:pt-4">
           <BackToGamesButton />
         </div>
         <div className="relative z-10">
@@ -203,7 +203,7 @@ export function MillionaireView() {
     <div className="relative rounded-2xl overflow-hidden bg-[var(--background-dark)]">
       <GameBackdrop />
 
-      <div className="relative z-10 flex flex-col lg:flex-row max-w-5xl mx-auto">
+      <div className="relative z-10 flex flex-col lg:flex-row max-w-6xl mx-auto">
         <div className="flex-1 min-w-0 flex flex-col p-4 sm:p-6">
           <div className="flex items-center justify-between mb-3 sm:mb-4">
             <BackToGamesButton />
@@ -279,12 +279,12 @@ export function MillionaireView() {
             )}
 
             {!hasLost && !isGameWon && currentQuestion && (
-              <>
-                <div className="bg-white/5 p-4 rounded-lg border border-white/10 text-white text-sm sm:text-base text-center">
+              <div className="flex flex-col gap-5 sm:gap-6 py-4 sm:py-8 min-h-[50vh] justify-center">
+                <div className="bg-white/5 p-6 sm:p-8 rounded-xl border border-white/10 text-white text-lg sm:text-2xl font-medium text-center leading-snug">
                   {currentQuestion.question}
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {currentQuestion.options.map((option, index) => {
                     const isSelected = pendingIndex === index;
                     const isRevealedCorrect =
@@ -302,7 +302,7 @@ export function MillionaireView() {
                         onClick={() => handleSelectOption(index)}
                         disabled={isLockedOrRevealed}
                         className={clsx(
-                          'p-3 rounded-lg text-left text-sm border transition-all duration-300',
+                          'p-4 sm:p-5 rounded-xl text-left text-sm sm:text-base border transition-all duration-300',
                           isRevealedCorrect && 'bg-green-500/20 border-green-400 text-green-300',
                           isRevealedWrong && 'bg-red-500/20 border-red-400 text-red-300',
                           !isRevealedCorrect &&
@@ -365,12 +365,12 @@ export function MillionaireView() {
                     {lastResult.isCorrect ? 'Correct!' : 'Incorrect!'}
                   </div>
                 )}
-              </>
+              </div>
             )}
           </div>
         </div>
 
-        <div className="flex flex-col gap-4 p-4 sm:p-6 w-full lg:w-72 shrink-0 border-t lg:border-t-0 lg:border-l border-white/10">
+        <div className="flex flex-col gap-4 p-4 sm:p-6 w-full lg:w-60 shrink-0 border-t lg:border-t-0 lg:border-l border-white/10">
           <MoneyLadder
             moneyLadder={moneyLadder}
             currentStep={hasLost ? Math.max(0, currentStep - 1) : currentStep}
