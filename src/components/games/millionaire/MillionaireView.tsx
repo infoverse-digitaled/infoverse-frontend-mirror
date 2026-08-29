@@ -3,15 +3,24 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { MillionaireGame } from './millionaireGame';
+import clsx from 'clsx';
 import { MoneyLadder } from './MoneyLadder';
-import { Leaderboard } from './Leaderboard';
 import { GamePicker } from './GamePicker';
 import { useAuth } from '@/contexts/AuthContext';
 import { useGame } from '@/lib/hooks/useGame';
-import type { Difficulty, GameQuestion, KeyStage } from '@/lib/api/game-service';
+import type {
+  Difficulty,
+  GameQuestion,
+  KeyStage,
+  SubmitAnswerResponse,
+} from '@/lib/api/game-service';
 
 type GameStatus = 'picking' | 'playing' | 'won' | 'lost';
+type AnswerPhase = 'idle' | 'locked' | 'revealed';
+
+const AUTO_RESTART_SECONDS = 4;
+const LOCK_IN_DELAY_MS = 1600;
+const REVEAL_HOLD_MS = 1300;
 
 function BackToGamesButton() {
   return (
@@ -52,94 +61,124 @@ function GameBackdrop() {
 export function MillionaireView() {
   const { user } = useAuth();
   const { startGame, submitAnswer, isLoading } = useGame();
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const gameRef = useRef<MillionaireGame | null>(null);
 
   const [status, setStatus] = useState<GameStatus>('picking');
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [moneyLadder, setMoneyLadder] = useState<number[]>([]);
   const [currentStep, setCurrentStep] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState<GameQuestion | null>(null);
-  const [isValidating, setIsValidating] = useState(false);
-  const [explanation, setExplanation] = useState<string | null>(null);
   const [score, setScore] = useState(0);
   const [xpEarned, setXpEarned] = useState(0);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  // Answer confirmation + delayed reveal
+  const [pendingIndex, setPendingIndex] = useState<number | null>(null);
+  const [answerPhase, setAnswerPhase] = useState<AnswerPhase>('idle');
+  const [lastResult, setLastResult] = useState<SubmitAnswerResponse | null>(null);
+  const [explanation, setExplanation] = useState<string | null>(null);
+
+  // Remembered so a loss/replay can restart at the same level without going back to picking
+  const lastPlayed = useRef<{ keyStage: KeyStage; difficulty: Difficulty } | null>(null);
+
+  // Auto-restart countdown after a loss
+  const [autoRestartIn, setAutoRestartIn] = useState<number | null>(null);
+
   useEffect(() => {
-    if (status === 'playing' && canvasRef.current && !gameRef.current) {
-      const game = new MillionaireGame(canvasRef.current, () => {});
-      gameRef.current = game;
-      return () => {
-        game.destroy();
-        gameRef.current = null;
-      };
+    if (status !== 'lost') {
+      setAutoRestartIn(null);
+      return undefined;
     }
-    return undefined;
+    setAutoRestartIn(AUTO_RESTART_SECONDS);
+    const interval = setInterval(() => {
+      setAutoRestartIn((prev) => (prev !== null && prev > 0 ? prev - 1 : prev));
+    }, 1000);
+    return () => clearInterval(interval);
   }, [status]);
+
+  useEffect(() => {
+    if (status === 'lost' && autoRestartIn === 0 && lastPlayed.current) {
+      handleStart(lastPlayed.current.keyStage, lastPlayed.current.difficulty);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoRestartIn, status]);
+
+  const resetRoundState = () => {
+    setPendingIndex(null);
+    setAnswerPhase('idle');
+    setLastResult(null);
+    setExplanation(null);
+  };
 
   const handleStart = async (keyStage: KeyStage, difficulty: Difficulty) => {
     setErrorMessage(null);
     try {
       const result = await startGame(keyStage, difficulty);
+      lastPlayed.current = { keyStage, difficulty };
       setSessionId(result.sessionId);
       setMoneyLadder(result.moneyLadder);
       setCurrentStep(result.currentStep);
       setCurrentQuestion(result.question);
-      setExplanation(null);
       setScore(0);
       setXpEarned(0);
+      resetRoundState();
       setStatus('playing');
     } catch {
       setErrorMessage('Could not start the game. Please try again.');
     }
   };
 
-  const handleOptionClick = async (index: number) => {
-    if (!sessionId || isValidating || isLoading) return;
-    setIsValidating(true);
-    setExplanation(null);
+  const handleChangeLevel = () => {
+    setStatus('picking');
+    setSessionId(null);
+    setCurrentQuestion(null);
+    resetRoundState();
+  };
+
+  const handleSelectOption = (index: number) => {
+    if (answerPhase !== 'idle') return;
+    setPendingIndex(index);
+  };
+
+  const handleConfirmAnswer = async () => {
+    if (pendingIndex === null || !sessionId) return;
+    setAnswerPhase('locked');
 
     try {
-      const result = await submitAnswer(sessionId, index);
-      setExplanation(result.explanation ?? null);
+      const [result] = await Promise.all([
+        submitAnswer(sessionId, pendingIndex),
+        new Promise((resolve) => {
+          setTimeout(resolve, LOCK_IN_DELAY_MS);
+        }),
+      ]);
+
+      setLastResult(result);
       setScore(result.score);
+      setAnswerPhase('revealed');
+      setExplanation(result.explanation ?? null);
+
+      await new Promise((resolve) => {
+        setTimeout(resolve, REVEAL_HOLD_MS);
+      });
 
       if (!result.isCorrect) {
-        gameRef.current?.submitAnswer(false);
         setStatus('lost');
-        setIsValidating(false);
         return;
       }
 
       setXpEarned(result.xpEarned ?? xpEarned);
 
       if (result.status === 'won') {
-        gameRef.current?.submitAnswer(true);
         setStatus('won');
-        setIsValidating(false);
         return;
       }
 
-      setTimeout(() => {
-        gameRef.current?.submitAnswer(true);
-        setCurrentStep(result.currentStep ?? currentStep + 1);
-        setCurrentQuestion(result.nextQuestion ?? null);
-        setIsValidating(false);
-      }, 1200);
+      setCurrentStep(result.currentStep ?? currentStep + 1);
+      setCurrentQuestion(result.nextQuestion ?? null);
+      resetRoundState();
     } catch {
       setErrorMessage('Could not submit your answer. Please try again.');
-      setIsValidating(false);
+      resetRoundState();
     }
-  };
-
-  const handlePlayAgain = () => {
-    gameRef.current?.destroy();
-    gameRef.current = null;
-    setStatus('picking');
-    setSessionId(null);
-    setCurrentQuestion(null);
-    setExplanation(null);
   };
 
   if (status === 'picking') {
@@ -158,6 +197,7 @@ export function MillionaireView() {
 
   const hasLost = status === 'lost';
   const isGameWon = status === 'won';
+  const isLockedOrRevealed = answerPhase !== 'idle';
 
   return (
     <div className="relative rounded-2xl overflow-hidden bg-[var(--background-dark)]">
@@ -174,15 +214,11 @@ export function MillionaireView() {
             )}
           </div>
 
-          <div className="rounded-lg overflow-hidden border border-white/10 h-28 sm:h-36">
-            <canvas ref={canvasRef} className="w-full h-full" />
-          </div>
-
-          <div className="mt-4 sm:mt-6 flex flex-col gap-4 justify-center">
+          <div className="flex flex-col gap-4 justify-center">
             {errorMessage && <div className="text-red-400 text-center text-sm">{errorMessage}</div>}
 
             {hasLost && (
-              <div className="flex flex-col items-center gap-3">
+              <div className="flex flex-col items-center gap-3 py-6">
                 <div className="text-red-400 text-xl sm:text-2xl text-center font-bold">Game Over!</div>
                 {explanation && (
                   <div className="text-gray-400 text-center max-w-lg italic text-sm">
@@ -190,68 +226,155 @@ export function MillionaireView() {
                   </div>
                 )}
                 <div className="text-white text-base sm:text-lg">Final score: ₦{score.toLocaleString()}</div>
-                <button
-                  onClick={handlePlayAgain}
-                  className="bg-[var(--accent-purple)] text-white px-6 py-2.5 rounded-lg font-bold shadow-lg text-sm sm:text-base"
-                >
-                  Try Again
-                </button>
+
+                <div className="flex flex-col items-center gap-2 mt-2">
+                  <p className="text-white/60 text-xs sm:text-sm">
+                    {autoRestartIn !== null && autoRestartIn > 0
+                      ? `Restarting at the same level in ${autoRestartIn}...`
+                      : 'Restarting...'}
+                  </p>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() =>
+                        lastPlayed.current && handleStart(lastPlayed.current.keyStage, lastPlayed.current.difficulty)
+                      }
+                      className="bg-[var(--accent-purple)] text-white px-6 py-2.5 rounded-lg font-bold shadow-lg text-sm sm:text-base"
+                    >
+                      Play Now
+                    </button>
+                    <button
+                      onClick={handleChangeLevel}
+                      className="bg-white/10 text-white border border-white/20 px-6 py-2.5 rounded-lg font-bold text-sm sm:text-base hover:bg-white/20 transition-colors"
+                    >
+                      Change Level
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
 
             {isGameWon && (
-              <div className="flex flex-col items-center gap-3">
+              <div className="flex flex-col items-center gap-3 py-6">
                 <div className="text-green-400 text-xl sm:text-2xl text-center font-bold">
                   Congratulations! You are a Virtual Millionaire!
                 </div>
                 <div className="text-white text-base sm:text-lg">Final score: ₦{score.toLocaleString()}</div>
-                <button
-                  onClick={handlePlayAgain}
-                  className="bg-green-500 text-white px-6 py-2.5 rounded-lg font-bold shadow-lg text-sm sm:text-base"
-                >
-                  Play Again
-                </button>
+                <div className="flex gap-3 mt-2">
+                  <button
+                    onClick={() =>
+                      lastPlayed.current && handleStart(lastPlayed.current.keyStage, lastPlayed.current.difficulty)
+                    }
+                    className="bg-green-500 text-white px-6 py-2.5 rounded-lg font-bold shadow-lg text-sm sm:text-base"
+                  >
+                    Play Again
+                  </button>
+                  <button
+                    onClick={handleChangeLevel}
+                    className="bg-white/10 text-white border border-white/20 px-6 py-2.5 rounded-lg font-bold text-sm sm:text-base hover:bg-white/20 transition-colors"
+                  >
+                    Change Level
+                  </button>
+                </div>
               </div>
             )}
 
-            {(isLoading || isValidating) && !hasLost && !isGameWon && (
-              <div className="text-[var(--accent-purple)] text-base sm:text-lg text-center font-bold italic">
-                {isValidating ? 'Validating answer...' : 'Loading next question...'}
-              </div>
-            )}
-
-            {!isLoading && !isValidating && !hasLost && !isGameWon && currentQuestion && (
+            {!hasLost && !isGameWon && currentQuestion && (
               <>
                 <div className="bg-white/5 p-4 rounded-lg border border-white/10 text-white text-sm sm:text-base text-center">
                   {currentQuestion.question}
                 </div>
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {currentQuestion.options.map((option, index) => (
-                    <button
-                      key={option}
-                      onClick={() => handleOptionClick(index)}
-                      className="bg-white/5 text-gray-300 border border-white/10 p-3 rounded-lg text-left text-sm hover:border-[var(--accent-purple)] hover:text-[var(--accent-purple)] transition-colors"
-                    >
-                      <span className="text-[var(--accent-purple)] font-bold mr-2">
-                        {String.fromCharCode(65 + index)}:
-                      </span>
-                      {option}
-                    </button>
-                  ))}
+                  {currentQuestion.options.map((option, index) => {
+                    const isSelected = pendingIndex === index;
+                    const isRevealedCorrect =
+                      answerPhase === 'revealed' &&
+                      lastResult &&
+                      (lastResult.isCorrect
+                        ? isSelected
+                        : lastResult.correctAnswerIndex === index);
+                    const isRevealedWrong =
+                      answerPhase === 'revealed' && lastResult && !lastResult.isCorrect && isSelected;
+
+                    return (
+                      <button
+                        key={option}
+                        onClick={() => handleSelectOption(index)}
+                        disabled={isLockedOrRevealed}
+                        className={clsx(
+                          'p-3 rounded-lg text-left text-sm border transition-all duration-300',
+                          isRevealedCorrect && 'bg-green-500/20 border-green-400 text-green-300',
+                          isRevealedWrong && 'bg-red-500/20 border-red-400 text-red-300',
+                          !isRevealedCorrect &&
+                            !isRevealedWrong &&
+                            isSelected &&
+                            answerPhase === 'locked' &&
+                            'bg-[var(--accent-purple)]/20 border-[var(--accent-purple)] text-white animate-pulse',
+                          !isRevealedCorrect &&
+                            !isRevealedWrong &&
+                            !(isSelected && answerPhase === 'locked') &&
+                            'bg-white/5 border-white/10 text-gray-300 hover:border-[var(--accent-purple)] hover:text-[var(--accent-purple)]',
+                          isLockedOrRevealed && !isSelected && 'opacity-40',
+                        )}
+                      >
+                        <span className="text-[var(--accent-purple)] font-bold mr-2">
+                          {String.fromCharCode(65 + index)}:
+                        </span>
+                        {option}
+                      </button>
+                    );
+                  })}
                 </div>
+
+                {pendingIndex !== null && answerPhase === 'idle' && (
+                  <div className="bg-black/30 border border-[var(--accent-purple)]/40 rounded-lg p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <p className="text-white text-sm text-center sm:text-left">
+                      Lock in <strong>{String.fromCharCode(65 + pendingIndex)}</strong>? Are you
+                      sure? Final answer?
+                    </p>
+                    <div className="flex gap-2 shrink-0">
+                      <button
+                        onClick={() => setPendingIndex(null)}
+                        className="px-4 py-2 rounded-lg text-sm font-semibold text-white/70 hover:text-white transition-colors"
+                      >
+                        Change Answer
+                      </button>
+                      <button
+                        onClick={handleConfirmAnswer}
+                        className="bg-[var(--accent-purple)] text-white px-5 py-2 rounded-lg text-sm font-bold shadow-lg"
+                      >
+                        Final Answer
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {answerPhase === 'locked' && (
+                  <div className="text-[var(--accent-purple)] text-base sm:text-lg text-center font-bold italic">
+                    Locking in your final answer&hellip;
+                  </div>
+                )}
+
+                {answerPhase === 'revealed' && lastResult && (
+                  <div
+                    className={clsx(
+                      'text-base sm:text-lg text-center font-bold',
+                      lastResult.isCorrect ? 'text-green-400' : 'text-red-400',
+                    )}
+                  >
+                    {lastResult.isCorrect ? 'Correct!' : 'Incorrect!'}
+                  </div>
+                )}
               </>
             )}
           </div>
         </div>
 
         <div className="flex flex-col gap-4 p-4 sm:p-6 w-full lg:w-72 shrink-0 border-t lg:border-t-0 lg:border-l border-white/10">
-          <Leaderboard />
-          <div className="max-h-56 overflow-y-auto">
-            <MoneyLadder
-              moneyLadder={moneyLadder}
-              currentStep={hasLost ? Math.max(0, currentStep - 1) : currentStep}
-            />
-          </div>
+          <MoneyLadder
+            moneyLadder={moneyLadder}
+            currentStep={hasLost ? Math.max(0, currentStep - 1) : currentStep}
+          />
         </div>
       </div>
     </div>
