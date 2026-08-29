@@ -27,7 +27,15 @@ export default function GamesPage() {
         {GAMES.map((game) => (
           <Link key={game.slug} href={`/games/${game.slug}`}>
             <Card hover className="h-full flex flex-col overflow-hidden">
-              <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${game.gradient} mb-4`} />
+              <div
+                className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${game.gradient} mb-4 flex items-center justify-center text-white`}
+              >
+                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <rect x="2" y="6" width="20" height="12" rx="6" strokeWidth={1.5} />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 10v4M6 12h4" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13h.01M18 11h.01" />
+                </svg>
+              </div>
               <h3 className="font-serif font-bold text-xl text-gray-900 mb-2">{game.title}</h3>
               <p className="text-sm text-gray-600 flex-grow">{game.description}</p>
             </Card>
