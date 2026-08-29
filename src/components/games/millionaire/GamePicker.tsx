@@ -39,15 +39,17 @@ export function GamePicker({ defaultKeyStage, onStart, isStarting }: GamePickerP
   const [difficulty, setDifficulty] = useState<Difficulty>('medium');
 
   return (
-    <div className="max-w-2xl mx-auto py-12 sm:py-16">
-      <div className="text-center mb-10">
-        <h1 className="font-serif font-bold text-3xl text-gray-900 mb-2">
+    <div className="max-w-2xl mx-auto px-4 sm:px-6 pb-8 sm:pb-12 pt-2">
+      <div className="text-center mb-6 sm:mb-8">
+        <h1 className="font-serif font-bold text-2xl sm:text-3xl text-white mb-2">
           Who Wants to Be a Millionaire?
         </h1>
-        <p className="text-gray-500">Pick your key stage and difficulty to begin.</p>
+        <p className="text-white/70 text-sm sm:text-base">
+          Pick your key stage and difficulty to begin.
+        </p>
       </div>
 
-      <Card className="p-6 sm:p-8 space-y-8">
+      <Card className="p-5 sm:p-8 space-y-6 sm:space-y-8">
         <div>
           <h2 className="text-sm font-semibold text-gray-700 mb-3">Key Stage</h2>
           <div className="grid grid-cols-2 gap-3">

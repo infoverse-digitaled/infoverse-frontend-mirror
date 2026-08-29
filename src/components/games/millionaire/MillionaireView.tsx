@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
 import { MillionaireGame } from './millionaireGame';
 import { MoneyLadder } from './MoneyLadder';
 import { Leaderboard } from './Leaderboard';
@@ -10,6 +12,42 @@ import { useGame } from '@/lib/hooks/useGame';
 import type { Difficulty, GameQuestion, KeyStage } from '@/lib/api/game-service';
 
 type GameStatus = 'picking' | 'playing' | 'won' | 'lost';
+
+function BackToGamesButton() {
+  return (
+    <Link
+      href="/games"
+      className="inline-flex items-center gap-1.5 text-sm font-semibold text-white/70 hover:text-white transition-colors"
+    >
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+      </svg>
+      Games
+    </Link>
+  );
+}
+
+// Game-show style backdrop: dark radial "stage lights" plus a faint Infoverse logo watermark.
+function GameBackdrop() {
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            'radial-gradient(circle at 50% 0%, rgba(139,92,246,0.35), transparent 55%), radial-gradient(circle at 15% 100%, rgba(74,159,199,0.25), transparent 50%), radial-gradient(circle at 85% 100%, rgba(232,123,92,0.2), transparent 50%), var(--background-dark)',
+        }}
+      />
+      <Image
+        src="/Transparent logo.png"
+        alt=""
+        width={480}
+        height={480}
+        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.05] select-none"
+      />
+    </div>
+  );
+}
 
 export function MillionaireView() {
   const { user } = useAuth();
@@ -105,98 +143,115 @@ export function MillionaireView() {
   };
 
   if (status === 'picking') {
-    return <GamePicker defaultKeyStage={user?.keyStage} onStart={handleStart} isStarting={isLoading} />;
+    return (
+      <div className="relative rounded-2xl overflow-hidden bg-[var(--background-dark)]">
+        <GameBackdrop />
+        <div className="relative z-10 px-4 sm:px-6 pt-4 sm:pt-6">
+          <BackToGamesButton />
+        </div>
+        <div className="relative z-10">
+          <GamePicker defaultKeyStage={user?.keyStage} onStart={handleStart} isStarting={isLoading} />
+        </div>
+      </div>
+    );
   }
 
   const hasLost = status === 'lost';
   const isGameWon = status === 'won';
 
   return (
-    <div className="flex flex-col lg:flex-row w-full bg-[var(--background-dark)] rounded-2xl overflow-hidden">
-      <div className="flex-1 min-w-0 flex flex-col p-4 sm:p-6 lg:p-8 relative">
-        {!hasLost && !isGameWon && (
-          <div className="absolute top-4 right-4 sm:top-6 sm:right-6 bg-white/5 border border-green-400/40 text-green-400 font-bold px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg z-20 text-sm sm:text-base">
-            ⭐ {xpEarned} XP
+    <div className="relative rounded-2xl overflow-hidden bg-[var(--background-dark)]">
+      <GameBackdrop />
+
+      <div className="relative z-10 flex flex-col lg:flex-row max-w-5xl mx-auto">
+        <div className="flex-1 min-w-0 flex flex-col p-4 sm:p-6">
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
+            <BackToGamesButton />
+            {!hasLost && !isGameWon && (
+              <div className="bg-white/5 border border-green-400/40 text-green-400 font-bold px-3 py-1.5 rounded-lg text-sm">
+                ⭐ {xpEarned} XP
+              </div>
+            )}
           </div>
-        )}
 
-        <div className="rounded-lg overflow-hidden border border-white/10 aspect-[8/3] w-full">
-          <canvas ref={canvasRef} className="w-full h-full" />
-        </div>
+          <div className="rounded-lg overflow-hidden border border-white/10 h-28 sm:h-36">
+            <canvas ref={canvasRef} className="w-full h-full" />
+          </div>
 
-        <div className="mt-4 sm:mt-6 flex flex-col gap-4 sm:gap-6 justify-center">
-          {errorMessage && <div className="text-red-400 text-center">{errorMessage}</div>}
+          <div className="mt-4 sm:mt-6 flex flex-col gap-4 justify-center">
+            {errorMessage && <div className="text-red-400 text-center text-sm">{errorMessage}</div>}
 
-          {hasLost && (
-            <div className="flex flex-col items-center gap-3 sm:gap-4">
-              <div className="text-red-400 text-xl sm:text-2xl text-center font-bold">Game Over!</div>
-              {explanation && (
-                <div className="text-gray-400 text-center max-w-lg italic text-sm sm:text-base">
-                  &ldquo;{explanation}&rdquo;
+            {hasLost && (
+              <div className="flex flex-col items-center gap-3">
+                <div className="text-red-400 text-xl sm:text-2xl text-center font-bold">Game Over!</div>
+                {explanation && (
+                  <div className="text-gray-400 text-center max-w-lg italic text-sm">
+                    &ldquo;{explanation}&rdquo;
+                  </div>
+                )}
+                <div className="text-white text-base sm:text-lg">Final score: ₦{score.toLocaleString()}</div>
+                <button
+                  onClick={handlePlayAgain}
+                  className="bg-[var(--accent-purple)] text-white px-6 py-2.5 rounded-lg font-bold shadow-lg text-sm sm:text-base"
+                >
+                  Try Again
+                </button>
+              </div>
+            )}
+
+            {isGameWon && (
+              <div className="flex flex-col items-center gap-3">
+                <div className="text-green-400 text-xl sm:text-2xl text-center font-bold">
+                  Congratulations! You are a Virtual Millionaire!
                 </div>
-              )}
-              <div className="text-white text-lg">Final score: ₦{score.toLocaleString()}</div>
-              <button
-                onClick={handlePlayAgain}
-                className="bg-[var(--accent-purple)] text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-bold shadow-lg"
-              >
-                Try Again
-              </button>
-            </div>
-          )}
-
-          {isGameWon && (
-            <div className="flex flex-col items-center gap-3 sm:gap-4">
-              <div className="text-green-400 text-xl sm:text-2xl text-center font-bold">
-                Congratulations! You are a Virtual Millionaire!
+                <div className="text-white text-base sm:text-lg">Final score: ₦{score.toLocaleString()}</div>
+                <button
+                  onClick={handlePlayAgain}
+                  className="bg-green-500 text-white px-6 py-2.5 rounded-lg font-bold shadow-lg text-sm sm:text-base"
+                >
+                  Play Again
+                </button>
               </div>
-              <div className="text-white text-lg">Final score: ₦{score.toLocaleString()}</div>
-              <button
-                onClick={handlePlayAgain}
-                className="bg-green-500 text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-bold shadow-lg"
-              >
-                Play Again
-              </button>
-            </div>
-          )}
+            )}
 
-          {(isLoading || isValidating) && !hasLost && !isGameWon && (
-            <div className="text-[var(--accent-purple)] text-lg sm:text-xl text-center font-bold italic">
-              {isValidating ? 'Validating answer...' : 'Loading next question...'}
-            </div>
-          )}
+            {(isLoading || isValidating) && !hasLost && !isGameWon && (
+              <div className="text-[var(--accent-purple)] text-base sm:text-lg text-center font-bold italic">
+                {isValidating ? 'Validating answer...' : 'Loading next question...'}
+              </div>
+            )}
 
-          {!isLoading && !isValidating && !hasLost && !isGameWon && currentQuestion && (
-            <>
-              <div className="bg-white/5 p-4 sm:p-6 rounded-lg border border-white/10 text-white text-base sm:text-lg text-center">
-                {currentQuestion.question}
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                {currentQuestion.options.map((option, index) => (
-                  <button
-                    key={option}
-                    onClick={() => handleOptionClick(index)}
-                    className="bg-white/5 text-gray-300 border border-white/10 p-3 sm:p-4 rounded-lg text-left text-sm sm:text-base hover:border-[var(--accent-purple)] hover:text-[var(--accent-purple)] transition-colors"
-                  >
-                    <span className="text-[var(--accent-purple)] font-bold mr-2">
-                      {String.fromCharCode(65 + index)}:
-                    </span>
-                    {option}
-                  </button>
-                ))}
-              </div>
-            </>
-          )}
+            {!isLoading && !isValidating && !hasLost && !isGameWon && currentQuestion && (
+              <>
+                <div className="bg-white/5 p-4 rounded-lg border border-white/10 text-white text-sm sm:text-base text-center">
+                  {currentQuestion.question}
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {currentQuestion.options.map((option, index) => (
+                    <button
+                      key={option}
+                      onClick={() => handleOptionClick(index)}
+                      className="bg-white/5 text-gray-300 border border-white/10 p-3 rounded-lg text-left text-sm hover:border-[var(--accent-purple)] hover:text-[var(--accent-purple)] transition-colors"
+                    >
+                      <span className="text-[var(--accent-purple)] font-bold mr-2">
+                        {String.fromCharCode(65 + index)}:
+                      </span>
+                      {option}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
         </div>
-      </div>
 
-      <div className="flex flex-col gap-4 sm:gap-6 p-4 sm:p-6 lg:p-8 w-full lg:w-80 shrink-0 border-t lg:border-t-0 lg:border-l border-white/10">
-        <Leaderboard />
-        <div className="max-h-64 lg:max-h-none overflow-y-auto">
-          <MoneyLadder
-            moneyLadder={moneyLadder}
-            currentStep={hasLost ? Math.max(0, currentStep - 1) : currentStep}
-          />
+        <div className="flex flex-col gap-4 p-4 sm:p-6 w-full lg:w-72 shrink-0 border-t lg:border-t-0 lg:border-l border-white/10">
+          <Leaderboard />
+          <div className="max-h-56 overflow-y-auto">
+            <MoneyLadder
+              moneyLadder={moneyLadder}
+              currentStep={hasLost ? Math.max(0, currentStep - 1) : currentStep}
+            />
+          </div>
         </div>
       </div>
     </div>
