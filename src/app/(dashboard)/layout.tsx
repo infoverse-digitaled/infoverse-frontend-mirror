@@ -163,6 +163,17 @@ export default function DashboardLayout({
                 isActive={pathname?.startsWith('/browse')}
               />
               <NavItem
+                href="/games"
+                icon={
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5s8.268 2.943 9.542 7c-1.274 4.057-5.065 7-9.542 7s-8.268-2.943-9.542-7z" />
+                  </svg>
+                }
+                label="Games"
+                isActive={pathname?.startsWith('/games')}
+              />
+              <NavItem
                 href="/pricing"
                 icon={
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
