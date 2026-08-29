@@ -112,31 +112,33 @@ export function MillionaireView() {
   const isGameWon = status === 'won';
 
   return (
-    <div className="flex w-full min-h-[70vh] bg-[var(--background-dark)] rounded-2xl overflow-hidden">
-      <div className="flex-1 flex flex-col p-8 relative">
+    <div className="flex flex-col lg:flex-row w-full bg-[var(--background-dark)] rounded-2xl overflow-hidden">
+      <div className="flex-1 min-w-0 flex flex-col p-4 sm:p-6 lg:p-8 relative">
         {!hasLost && !isGameWon && (
-          <div className="absolute top-8 right-8 bg-white/5 border border-green-400/40 text-green-400 font-bold px-4 py-2 rounded-lg z-20">
+          <div className="absolute top-4 right-4 sm:top-6 sm:right-6 bg-white/5 border border-green-400/40 text-green-400 font-bold px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg z-20 text-sm sm:text-base">
             ⭐ {xpEarned} XP
           </div>
         )}
 
-        <div className="flex-1 rounded-lg overflow-hidden border border-white/10">
+        <div className="rounded-lg overflow-hidden border border-white/10 aspect-[8/3] w-full">
           <canvas ref={canvasRef} className="w-full h-full" />
         </div>
 
-        <div className="mt-8 flex flex-col gap-6 min-h-[200px] justify-center">
+        <div className="mt-4 sm:mt-6 flex flex-col gap-4 sm:gap-6 justify-center">
           {errorMessage && <div className="text-red-400 text-center">{errorMessage}</div>}
 
           {hasLost && (
-            <div className="flex flex-col items-center gap-4">
-              <div className="text-red-400 text-2xl text-center font-bold">Game Over!</div>
+            <div className="flex flex-col items-center gap-3 sm:gap-4">
+              <div className="text-red-400 text-xl sm:text-2xl text-center font-bold">Game Over!</div>
               {explanation && (
-                <div className="text-gray-400 text-center max-w-lg italic">&ldquo;{explanation}&rdquo;</div>
+                <div className="text-gray-400 text-center max-w-lg italic text-sm sm:text-base">
+                  &ldquo;{explanation}&rdquo;
+                </div>
               )}
               <div className="text-white text-lg">Final score: ₦{score.toLocaleString()}</div>
               <button
                 onClick={handlePlayAgain}
-                className="bg-[var(--accent-purple)] text-white px-8 py-3 rounded-lg font-bold shadow-lg"
+                className="bg-[var(--accent-purple)] text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-bold shadow-lg"
               >
                 Try Again
               </button>
@@ -144,14 +146,14 @@ export function MillionaireView() {
           )}
 
           {isGameWon && (
-            <div className="flex flex-col items-center gap-4">
-              <div className="text-green-400 text-2xl text-center font-bold">
+            <div className="flex flex-col items-center gap-3 sm:gap-4">
+              <div className="text-green-400 text-xl sm:text-2xl text-center font-bold">
                 Congratulations! You are a Virtual Millionaire!
               </div>
               <div className="text-white text-lg">Final score: ₦{score.toLocaleString()}</div>
               <button
                 onClick={handlePlayAgain}
-                className="bg-green-500 text-white px-8 py-3 rounded-lg font-bold shadow-lg"
+                className="bg-green-500 text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-bold shadow-lg"
               >
                 Play Again
               </button>
@@ -159,22 +161,22 @@ export function MillionaireView() {
           )}
 
           {(isLoading || isValidating) && !hasLost && !isGameWon && (
-            <div className="text-[var(--accent-purple)] text-xl text-center font-bold italic">
+            <div className="text-[var(--accent-purple)] text-lg sm:text-xl text-center font-bold italic">
               {isValidating ? 'Validating answer...' : 'Loading next question...'}
             </div>
           )}
 
           {!isLoading && !isValidating && !hasLost && !isGameWon && currentQuestion && (
             <>
-              <div className="bg-white/5 p-6 rounded-lg border border-white/10 text-white text-lg text-center">
+              <div className="bg-white/5 p-4 sm:p-6 rounded-lg border border-white/10 text-white text-base sm:text-lg text-center">
                 {currentQuestion.question}
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 {currentQuestion.options.map((option, index) => (
                   <button
                     key={option}
                     onClick={() => handleOptionClick(index)}
-                    className="bg-white/5 text-gray-300 border border-white/10 p-4 rounded-lg text-left hover:border-[var(--accent-purple)] hover:text-[var(--accent-purple)] transition-colors"
+                    className="bg-white/5 text-gray-300 border border-white/10 p-3 sm:p-4 rounded-lg text-left text-sm sm:text-base hover:border-[var(--accent-purple)] hover:text-[var(--accent-purple)] transition-colors"
                   >
                     <span className="text-[var(--accent-purple)] font-bold mr-2">
                       {String.fromCharCode(65 + index)}:
@@ -188,9 +190,14 @@ export function MillionaireView() {
         </div>
       </div>
 
-      <div className="flex flex-col gap-6 p-8">
+      <div className="flex flex-col gap-4 sm:gap-6 p-4 sm:p-6 lg:p-8 w-full lg:w-80 shrink-0 border-t lg:border-t-0 lg:border-l border-white/10">
         <Leaderboard />
-        <MoneyLadder moneyLadder={moneyLadder} currentStep={hasLost ? Math.max(0, currentStep - 1) : currentStep} />
+        <div className="max-h-64 lg:max-h-none overflow-y-auto">
+          <MoneyLadder
+            moneyLadder={moneyLadder}
+            currentStep={hasLost ? Math.max(0, currentStep - 1) : currentStep}
+          />
+        </div>
       </div>
     </div>
   );
