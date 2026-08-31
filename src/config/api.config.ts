@@ -39,6 +39,11 @@ export const API_ENDPOINTS = {
   // School Admin endpoints
   schoolRegister: '/school/register',
   schoolStudents: '/school/students',
+  // Games
+  gameStart: '/game/millionaire/start',
+  gameAnswer: (sessionId: string) => `/game/millionaire/${sessionId}/answer`,
+  gameCashout: (sessionId: string) => `/game/millionaire/${sessionId}/cashout`,
+  gameLeaderboard: '/game/leaderboard',
 } as const;
 
 export const API_CONFIG = {
