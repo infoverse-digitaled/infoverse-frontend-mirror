@@ -143,6 +143,7 @@ export function MillionaireView() {
   };
 
   const handleStart = async (keyStage: KeyStage, difficulty: Difficulty) => {
+    sound.playMusic();
     setErrorMessage(null);
     try {
       const result = await startGame(keyStage, difficulty);
@@ -162,6 +163,7 @@ export function MillionaireView() {
 
   const handleChangeLevel = () => {
     sound.play('navClick');
+    sound.stopMusic();
     setStatus('picking');
     setSessionId(null);
     setCurrentQuestion(null);
@@ -224,7 +226,7 @@ export function MillionaireView() {
       <div className="relative rounded-2xl overflow-hidden bg-[var(--background-dark)]">
         <GameBackdrop />
         <div className="relative z-10 px-4 sm:px-6 pt-3 sm:pt-4 flex items-center justify-between">
-          <BackToGamesButton onClick={() => sound.play('navClick')} />
+          <BackToGamesButton onClick={() => { sound.play('navClick'); sound.stopMusic(); }} />
           <MuteButton muted={isMuted} onToggle={handleToggleMuted} />
         </div>
         <div className="relative z-10">
@@ -252,7 +254,7 @@ export function MillionaireView() {
       <div className="relative z-10 flex flex-col lg:flex-row max-w-6xl mx-auto">
         <div className="flex-1 min-w-0 flex flex-col p-4 sm:p-6">
           <div className="flex items-center justify-between mb-3 sm:mb-4">
-            <BackToGamesButton onClick={() => sound.play('navClick')} />
+            <BackToGamesButton onClick={() => { sound.play('navClick'); sound.stopMusic(); }} />
             <div className="flex items-center gap-3">
               {!hasLost && !isGameWon && (
                 <div className="bg-white/5 border border-green-400/40 text-green-400 font-bold px-3 py-1.5 rounded-lg text-sm">
