@@ -8,6 +8,7 @@ import { MoneyLadder } from './MoneyLadder';
 import { GamePicker } from './GamePicker';
 import { useAuth } from '@/contexts/AuthContext';
 import { useGame } from '@/lib/hooks/useGame';
+import { useSound } from '@/lib/hooks/useSound';
 import type {
   Difficulty,
   GameQuestion,
@@ -22,10 +23,11 @@ const AUTO_RESTART_SECONDS = 4;
 const LOCK_IN_DELAY_MS = 1600;
 const REVEAL_HOLD_MS = 1300;
 
-function BackToGamesButton() {
+function BackToGamesButton({ onClick }: { onClick?: () => void }) {
   return (
     <Link
       href="/games"
+      onClick={onClick}
       className="inline-flex items-center gap-1.5 text-sm font-semibold text-white/70 hover:text-white transition-colors"
     >
       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -33,6 +35,26 @@ function BackToGamesButton() {
       </svg>
       Games
     </Link>
+  );
+}
+
+function MuteButton({ muted, onToggle }: { muted: boolean; onToggle: () => void }) {
+  return (
+    <button
+      onClick={onToggle}
+      aria-label={muted ? 'Unmute sound' : 'Mute sound'}
+      className="text-white/60 hover:text-white transition-colors p-1.5"
+    >
+      {muted ? (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M9.5 8.5l-4 3H3v1h2.5l4 3v-7z" />
+        </svg>
+      ) : (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072M18.364 5.636a9 9 0 010 12.728M9.5 8.5l-4 3H3v1h2.5l4 3v-7z" />
+        </svg>
+      )}
+    </button>
   );
 }
 
@@ -61,6 +83,17 @@ function GameBackdrop() {
 export function MillionaireView() {
   const { user } = useAuth();
   const { startGame, submitAnswer, isLoading } = useGame();
+  const sound = useSound();
+  const [isMuted, setIsMuted] = useState(false);
+
+  useEffect(() => {
+    setIsMuted(sound.isMuted());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleToggleMuted = () => {
+    setIsMuted(sound.toggleMuted());
+  };
 
   const [status, setStatus] = useState<GameStatus>('picking');
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -128,6 +161,7 @@ export function MillionaireView() {
   };
 
   const handleChangeLevel = () => {
+    sound.play('navClick');
     setStatus('picking');
     setSessionId(null);
     setCurrentQuestion(null);
@@ -136,12 +170,14 @@ export function MillionaireView() {
 
   const handleSelectOption = (index: number) => {
     if (answerPhase !== 'idle') return;
+    sound.play('select');
     setPendingIndex(index);
   };
 
   const handleConfirmAnswer = async () => {
     if (pendingIndex === null || !sessionId) return;
     setAnswerPhase('locked');
+    sound.play('lockIn');
 
     try {
       const [result] = await Promise.all([
@@ -155,6 +191,7 @@ export function MillionaireView() {
       setScore(result.score);
       setAnswerPhase('revealed');
       setExplanation(result.explanation ?? null);
+      sound.play(result.isCorrect ? 'correct' : 'wrong');
 
       await new Promise((resolve) => {
         setTimeout(resolve, REVEAL_HOLD_MS);
@@ -168,6 +205,7 @@ export function MillionaireView() {
       setXpEarned(result.xpEarned ?? xpEarned);
 
       if (result.status === 'won') {
+        sound.play('win');
         setStatus('won');
         return;
       }
@@ -185,11 +223,19 @@ export function MillionaireView() {
     return (
       <div className="relative rounded-2xl overflow-hidden bg-[var(--background-dark)]">
         <GameBackdrop />
-        <div className="relative z-10 px-4 sm:px-6 pt-3 sm:pt-4">
-          <BackToGamesButton />
+        <div className="relative z-10 px-4 sm:px-6 pt-3 sm:pt-4 flex items-center justify-between">
+          <BackToGamesButton onClick={() => sound.play('navClick')} />
+          <MuteButton muted={isMuted} onToggle={handleToggleMuted} />
         </div>
         <div className="relative z-10">
-          <GamePicker defaultKeyStage={user?.keyStage} onStart={handleStart} isStarting={isLoading} />
+          <GamePicker
+            defaultKeyStage={user?.keyStage}
+            onStart={(keyStage, difficulty) => {
+              sound.play('navClick');
+              handleStart(keyStage, difficulty);
+            }}
+            isStarting={isLoading}
+          />
         </div>
       </div>
     );
@@ -206,12 +252,15 @@ export function MillionaireView() {
       <div className="relative z-10 flex flex-col lg:flex-row max-w-6xl mx-auto">
         <div className="flex-1 min-w-0 flex flex-col p-4 sm:p-6">
           <div className="flex items-center justify-between mb-3 sm:mb-4">
-            <BackToGamesButton />
-            {!hasLost && !isGameWon && (
-              <div className="bg-white/5 border border-green-400/40 text-green-400 font-bold px-3 py-1.5 rounded-lg text-sm">
-                ⭐ {xpEarned} XP
-              </div>
-            )}
+            <BackToGamesButton onClick={() => sound.play('navClick')} />
+            <div className="flex items-center gap-3">
+              {!hasLost && !isGameWon && (
+                <div className="bg-white/5 border border-green-400/40 text-green-400 font-bold px-3 py-1.5 rounded-lg text-sm">
+                  ⭐ {xpEarned} XP
+                </div>
+              )}
+              <MuteButton muted={isMuted} onToggle={handleToggleMuted} />
+            </div>
           </div>
 
           <div className="flex flex-col gap-4 justify-center">
@@ -235,9 +284,10 @@ export function MillionaireView() {
                   </p>
                   <div className="flex gap-3">
                     <button
-                      onClick={() =>
-                        lastPlayed.current && handleStart(lastPlayed.current.keyStage, lastPlayed.current.difficulty)
-                      }
+                      onClick={() => {
+                        sound.play('navClick');
+                        if (lastPlayed.current) handleStart(lastPlayed.current.keyStage, lastPlayed.current.difficulty);
+                      }}
                       className="bg-[var(--accent-purple)] text-white px-6 py-2.5 rounded-lg font-bold shadow-lg text-sm sm:text-base"
                     >
                       Play Now
@@ -261,9 +311,10 @@ export function MillionaireView() {
                 <div className="text-white text-base sm:text-lg">Final score: ₦{score.toLocaleString()}</div>
                 <div className="flex gap-3 mt-2">
                   <button
-                    onClick={() =>
-                      lastPlayed.current && handleStart(lastPlayed.current.keyStage, lastPlayed.current.difficulty)
-                    }
+                    onClick={() => {
+                      sound.play('navClick');
+                      if (lastPlayed.current) handleStart(lastPlayed.current.keyStage, lastPlayed.current.difficulty);
+                    }}
                     className="bg-green-500 text-white px-6 py-2.5 rounded-lg font-bold shadow-lg text-sm sm:text-base"
                   >
                     Play Again
