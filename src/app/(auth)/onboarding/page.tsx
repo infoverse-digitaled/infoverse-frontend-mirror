@@ -10,7 +10,6 @@ import { getApiErrorMessage } from '@/lib/api/errors';
 export default function OnboardingPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
-  const [role, setRole] = useState('student');
   const [keyStage, setKeyStage] = useState('ks1');
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState('');
@@ -26,13 +25,7 @@ export default function OnboardingPage() {
     setError('');
 
     try {
-      // Map frontend role values to backend values
-      const backendRole = role === 'teacher' || role === 'parent' ? 'instructor' : 'student';
-
-      await authApiClient.patch('/auth/onboarding', {
-        role: backendRole,
-        keyStage,
-      });
+      await authApiClient.patch('/auth/onboarding', { keyStage });
 
       router.push('/dashboard');
     } catch (err) {
@@ -75,39 +68,21 @@ export default function OnboardingPage() {
               Tell us more about you
             </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  I am a...
-                </label>
-                <select
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                  disabled={isSaving}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
-                >
-                  <option value="student">Student</option>
-                  <option value="teacher">Teacher</option>
-                  <option value="parent">Parent</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Key Stage
-                </label>
-                <select
-                  value={keyStage}
-                  onChange={(e) => setKeyStage(e.target.value)}
-                  disabled={isSaving}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
-                >
-                  <option value="ks1">Key Stage 1 (Years 1-2)</option>
-                  <option value="ks2">Key Stage 2 (Years 3-6)</option>
-                  <option value="ks3">Key Stage 3 (Years 7-9)</option>
-                  <option value="ks4">Key Stage 4 (Years 10-11)</option>
-                </select>
-              </div>
+            <div className="max-w-sm">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Key Stage
+              </label>
+              <select
+                value={keyStage}
+                onChange={(e) => setKeyStage(e.target.value)}
+                disabled={isSaving}
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
+              >
+                <option value="ks1">Key Stage 1 (Years 1-2)</option>
+                <option value="ks2">Key Stage 2 (Years 3-6)</option>
+                <option value="ks3">Key Stage 3 (Years 7-9)</option>
+                <option value="ks4">Key Stage 4 (Years 10-11)</option>
+              </select>
             </div>
           </div>
 
