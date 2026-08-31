@@ -20,7 +20,7 @@ type GameStatus = 'picking' | 'playing' | 'won' | 'lost';
 type AnswerPhase = 'idle' | 'locked' | 'revealed';
 
 const AUTO_RESTART_SECONDS = 4;
-const LOCK_IN_DELAY_MS = 1600;
+const LOCK_IN_DELAY_MS = 2200;
 const REVEAL_HOLD_MS = 1300;
 
 function BackToGamesButton({ onClick }: { onClick?: () => void }) {
@@ -178,7 +178,7 @@ export function MillionaireView() {
     if (pendingIndex === null || !sessionId) return;
     setAnswerPhase('locked');
     sound.play('lockIn');
-    sound.startLoop('tick');
+    sound.playAmbient('tension');
 
     try {
       const [result] = await Promise.all([
@@ -188,7 +188,7 @@ export function MillionaireView() {
         }),
       ]);
 
-      sound.stopLoop();
+      sound.stopAmbient();
       setLastResult(result);
       setScore(result.score);
       setAnswerPhase('revealed');
@@ -216,7 +216,7 @@ export function MillionaireView() {
       setCurrentQuestion(result.nextQuestion ?? null);
       resetRoundState();
     } catch {
-      sound.stopLoop();
+      sound.stopAmbient();
       setErrorMessage('Could not submit your answer. Please try again.');
       resetRoundState();
     }
