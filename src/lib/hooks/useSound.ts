@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useRef } from 'react';
 
 // CC0 (public domain) SFX from Kenney's "Interface Sounds" pack (kenney.nl), converted to MP3
-// for Safari compatibility. Background music is a CC0 loop by opengameart.org user "syncopika"
-// (opengameart.org/content/simple-menubackground-music-loop), also converted to MP3.
+// for Safari compatibility. Background music is "Determined Pursuit (epic orchestra loop)",
+// CC0 (opengameart.org/content/determined-pursuit-epic-orchestra-loop), also converted to MP3.
 const SOUND_FILES = {
   select: '/sounds/millionaire/select.mp3',
   lockIn: '/sounds/millionaire/lock-in.mp3',
