@@ -180,6 +180,7 @@ export function MillionaireView() {
     if (pendingIndex === null || !sessionId) return;
     setAnswerPhase('locked');
     sound.play('lockIn');
+    sound.stopMusic();
 
     try {
       const [result] = await Promise.all([
@@ -217,9 +218,11 @@ export function MillionaireView() {
       setCurrentStep(result.currentStep ?? currentStep + 1);
       setCurrentQuestion(result.nextQuestion ?? null);
       resetRoundState();
+      sound.playMusic();
     } catch {
       setErrorMessage('Could not submit your answer. Please try again.');
       resetRoundState();
+      sound.playMusic();
     }
   };
 
