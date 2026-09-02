@@ -10,6 +10,7 @@ const SOUND_FILES = {
   lockIn: '/sounds/millionaire/lock-in.mp3',
   correct: '/sounds/millionaire/correct.mp3',
   wrong: '/sounds/millionaire/wrong.mp3',
+  fail: '/sounds/millionaire/fail.mp3',
   win: '/sounds/millionaire/win.mp3',
   navClick: '/sounds/millionaire/nav-click.mp3',
 } as const;

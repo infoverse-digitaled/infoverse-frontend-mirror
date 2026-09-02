@@ -200,6 +200,8 @@ export function MillionaireView() {
       });
 
       if (!result.isCorrect) {
+        sound.stopMusic();
+        sound.play('fail');
         setStatus('lost');
         return;
       }
@@ -403,7 +405,7 @@ export function MillionaireView() {
                 )}
 
                 {answerPhase === 'locked' && (
-                  <div className="text-[var(--accent-purple)] text-base sm:text-lg text-center font-bold italic">
+                  <div className="text-white text-base sm:text-lg text-center font-bold italic">
                     Locking in your final answer&hellip;
                   </div>
                 )}
