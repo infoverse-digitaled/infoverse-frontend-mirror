@@ -2,9 +2,10 @@
 
 import { useCallback, useEffect, useRef } from 'react';
 
-// CC0 (public domain) SFX from Kenney's "Interface Sounds" pack (kenney.nl), converted to MP3
-// for Safari compatibility. Background music is "Determined Pursuit (epic orchestra loop)",
-// CC0 (opengameart.org/content/determined-pursuit-epic-orchestra-loop), also converted to MP3.
+// Most SFX are CC0 (public domain) from Kenney's "Interface Sounds" pack (kenney.nl). Background
+// music is "Determined Pursuit (epic orchestra loop)", CC0 (opengameart.org/content/determined-
+// pursuit-epic-orchestra-loop). The fail stinger is a trimmed excerpt of "Game Over" by Kistol,
+// CC0 (opengameart.org/content/game-over). All converted to MP3 for Safari compatibility.
 const SOUND_FILES = {
   select: '/sounds/millionaire/select.mp3',
   lockIn: '/sounds/millionaire/lock-in.mp3',
