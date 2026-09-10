@@ -19,7 +19,7 @@ import type {
 type GameStatus = 'picking' | 'playing' | 'won' | 'lost';
 type AnswerPhase = 'idle' | 'locked' | 'revealed';
 
-const AUTO_RESTART_SECONDS = 4;
+const AUTO_RESTART_SECONDS = 10;
 const LOCK_IN_DELAY_MS = 1600;
 const REVEAL_HOLD_MS = 1300;
 
