@@ -19,7 +19,7 @@ import type {
 type GameStatus = 'picking' | 'playing' | 'won' | 'lost';
 type AnswerPhase = 'idle' | 'locked' | 'revealed';
 
-const AUTO_RESTART_SECONDS = 4;
+const AUTO_RESTART_SECONDS = 10;
 const LOCK_IN_DELAY_MS = 1600;
 const REVEAL_HOLD_MS = 1300;
 
@@ -143,6 +143,7 @@ export function MillionaireView() {
   };
 
   const handleStart = async (keyStage: KeyStage, difficulty: Difficulty) => {
+    sound.playMusic();
     setErrorMessage(null);
     try {
       const result = await startGame(keyStage, difficulty);
@@ -162,6 +163,7 @@ export function MillionaireView() {
 
   const handleChangeLevel = () => {
     sound.play('navClick');
+    sound.stopMusic();
     setStatus('picking');
     setSessionId(null);
     setCurrentQuestion(null);
@@ -178,6 +180,7 @@ export function MillionaireView() {
     if (pendingIndex === null || !sessionId) return;
     setAnswerPhase('locked');
     sound.play('lockIn');
+    sound.stopMusic();
 
     try {
       const [result] = await Promise.all([
@@ -198,6 +201,8 @@ export function MillionaireView() {
       });
 
       if (!result.isCorrect) {
+        sound.stopMusic();
+        sound.play('fail');
         setStatus('lost');
         return;
       }
@@ -213,9 +218,11 @@ export function MillionaireView() {
       setCurrentStep(result.currentStep ?? currentStep + 1);
       setCurrentQuestion(result.nextQuestion ?? null);
       resetRoundState();
+      sound.playMusic();
     } catch {
       setErrorMessage('Could not submit your answer. Please try again.');
       resetRoundState();
+      sound.playMusic();
     }
   };
 
@@ -224,7 +231,7 @@ export function MillionaireView() {
       <div className="relative rounded-2xl overflow-hidden bg-[var(--background-dark)]">
         <GameBackdrop />
         <div className="relative z-10 px-4 sm:px-6 pt-3 sm:pt-4 flex items-center justify-between">
-          <BackToGamesButton onClick={() => sound.play('navClick')} />
+          <BackToGamesButton onClick={() => { sound.play('navClick'); sound.stopMusic(); }} />
           <MuteButton muted={isMuted} onToggle={handleToggleMuted} />
         </div>
         <div className="relative z-10">
@@ -252,7 +259,7 @@ export function MillionaireView() {
       <div className="relative z-10 flex flex-col lg:flex-row max-w-6xl mx-auto">
         <div className="flex-1 min-w-0 flex flex-col p-4 sm:p-6">
           <div className="flex items-center justify-between mb-3 sm:mb-4">
-            <BackToGamesButton onClick={() => sound.play('navClick')} />
+            <BackToGamesButton onClick={() => { sound.play('navClick'); sound.stopMusic(); }} />
             <div className="flex items-center gap-3">
               {!hasLost && !isGameWon && (
                 <div className="bg-white/5 border border-green-400/40 text-green-400 font-bold px-3 py-1.5 rounded-lg text-sm">
@@ -401,7 +408,7 @@ export function MillionaireView() {
                 )}
 
                 {answerPhase === 'locked' && (
-                  <div className="text-[var(--accent-purple)] text-base sm:text-lg text-center font-bold italic">
+                  <div className="text-white text-base sm:text-lg text-center font-bold italic">
                     Locking in your final answer&hellip;
                   </div>
                 )}
